@@ -258,13 +258,7 @@ function CreateBusinessProfile({ onSuccess, hasInvestorProfile }) {
                     <Grid container spacing={3} sx={{ ml: 2 }}>
                         <Grid item xs={12} sm={11.4}>
                             <Grid container spacing={2}>
-                                <Grid item xs={4}>
-                                        <label>Startup Code {RequiredAsterisk}</label>
-                                        <TextField fullWidth  required variant="outlined" disabled
-                                            sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }} />
-                                    </Grid>
-
-                                <Grid item xs={8}>
+                                <Grid item xs={12}>
                                     <label>Company Name {RequiredAsterisk}</label>
                                     <TextField fullWidth  required variant="outlined" value={companyName}
                                         onChange={(e) => setCompanyName(e.target.value)}

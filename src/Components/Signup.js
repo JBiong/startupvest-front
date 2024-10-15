@@ -186,7 +186,7 @@ function Signup() {
                                         {roleOptions.map((option) => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.label}
-                                            </MenuItem>
+                                            </MenuItem> 
                                         ))}
                                     </Select>
                                 </FormControl>

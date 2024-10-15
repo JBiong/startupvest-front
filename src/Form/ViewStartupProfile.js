@@ -29,6 +29,7 @@ function ViewStartupProfile({ profile }) {
     const [companyName, setCompanyName] = useState(profile ? profile.companyName : '');
     const [companyDescription, setCompanyDescription] = useState(profile ? profile.companyDescription : '');
     const [streetAddress, setStreetAddress] = useState(profile ? profile.streetAddress : '');
+    const [startupCode, setStartupCode] = useState(profile ? profile.startupCode : '');
     const [country, setCountry] = useState(profile ? profile.country : '');
     const [city, setCity] = useState(profile ? profile.city : '');
     const [state, setState] = useState(profile ? profile.state : '');
@@ -125,6 +126,7 @@ function ViewStartupProfile({ profile }) {
                     twitter: twitter,
                     instagram: instagram,
                     linkedIn: linkedIn,
+                    startupCode: startupCode,
                     companyName: companyName,
                     companyDescription: companyDescription,
                     foundedDate: `${foundedMonth} ${foundedDay}, ${foundedYear}`,
@@ -234,7 +236,12 @@ function ViewStartupProfile({ profile }) {
             <Grid container spacing={3} sx={{ ml: 2 }}>
                 <Grid item xs={12} sm={11.4}>
                     <Grid container spacing={2}>
-                        <Grid item xs={12}>
+                    <Grid item xs={4}>
+                                        <label>Startup Code </label>
+                                        <TextField fullWidth  required variant="outlined" disabled value={startupCode}
+                                            sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }} />
+                            </Grid>
+                        <Grid item xs={8}>
                             <label>Company Name {RequiredAsterisk}</label>
                             <TextField fullWidth variant="outlined" value={companyName}
                                 onChange={(e) => setCompanyName(e.target.value)} disabled={!isEditable}
