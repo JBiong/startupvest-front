@@ -18,7 +18,7 @@ function ViewInvestorProfile({ profile }) {
   const [contactInformation, setContactInformation] = useState(profile ? profile.contactInformation : '');
   const [gender, setGender] = useState(profile ? profile.gender : '');
   const [biography, setBiography] = useState(profile ? profile.biography : '');
-  const [streetAddress, setStreetAddress] = useState(profile ? profile.streetAddress : '');
+  const [streetAddress, setStreetAddress] = useState(profile ? profile.locationName : '');
   const [country, setCountry] = useState(profile ? profile.country : '');
   const [city, setCity] = useState(profile ? profile.city : '');
   const [state, setState] = useState(profile ? profile.state : '');
@@ -309,14 +309,14 @@ function ViewInvestorProfile({ profile }) {
                     <Grid container spacing={3} sx={{ ml: 2 }}>
                         <Grid item xs={12} sm={11.4}>
                             <Grid container spacing={2}>
-                              <Grid item xs={8}>
-                                <label>Street Address {RequiredAsterisk}</label>
+                              <Grid item xs={12}>
+                                <label>Address {RequiredAsterisk}</label>
                                 <TextField 
                                   fullWidth 
                                   variant="outlined" 
                                   value={streetAddress} 
                                   onChange={(e) => setStreetAddress(e.target.value)} 
-                                  disabled={!isEditable} 
+                                  disabled 
                                   sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
                                   error={!!errors.streetAddress}
                                 />
@@ -325,7 +325,26 @@ function ViewInvestorProfile({ profile }) {
                                 )}
                               </Grid>
 
-                              <Grid item xs={4}>
+                              <Grid item xs={4} sm={11.4}>
+                    <Button
+                      variant="contained"
+                      sx={{
+                        width: 150,
+                        background: "#336FB0",
+                        "&:hover": {
+                          boxShadow: "0 0 10px rgba(0,0,0,0.5)",
+                          backgroundColor: "#336FB0",
+                        },
+                      }}
+                      onClick={() =>
+                        (window.location.href = `https://startupsphere.mugnavo.com/investor/${profile.id}`)
+                      }
+                    >
+                      Set Location
+                    </Button>
+                  </Grid>
+
+                              <Grid item xs={8}>
                                 <label>Country {RequiredAsterisk}</label>
                                 <Autocomplete
                                   options={countries}
@@ -371,37 +390,7 @@ function ViewInvestorProfile({ profile }) {
                                 )}
                               </Grid>
 
-                              <Grid item xs={4}>
-                                <label>City {RequiredAsterisk}</label>
-                                <TextField 
-                                  fullWidth 
-                                  variant="outlined" 
-                                  value={city} 
-                                  onChange={(e) => setCity(e.target.value)} 
-                                  disabled={!isEditable} 
-                                  sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
-                                  error={!!errors.city}
-                                />
-                                {errors.city && (
-                                  <FormHelperText error>{errors.city}</FormHelperText>
-                                )}
-                              </Grid>
-
-                              <Grid item xs={4}>
-                                <label>Province/State {RequiredAsterisk}</label>
-                                <TextField 
-                                  fullWidth 
-                                  variant="outlined" 
-                                  value={state} 
-                                  onChange={(e) => setState(e.target.value)} 
-                                  disabled={!isEditable} 
-                                  sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
-                                  error={!!errors.state}
-                                />
-                                {errors.state && (
-                                  <FormHelperText error>{errors.state}</FormHelperText>
-                                )}
-                              </Grid>
+                              
 
                               <Grid item xs={4}>
                                 <label>Postal/Zip Code {RequiredAsterisk}</label>
