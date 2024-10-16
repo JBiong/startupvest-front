@@ -20,7 +20,7 @@ function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false); 
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
-  const [selected, setSelected] = useState('');
+  const [selected, setSelected] = useState('Startup Vest');
   
   const handleButtonClick = (value) => {
     setSelected(value);
@@ -61,10 +61,25 @@ function Login() {
             localStorage.setItem('userId', response.data.userId);
             localStorage.setItem('role', response.data.role); 
 
-            if (response.data.role === 'admin') {
-                navigate('/admindashboard');
+            // pass auth to other systems
+            window.open(`https://startupsphere.mugnavo.com/auth?token=${response.data.jwt}`, '_blank');
+            // TODO: also for finease
+
+            if(selected === 'Finease') {
+              setTimeout(() => {
+                window.location.href = "https://finease-test.vercel.app"
+              }, 2000);
+            } else if(selected === 'StartupSphere') {
+              setTimeout(() => {
+                window.location.href = "https://startupsphere.mugnavo.com"
+              }, 2000);
             } else {
-                navigate('/asCompanyOwnerOverview');
+              // startupvest, no redirect to other systems
+              if (response.data.role === 'admin') {
+                navigate('/admindashboard');
+              } else {
+                  navigate('/asCompanyOwnerOverview');
+              }
             }
         } else {
             throw new Error('Invalid login response');
@@ -133,9 +148,9 @@ function Login() {
                     <Typography sx={{ fontSize: '13px' }}>Finease</Typography>
                   </Button>
 
-                  <Button onClick={() => handleButtonClick('Startup Sphere')}
-                    variant={selected === 'Startup Sphere' ? 'contained' : 'outlined'} sx={{ borderRadius: 4, textTransform: 'none'  }}>
-                    <Typography sx={{ fontSize: '13px' }}>Startup Sphere</Typography>
+                  <Button onClick={() => handleButtonClick('StartupSphere')}
+                    variant={selected === 'StartupSphere' ? 'contained' : 'outlined'} sx={{ borderRadius: 4, textTransform: 'none'  }}>
+                    <Typography sx={{ fontSize: '13px' }}>StartupSphere</Typography>
                   </Button>
                 </ButtonGroup>
               </FormControl>
