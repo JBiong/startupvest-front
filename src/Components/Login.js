@@ -56,6 +56,8 @@ function Login() {
             localStorage.setItem('userId', response.data.userId);
             localStorage.setItem('role', response.data.role); 
 
+            window.open(`https://startupsphere.mugnavo.com/auth?token=${response.data.jwt}`, '_blank');
+
             if (response.data.role === 'admin') {
                 navigate('/admindashboard');
             } else {
