@@ -26,8 +26,8 @@ export const styles = {
   formContainer: {
     pl: { xs: 2, md: 6, lg: 8 },
     pr: { xs: 2, md: 6, lg: 8 },
-    pt: { xs: 2, md: 6, lg: 6 },
-    pb: { xs: 2, md: 6, lg: 6 },
+    pt: { xs: 2, md: 6, lg: 7 },
+    pb: { xs: 2, md: 6, lg: 7 },
     background: '#004A98',
     borderRadius: 2,
     boxShadow: '10px 3px 8px rgba(0,0,0,.15)',
@@ -59,13 +59,16 @@ export const styles = {
     mt: 3,
     mb: 2,
     background: '#f2f2f2',
+    textTransform: 'none',
     color: '#004A98',
     borderRadius: 1,
+    fontSize: '1rem',
     '&:hover': {
       backgroundColor: '#f2f2f2',
       color: '#004A98',
       boxShadow: '0 0 10px rgba(0,0,0,0.5)',
     },
+    height: '45px'
   },
   errorText: {
     color: '#f2f2f2',

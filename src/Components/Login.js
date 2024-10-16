@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Container, Grid, Typography, TextField, Button, Link, Paper, IconButton, InputAdornment } from '@mui/material';
+import { Container, Grid, Typography, TextField, Button, Link, Paper, IconButton, InputAdornment, FormControl, ButtonGroup } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import LoginStyles from '../styles/Login';
@@ -20,6 +20,11 @@ function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false); 
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
+  const [selected, setSelected] = useState('');
+  
+  const handleButtonClick = (value) => {
+    setSelected(value);
+    };
 
   const handleOpenForgotPassword = () => {
     setForgotPasswordOpen(true);
@@ -113,15 +118,31 @@ function Login() {
 
         {/* LOGIN FORM */}
         <Grid item xs={12} sm={5} sx={LoginStyles.formContainer}>
-          <img src="images/logo.png" alt="Logo" style={LoginStyles.logoImage}/>
           <Paper elevation={3} sx={LoginStyles.formPaper}>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column',}}>
               <Typography variant="h5" sx={LoginStyles.formHeading}>Sign In</Typography>
-              {error && ( <Typography variant="body2" color="error" sx={{ textAlign: 'center' }}>{error}
-              </Typography>
-              )}
 
-              <Typography sx={{ color: '#004A98', mb: -1 }}>Email</Typography>
+              {/* Buttons for Application */}
+              <FormControl component="fieldset" sx={{ mb: 2 }}>
+                <ButtonGroup variant="contained" aria-label="application button group" sx={{ borderRadius: 4}}>
+                  <Button onClick={() => handleButtonClick('Startup Vest')}
+                    variant={selected === 'Startup Vest' ? 'contained' : 'outlined'} sx={{ borderRadius: 4, textTransform: 'none'  }}>
+                    <Typography sx={{ fontSize: '13px' }}>Startup Vest</Typography>
+                  </Button>
+
+                  <Button onClick={() => handleButtonClick('Finease')}
+                    variant={selected === 'Finease' ? 'contained' : 'outlined'} sx={{ textTransform: 'none' }}>
+                    <Typography sx={{ fontSize: '13px' }}>Finease</Typography>
+                  </Button>
+
+                  <Button onClick={() => handleButtonClick('Startup Sphere')}
+                    variant={selected === 'Startup Sphere' ? 'contained' : 'outlined'} sx={{ borderRadius: 4, textTransform: 'none'  }}>
+                    <Typography sx={{ fontSize: '13px' }}>Startup Sphere</Typography>
+                  </Button>
+                </ButtonGroup>
+              </FormControl>
+
+              <Typography variant='body2' sx={{ color: '#004A98', mb: -1 }}>Email</Typography>
               <TextField type="text" placeholder="johndoe@gmail.com" required value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -130,7 +151,7 @@ function Login() {
                 }}
                 onBlur={isEmailRegistered} fullWidth margin="normal" sx={LoginStyles.formInput}/>
 
-              <Typography sx={{ color: '#004A98', mt: 1.5, mb: 1 }}>Password</Typography>
+              <Typography variant='body2' sx={{ color: '#004A98', mt: 1.5, mb: 1 }}>Password</Typography>
               <TextField type={showPassword ? 'text' : 'password'}
                 placeholder="Example123" required value={password}
                 onChange={(e) => {
@@ -152,10 +173,8 @@ function Login() {
                   ),
                 }}/>
 
-              <Typography variant="body2" sx={LoginStyles.forgotPasswordText} onClick={handleOpenForgotPassword}>
-                Forgot password?
-              </Typography>
-
+              <Typography variant="body2" sx={LoginStyles.forgotPasswordText} onClick={handleOpenForgotPassword}>Forgot password?</Typography>
+              {error && ( <Typography variant="body2" color="error">{error}</Typography>)}
               <Button type="submit" variant="contained" color="primary" sx={LoginStyles.formSubmitButton}>Sign In</Button>
 
               <div style={{ marginTop: '16px' }}>

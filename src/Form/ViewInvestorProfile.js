@@ -288,7 +288,7 @@ function ViewInvestorProfile({ profile }) {
                                   fullWidth 
                                   variant="outlined" 
                                   multiline 
-                                  rows={5} 
+                                  rows={6} 
                                   value={biography} 
                                   onChange={(e) => setBiography(e.target.value)} 
                                   disabled={!isEditable}
