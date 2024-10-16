@@ -4,7 +4,7 @@ const LoginStyles = {
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: '100vh',
-    paddingX: { xs: 2, md: 4 },
+    paddingX: { xs: 2, md: 2 },
     transformOrigin: 'center',
   },
   leftSideGrid: {
@@ -50,7 +50,7 @@ const LoginStyles = {
   formPaper: {
     padding: { xs: '30px', md: '50px', lg: '55px' },
     position: 'relative',
-    width: { xs: '90%', md: '70%', lg: '60%' },
+    width: { xs: '90%', md: '70%', lg: '62.8%' },
     maxWidth: '500px',
   },
   formHeading: {
@@ -73,6 +73,7 @@ const LoginStyles = {
     marginTop: 3,
     width: '100%',
     background: '#004A98',
+    textTransform: 'none',
     fontSize: { xs: '1rem', md: '1rem' },
     '&:hover': {
       boxShadow: '0 0 10px rgba(0,0,0,0.5)',

@@ -256,7 +256,7 @@ function ViewStartupProfile({ profile }) {
                             <label>Company Description {RequiredAsterisk}</label>
                             <TextField fullWidth variant="outlined" value={companyDescription}
                                 onChange={(e) => setCompanyDescription(e.target.value)} disabled={!isEditable} 
-                                multiline rows={5}
+                                multiline rows={6}
                                 error={!!errors.companyDescription}/>
                                 {errors.companyDescription && (
                                 <FormHelperText error>{errors.companyDescription}</FormHelperText>
