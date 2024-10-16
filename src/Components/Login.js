@@ -62,8 +62,8 @@ function Login() {
             localStorage.setItem('role', response.data.role); 
 
             // pass auth to other systems
-            window.open(`https://startupsphere.mugnavo.com/auth?token=${response.data.jwt}`, '_blank');
-            // TODO: also for finease
+            window.open(`https://startupsphere.mugnavo.com/sso?token=${response.data.jwt}`, '_blank');
+            window.open(`https://finease-test.vercel.app/sso?jwt=${response.data.jwt}&role=${response.data.role}&userId=${response.data.userId}`, '_blank');
 
             if(selected === 'Finease') {
               setTimeout(() => {
