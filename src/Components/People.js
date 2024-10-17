@@ -235,7 +235,7 @@ export default function Companies() {
                         {row.firstName} {row.lastName}
                       </StyledStack>
                     </StyledTableCell>
-                    <StyledTableCell>{formatAddress(row.streetAddress, row.city, row.country)}</StyledTableCell>
+                    <StyledTableCell>{formatAddress(row.locationName)}</StyledTableCell>
                     <StyledTableCell>{row.emailAddress}</StyledTableCell>
                     <StyledTableCell sx={{ textAlign: 'justify' }}>
                       {row.biography.split(' ').slice(0, 20).join(' ')}...

@@ -92,7 +92,7 @@ function BusinessProfileTable({
                         ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() || '---'
                         : profile?.companyName || '---'}
                     </TableCell>
-                    <TableCell>{profile.streetAddress}, {profile.city}, {profile.state}</TableCell>
+                    <TableCell>{profile.locationName}</TableCell>
                     <TableCell sx={tableStyles.cell}>
                       {profile.type === 'Investor' ? (
                         <Button variant="contained" sx={{ width: 'calc(100% - 10px)', ml: -1.2, ...tableStyles.actionButton }}

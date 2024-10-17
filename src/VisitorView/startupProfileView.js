@@ -210,7 +210,7 @@ function StartUpView() {
                             <Skeleton width="60%" />
                           ) : (
                             <Typography variant="body1">
-                              {streetAddress && <>{streetAddress}{(city || state) ? ", " : ""}</>}
+                              {startup.location_name && <>{startup.location_name}{(city || state) ? ", " : ""}</>}
                               {city && <>{city}{state ? ", " : ""}</>}
                               {state}
                               {!streetAddress && !city && !state && <span>No address available</span>}
