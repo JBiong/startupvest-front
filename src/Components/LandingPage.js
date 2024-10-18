@@ -51,9 +51,9 @@ const LandingPage = () => {
         {/* Logo */}
         <Grid item xs={6} md={4} lg={3}>
           <Box component="img"
-            src="/images/logoStartUp.png"
+            src="/images/logoV1.png"
             alt="Startup Vest Logo"
-            sx={{ width: '70%', height: 'auto' }} />
+            sx={{ width: '12%', height: 'auto' }} />
         </Grid>
 
         {/* Buttons */}

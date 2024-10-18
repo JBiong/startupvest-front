@@ -31,10 +31,11 @@ function BusinessProfileTable({
         <Table> 
           <TableHead sx={tableStyles.head}>
             <TableRow>
+              <TableCell sx={{ ...tableStyles.cell, width: '5%', pl: 5 }}><Typography sx={tableStyles.typography}>Startup Code</Typography></TableCell>
               <TableCell sx={{ width: '10%', pl: 8 }}><Typography sx={tableStyles.typography}>Startup Name</Typography></TableCell>
               <TableCell sx={{ ...tableStyles.cell, width: '10%'}}><Typography sx={tableStyles.typography}>Industry</Typography></TableCell>
-              <TableCell sx={{ width: '20%' }}><Typography sx={tableStyles.typography}>Location</Typography></TableCell>
-              <TableCell sx={{...tableStyles.cell, width: '12%' }}><Typography sx={tableStyles.typography}>Action</Typography></TableCell>
+              <TableCell sx={{ width: '15%' }}><Typography sx={tableStyles.typography}>Location</Typography></TableCell>
+              <TableCell sx={{ ...tableStyles.cell, width: '10%' }}><Typography sx={tableStyles.typography}>Action</Typography></TableCell>
             </TableRow>
           </TableHead>
 
@@ -54,16 +55,10 @@ function BusinessProfileTable({
                   <TableRow
                     key={`${profile.type}-${profile.id}`}
                     sx={{ backgroundColor: 'white', }}>
+                    <TableCell sx={{ ...tableStyles.cell, pl: 5 }}>{profile.industry}</TableCell>
                     <TableCell sx={{ ...tableStyles.cell, display: 'flex', alignItems: 'center', pl: 8}}>
-                      <Avatar 
-                        src={profile.photo} 
-                        alt={profile.companyName}
-                        sx={{ 
-                          border: '2px rgba(0, 116, 144, 1) solid', 
-                          borderRadius: 1, 
-                          mr: 2, 
-                          width: 40, 
-                          height: 40 
+                      <Avatar src={profile.photo} alt={profile.companyName}
+                        sx={{  border: '2px rgba(0, 116, 144, 1) solid',  borderRadius: 1,  mr: 2,  width: 40,  height: 40 
                         }} 
                         variant="square">
                         {profile.companyName?.charAt(0) || ''}
@@ -71,17 +66,23 @@ function BusinessProfileTable({
                       {profile?.companyName || '---'}
                     </TableCell>
                     <TableCell sx={tableStyles.cell}>{profile.industry}</TableCell>
-                    <TableCell>{profile.locationName}</TableCell>
+                    <TableCell>
+                      <span>
+                        {profile.locationName || (
+                          <>
+                            No location selected at the moment.{' '}
+                            <span style={{ color: '#336FB0', textDecoration: 'underline', cursor: 'pointer' }}
+                              onClick={() => window.location.href = `https://startupsphere.mugnavo.com/startup/${profile.id}`}>
+                              Set Location
+                            </span>
+                          </>
+                        )}
+                      </span>
+                    </TableCell> 
                     <TableCell sx={tableStyles.cell}>
-                      <Box sx={{ display: 'flex', width: '100%' }}>
-                        <Button variant="contained" sx={{ width: 'calc(50% - 5px)', ...tableStyles.actionButton }}
-                          onClick={() => handleOpenStartUp(profile)}>
-                          View
-                        </Button>
-                        <Button variant="text" sx={tableStyles.deleteButton}
-                          onClick={() => handleOpenDeleteDialog(profile)}>
-                          Delete
-                        </Button>
+                      <Box>
+                        <Button variant="contained" sx={tableStyles.actionButton} onClick={() => handleOpenStartUp(profile)}>View</Button>
+                        <Button variant="text" sx={tableStyles.deleteButton} onClick={() => handleOpenDeleteDialog(profile)}>Delete</Button>
                       </Box>
                     </TableCell>
                   </TableRow>

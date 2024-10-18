@@ -157,7 +157,7 @@ function Profile() {
         </Typography>
 
         {userData.role === 'Investor' && (
-        <Box sx={{ backgroundColor: '#FFEB3B', padding: 2, borderRadius: 2, marginTop: 2, ml: 8, mr: 5 }}>
+        <Box sx={{ backgroundColor: '#FFEB3B', padding: 2, borderRadius: 2, marginTop: 2, ml: 8, mr: 5, mb: -1 }}>
           <Typography variant="body1" sx={{ color: '#1E1E1E', fontWeight: 'bold' }}>
             ⚠️ To enhance your credibility and legitimacy, please ensure that your profile is fully completed.
           </Typography>
@@ -172,38 +172,19 @@ function Profile() {
           {loading ? (
             <Grid container spacing={2} sx={{ ml: 7 }}>
               <Grid item xs={12} sm={2.5}>
-                <Skeleton variant="circular" width={200} height={200} sx={{ mt: 4 }} />
-                <Skeleton variant="text" width="30%" sx={{ mt: 1, ml: 6.5 }} />
+                <Skeleton variant="circular" width={220} height={220} sx={{ mt: 2, mt: 2, ml: 5, }} />
+                <Skeleton variant="text" width="30%" sx={{ mt: 1, ml: 12, }} />
               </Grid>
 
               <Grid item xs={12} sm={7.8}>
                 <Grid container spacing={2}>
-                  <Grid item xs={2}>
-                    <Skeleton variant="text" width="100%" height={45} />
-                  </Grid>
-
-                  <Grid item xs={4}>
-                    <Skeleton variant="text" width="100%" height={45} />
-                  </Grid>
-
-                  <Grid item xs={6}>
-                    <Skeleton variant="text" width="100%" height={45} />
-                  </Grid>
-
-                  <Grid item xs={6}>
-                    <Skeleton variant="text" width="100%" height={45} />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Skeleton variant="text" width="100%" height={45} />
-                  </Grid>
-
-                  <Grid item xs={6}>
-                    <Skeleton variant="text" width="100%" height={45} />
-                  </Grid>
-
-                  <Grid item xs={6}>
-                    <Skeleton variant="text" width="100%" height={45} />
-                  </Grid>
+                  <Grid item xs={2}><Skeleton variant="text" width="100%" height={45} /></Grid>
+                  <Grid item xs={4}><Skeleton variant="text" width="100%" height={45} /></Grid>
+                  <Grid item xs={6}><Skeleton variant="text" width="100%" height={45} /></Grid>
+                  <Grid item xs={6}><Skeleton variant="text" width="100%" height={45} /></Grid>
+                  <Grid item xs={6}><Skeleton variant="text" width="100%" height={45} /></Grid>
+                  <Grid item xs={6}><Skeleton variant="text" width="100%" height={45} /></Grid>
+                  <Grid item xs={6}><Skeleton variant="text" width="100%" height={45} /></Grid>
                 </Grid>
               </Grid>
             </Grid>
@@ -211,7 +192,7 @@ function Profile() {
             <Grid container sx={{ ml: 7 }}>
               <Grid item xs={12} sm={2.5}>
                 <label htmlFor="avatar-upload">
-                  <Avatar sx={{ width: 200, height: 200, mt: 2, ml: 6, cursor: 'pointer', border: '5px #336FB0 solid' }} src={profilePicUrl} />
+                  <Avatar sx={{ width: 220, height: 220, mt: 2, ml: 5, border: '5px #336FB0 solid', cursor: isEditable ? 'pointer' : 'default' }} src={profilePicUrl}  />
                 </label>
                 <input type="file" accept="image/*" id="avatar-upload" style={{ display: 'none' }}
                   onChange={(event) => {
@@ -260,20 +241,6 @@ function Profile() {
                   </Grid>
 
                   <Grid item xs={6}>
-                    <label>Gender</label>
-                    <Select fullWidth variant="outlined" value={userData.gender}
-                      onChange={(e) => setUserData((prevData) => ({ ...prevData, gender: e.target.value }))} 
-                      disabled={!isEditable}
-                      style={{ height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
-                      {genderOptions.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </Grid>
-
-                  <Grid item xs={6}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                       <label>Password</label>
                       {isEditable ? (
@@ -305,13 +272,26 @@ function Profile() {
                         style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' },
                       }} />
                   </Grid>
+
+                  <Grid item xs={6}>
+                    <label>Gender</label>
+                    <Select fullWidth variant="outlined" value={userData.gender}
+                      onChange={(e) => setUserData((prevData) => ({ ...prevData, gender: e.target.value }))} 
+                      disabled={!isEditable}
+                      style={{ height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.2)' }}>
+                      {genderOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
           )}
 
-          {/* Additional fields for investor role */}
-          {userData.role === 'Investor' && (
+          {/* Additional fields important for investor role to fill up*/}
           <Box sx={{ mt: 3, pl: 8, pr: 20 }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
@@ -337,6 +317,37 @@ function Profile() {
                     }} />
                 )}
               </Grid>
+
+              {userData.role === 'Investor' && (
+                  <Grid item xs={12}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <label>Location</label>
+                      {isEditable ? (
+                        <Typography variant="caption" sx={{ color: '#336FB0', ml: 1, textDecoration: 'underline',cursor: 'pointer', }}
+                          // onClick={() => {
+                          //   const isValidId = profile?.id && typeof profile.id === 'string';
+                          //   if (isValidId) {
+                          //     window.location.href = `https://startupsphere.mugnavo.com/investor/${profile.id}`;
+                          //   } else {
+                          //     console.error('Invalid profile ID');
+                          //   }
+                          // }}
+                           >
+                          Click to Set Your Current Location
+                        </Typography>
+                      ) : (
+                        <Typography variant="caption"sx={{ color: 'gray', ml: 1,}}>Click to Set Your Current Location</Typography>
+                      )}
+                    </Box>
+                    <TextField fullWidth variant="outlined" type="password" disabled
+                      InputProps={{
+                        style: {
+                          height: '45px',
+                          boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+                        },
+                      }}/>
+                  </Grid>
+                  )}
 
               <Grid item xs={12}>
               <Typography variant='h5'>Links</Typography>
@@ -399,7 +410,6 @@ function Profile() {
               </Grid>
             </Grid>
           </Box>
-          )}
 
           <Grid container justifyContent="flex-end" sx={{ mt: 3, pr: 20 }}>
             <Grid item>

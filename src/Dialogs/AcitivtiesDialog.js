@@ -8,7 +8,7 @@ const ActivitiesDialog = ({ open, onClose, activities }) => {
             <DialogTitle>
                 Recent Activities
                 <IconButton  edge="end" color="inherit" onClick={onClose} aria-label="close"
-                    sx={{ position: 'absolute', right: 12, top: 10, color: (theme) => theme.palette.grey[500] }}><CloseIcon />
+                    sx={{ position: 'absolute', right: 12, top: 10, color: '#ED262A'}}><CloseIcon />
                 </IconButton>
             </DialogTitle>
             <DialogContent>

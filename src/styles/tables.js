@@ -26,7 +26,6 @@ export const tableStyles = {
     },
     deleteButton: {
       ml: 1,
-      width: 'calc(50% - 5px)',
       color: '#ED262A',
     },
     acceptButton: {

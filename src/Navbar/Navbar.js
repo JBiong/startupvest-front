@@ -80,8 +80,8 @@ export default function Navbar() {
       <CssBaseline />
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, background: '#004A98' }}>
         <Toolbar>
-          <Avatar sx={{ ml: -3, width: 70, height: 70 }} src='images/logoonly.png' />
-          <Typography variant="h6" noWrap component="div" sx={{ ml: -1 }}>Startup Vest</Typography>
+          <Avatar sx={{ ml: -1, width: 40, height: 40, mr: 1 }} src='images/logoV1.png' />
+          <Typography variant="h6" noWrap component="div">Startup Vest</Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Avatar sx={{ mr: 1, width: 40, height: 40, border: '2px #F2F2F2 solid' }}>
             {userPhoto ? (
