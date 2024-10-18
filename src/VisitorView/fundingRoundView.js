@@ -6,13 +6,15 @@ import axios from 'axios';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import InvestNowDialog from '../Dialogs/InvestNowDialog';
-import { useProfile } from '../Context/ProfileContext';
+import { useAuth } from '../Context/AuthContext';
 
 import { StyledAvatar, OverviewBox, OverviewTitle, StyledTable, StyledTableHead, StyledTableCell, PaginationBox, InvestorTitle } from '../styles/VisitorView';
 
 const drawerWidth = 240;
 
 function FundingRoundView() {
+  const { role } = useAuth();
+
   const [avatarUrl, setAvatarUrl] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage] = useState(5);
@@ -20,7 +22,6 @@ function FundingRoundView() {
   const [loading, setLoading] = useState(true);
   const location = useLocation();
   const { fundinground } = location.state || {};
-  const { hasInvestorProfile } = useProfile();
 
   useEffect(() => {
     const fetchProfilePicture = async () => {
@@ -106,6 +107,14 @@ function FundingRoundView() {
     return Object.values(combinedInvestors);
   };
 
+  const isFundingRoundClosed = () => {
+    const currentDate = new Date();
+    const closedDate = new Date(fundinground.closedDate);
+    const isClosed = closedDate < currentDate || fundinground.moneyRaised > fundinground.targetFunding;
+
+    return isClosed;
+  };
+
   return (
     <>
       <Navbar />
@@ -132,19 +141,20 @@ function FundingRoundView() {
 
             {loading ? (
               <Skeleton variant="rectangular" width={150} height={40} />
-            ) : hasInvestorProfile ? (
-              <Button variant="outlined" sx={{ width: '150px' }} onClick={handleOpenDialog}>
-                Invest Now
-              </Button>
-            ) : (
-              <Tooltip title="You need an investor profile to invest.">
-                <span>
-                  <Button variant="outlined" sx={{ width: '150px' }} disabled>
-                    Invest Now
-                  </Button>
-                </span>
-              </Tooltip>
-            )}
+            ) : role === 'Investor' ? (
+              isFundingRoundClosed() ? (
+                <Tooltip title="This funding round has been closed." arrow>
+                  <span>
+                    <Button variant="outlined" sx={{ width: '150px' }} disabled>Invest Now</Button>
+                  </span>
+                </Tooltip>
+              ) : (
+                <Button variant="outlined" sx={{ width: '150px' }}
+                  onClick={handleOpenDialog}>
+                  Invest Now
+                </Button>
+              )
+            ) : null}
           </Grid>
         </Grid>
 

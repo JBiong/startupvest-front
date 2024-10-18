@@ -5,7 +5,7 @@ import InvestmentTable from '../Tables/InvestorMyInvestments';
 import InvestorRequest from '../Tables/InvestorMyRequests';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { TopInfoBox, TopInfoText, TopInfoTitle } from '../styles/UserDashboard';
+import { TopInfoBox, TopInfoText, TopInfoTitle } from '../styles/StartupDashboard';
 
 const drawerWidth = 285;
 
@@ -30,7 +30,7 @@ function createData(id, fundingName, startupName, fundingType, moneyRaised, mone
   };
 }
 
-const InvestorOverview = () => {
+const InvestorDashboard = () => {
   const userId = localStorage.getItem('userId');
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(5);
@@ -50,10 +50,6 @@ const InvestorOverview = () => {
 
   const conversionRates = {
     USD: 50.0,
-    EUR: 60.0,
-    GBP: 70.0,
-    JPY: 0.45,
-    KRW: 0.045,
     PHP: 1
   };
 
@@ -289,17 +285,12 @@ const InvestorOverview = () => {
         ) : tabIndex === 0 ? (
           <InvestorRequest onPendingRequestsCountChange={setPendingRequestsCount} />
         ) : (
-          <InvestmentTable 
-            filteredRows={filteredRows}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            handleRowClick={handleRowClick}
-            profilePictures={profilePictures}
-            handleChangePage={handleChangePage} />
+          <InvestmentTable  filteredRows={filteredRows} page={page} rowsPerPage={rowsPerPage} handleRowClick={handleRowClick} 
+            profilePictures={profilePictures} handleChangePage={handleChangePage} />
         )}
       </Box>
     </Box>
   );
 };
 
-export default InvestorOverview;
+export default InvestorDashboard;

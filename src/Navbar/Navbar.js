@@ -1,54 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Box, Drawer, AppBar, List, Typography, CssBaseline, Toolbar, Divider, ListItem, ListItemButton, ListItemIcon, ListItemText, Avatar, IconButton } from '@mui/material';
-import SpaceDashboardIcon from '@mui/icons-material/SpaceDashboard';
 import StoreIcon from '@mui/icons-material/Store';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOnRounded';
 import PeopleIcon from '@mui/icons-material/PeopleRounded';
 import LogoutIcon from '@mui/icons-material/LogoutRounded';
 import HelpIcon from '@mui/icons-material/Help';
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import NavigationIcon from '@mui/icons-material/Navigation';
+import DashboardIcon from '@mui/icons-material/Dashboard';
 
-import UserGuideDialog from '../Dialogs/UserGuideDialog'; 
+import { useAuth } from '../Context/AuthContext';
 
 const drawerWidth = 240;
 
 export default function Navbar() {
-  const [openDashboard, setOpenDashboard] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [activeStep, setActiveStep] = useState(0);
+  const { role } = useAuth();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [userPhoto, setUserPhoto] = useState('');
+  const location = useLocation(); 
 
-  const handleClickOpen = () => {
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setActiveStep(0); 
-  };
-
-  const handleDashboardClick = () => {
-    setOpenDashboard(!openDashboard);
-  };
+  const dashboardPath = role === 'Investor' ? '/investorDashboard' : '/startupDashboard';
 
   const menuItems = [
+    { text: 'Dashboard', icon: <DashboardIcon sx={{ color: '#F2F2F2' }} />, path: dashboardPath },
     { text: 'Companies', icon: <StoreIcon sx={{ color: '#F2F2F2' }} />, path: '/companies' },
     { text: 'Funding Round', icon: <MonetizationOnIcon sx={{ color: '#F2F2F2' }} />, path: '/fundinground' },
     { text: 'People', icon: <PeopleIcon sx={{ color: '#F2F2F2' }} />, path: '/people' },
     { text: 'FAQs', icon: <HelpIcon sx={{ color: '#F2F2F2' }} />, path: '/faqs' },
   ];
-
-  const dashboardSubItems = [
-    { text: 'Startup Owner', path: '/asCompanyOwnerOverview' },
-    { text: 'Investor', path: '/asInvestorOverview' },
-  ];
-
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [userPhoto, setUserPhoto] = useState('');
 
   useEffect(() => {
     fetchUserData();
@@ -78,7 +58,7 @@ export default function Navbar() {
       } catch (picError) {
         if (picError.response && picError.response.status === 404) {
           console.log('Profile picture not found, using default initials.');
-          setUserPhoto(null); // Use initials or a default image instead
+          setUserPhoto(null);
         } else {
           console.error('Error fetching profile picture:', picError);
         }
@@ -92,8 +72,7 @@ export default function Navbar() {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('role');
-    
-    window.location = '/';
+    window.location = '/login';
   };
 
   return (
@@ -102,130 +81,76 @@ export default function Navbar() {
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, background: '#004A98' }}>
         <Toolbar>
           <Avatar sx={{ ml: -3, width: 70, height: 70 }} src='images/logoonly.png' />
-          <Typography variant="h6" noWrap component="div" sx={{ ml: -1 }}>
-            StartUp Vest
-          </Typography>
+          <Typography variant="h6" noWrap component="div" sx={{ ml: -1 }}>Startup Vest</Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Avatar sx={{ mr: 1, width: 40, height: 40, border: '2px #F2F2F2 solid' }}>
             {userPhoto ? (
-              <img
-                src={userPhoto}
-                alt="User"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  objectPosition: 'center'
-                }}
-              />
+              <img src={userPhoto} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
             ) : (
               `${firstName[0]}${lastName[0]}`
             )}
           </Avatar>
-          <Typography variant="h6" noWrap component="div">
-            {lastName}, {firstName}
-          </Typography>
+          <Typography variant="h6" noWrap component="div">{lastName}, {firstName}</Typography>
           <IconButton size="medium" aria-label="show 17 new notifications" color="inherit">
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box', background: '#004A98', color: '#F2F2F2' },
-        }}>
+
+      <Drawer variant="permanent"
+        sx={{ width: drawerWidth, flexShrink: 0,
+          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box', background: '#004A98', color: '#F2F2F2' }, }}>
         <Toolbar />
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
           <Box sx={{ flex: 1, overflow: 'auto' }}>
             <List>
               <ListItem disablePadding>
-                <ListItemButton component={Link} to="/profile">
-                  <Avatar sx={{ mr: 1,  width: 40, height: 40, border: '2px #F2F2F2 solid' }}>
+                <ListItemButton component={Link} to="/profile" sx={{ p: 2 }}>
+                  <Avatar sx={{ mr: 1, width: 40, height: 40, border: '2px #F2F2F2 solid' }}>
                     {userPhoto ? (
-                      <img
-                        src={userPhoto}
-                        alt="User"
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          objectPosition: 'center',
-                        }} />
+                      <img src={userPhoto} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', }} />
                     ) : (
                       `${firstName[0]}${lastName[0]}`
                     )}
                   </Avatar>
-                  <Typography variant="h6" noWrap component="div">
-                    {firstName} {lastName}
-                  </Typography>
+                  <Typography variant="h6" noWrap component="div">{firstName} {lastName}</Typography>
                 </ListItemButton>
               </ListItem>
 
               <Divider />
 
-              <ListItem disablePadding>
-                <ListItemButton onClick={handleDashboardClick}>
-                  <ListItemIcon>
-                    <SpaceDashboardIcon sx={{ color: '#F2F2F2' }} />
-                  </ListItemIcon>
-                  <ListItemText primary="Dashboard" sx={{ p: 1}}/>
-                  {openDashboard ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
-              </ListItem>
+              {menuItems.map((item) => {
+                const isActive = location.pathname === item.path; 
 
-              {openDashboard && (
-                <List component="div" disablePadding>
-                  {dashboardSubItems.map((item) => (
-                    <ListItem key={item.text} disablePadding sx={{ pl: 6.5 }}>
-                      <ListItemButton component={Link} to={item.path}>
-                        <ListItemText primary={item.text} />
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                </List>
-              )}
-
-              {menuItems.map((item) => (
-                <ListItem key={item.text} disablePadding sx={{ pt: 1, pb: 1}}>
-                  <ListItemButton component={Link} to={item.path}>
-                    <ListItemIcon>
+                return (
+                  <ListItem key={item.text} disablePadding>
+                    <ListItemButton component={Link} to={item.path} 
+                      sx={{ pt: 2, pb: 2, backgroundColor: isActive ? '#003B7A' : 'transparent', 
+                        '&:hover': { 
+                          backgroundColor: isActive ? '#003B7A' : 'rgba(255, 255, 255, 0.1)', 
+                        } }}>
+                      <ListItemIcon>
                         {item.icon}
                       </ListItemIcon>
-                    <ListItemText primary={item.text} />
-                  </ListItemButton>
-                </ListItem>
-              ))}
-              <Divider />
-              <ListItem disablePadding>
-                <ListItemButton component={Link} to="/" onClick={handleLogout}>
-                  <ListItemIcon>
-                      <LogoutIcon sx={{ color: '#F2F2F2' }} />
-                    </ListItemIcon>
-                  <ListItemText primary="Logout" />
-                </ListItemButton>
-              </ListItem>
-            </List>
-          </Box>
+                      <ListItemText primary={item.text} />
+                    </ListItemButton>
+                  </ListItem>
+                );
+              })}
 
-          {/* Place the "Show More Info" button at the bottom */}
-          <Box sx={{ p: 1, position: 'relative', bottom: 0}}>
-            <List>
-              <ListItem disablePadding sx={{ background: '#336FB0', borderRadius: 2, color: '#f2f2f2' }}>
-                <ListItemButton onClick={handleClickOpen}>
+              <Divider />
+
+              <ListItem disablePadding>
+                <ListItemButton component={Link} to="/" onClick={handleLogout} sx={{ pt: 2, pb: 2 }}>
                   <ListItemIcon>
-                      <NavigationIcon sx={{ color: '#f2f2f2' }} />
+                    <LogoutIcon sx={{ color: '#F2F2F2' }} />
                   </ListItemIcon>
-                  <ListItemText primary="User Guide" />
+                  <ListItemText primary="Logout" />
                 </ListItemButton>
               </ListItem>
             </List>
           </Box>
         </Box>
       </Drawer>
-
-      <UserGuideDialog open={openDialog} onClose={handleCloseDialog} activeStep={activeStep} setActiveStep={setActiveStep} />
     </Box>
   );
 }

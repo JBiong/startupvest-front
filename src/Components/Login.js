@@ -9,7 +9,10 @@ import LoginStyles from '../styles/Login';
 import Loading from './Loading';
 import ForgotPasswordDialog from '../Dialogs/ForgotPasswordDialog';
 
+import { useAuth } from '../Context/AuthContext';
+
 function Login() {
+  const { setRole } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailExists, setEmailExists] = useState(false);
@@ -60,7 +63,8 @@ function Login() {
             localStorage.setItem('token', response.data.jwt);
             localStorage.setItem('userId', response.data.userId);
             localStorage.setItem('role', response.data.role); 
-
+            setRole(response.data.role);
+            
             // pass auth to other systems
             window.open(`https://startupsphere.mugnavo.com/sso?token=${response.data.jwt}`, '_blank');
             window.open(`https://finease-test.vercel.app/sso?jwt=${response.data.jwt}&role=${response.data.role}&userId=${response.data.userId}`, '_blank');
@@ -77,10 +81,12 @@ function Login() {
               // startupvest, no redirect to other systems
               if (response.data.role === 'admin') {
                 navigate('/admindashboard');
-              } else {
-                  navigate('/asCompanyOwnerOverview');
-              }
+            } else if (response.data.role === 'Investor') {
+                navigate('/investorDashboard');
+            } else {
+                navigate('/startupDashboard');
             }
+        }
         } else {
             throw new Error('Invalid login response');
         }
@@ -136,20 +142,23 @@ function Login() {
               <Typography variant="h5" sx={LoginStyles.formHeading}>Sign In</Typography>
 
               {/* Buttons for Application */}
-              <FormControl component="fieldset" sx={{ mb: 2 }}>
-                <ButtonGroup variant="contained" aria-label="application button group" sx={{ borderRadius: 4}}>
+              <FormControl component="fieldset" sx={{ mb: 2, width: '100%' }}>
+                <ButtonGroup variant="contained" aria-label="application button group" sx={{ borderRadius: 4, width: '100%' }}>
                   <Button onClick={() => handleButtonClick('Startup Vest')}
-                    variant={selected === 'Startup Vest' ? 'contained' : 'outlined'} sx={{ borderRadius: 4, textTransform: 'none'  }}>
+                    variant={selected === 'Startup Vest' ? 'contained' : 'outlined'}
+                    sx={{ borderRadius: 4, textTransform: 'none', flexGrow: 1 }}>
                     <Typography sx={{ fontSize: '13px' }}>Startup Vest</Typography>
                   </Button>
 
                   <Button onClick={() => handleButtonClick('Finease')}
-                    variant={selected === 'Finease' ? 'contained' : 'outlined'} sx={{ textTransform: 'none' }}>
+                    variant={selected === 'Finease' ? 'contained' : 'outlined'}
+                    sx={{ textTransform: 'none', flexGrow: 1 }}>
                     <Typography sx={{ fontSize: '13px' }}>Finease</Typography>
                   </Button>
 
                   <Button onClick={() => handleButtonClick('StartupSphere')}
-                    variant={selected === 'StartupSphere' ? 'contained' : 'outlined'} sx={{ borderRadius: 4, textTransform: 'none'  }}>
+                    variant={selected === 'StartupSphere' ? 'contained' : 'outlined'}
+                    sx={{ borderRadius: 4, textTransform: 'none', flexGrow: 1 }}>
                     <Typography sx={{ fontSize: '13px' }}>StartupSphere</Typography>
                   </Button>
                 </ButtonGroup>

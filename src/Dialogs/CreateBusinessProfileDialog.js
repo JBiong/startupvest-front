@@ -48,7 +48,7 @@ function CreateBusinessProfileDialog({ open, onClose, hasInvestorProfile }) {
 
                     {/* Form content */}
                     <Box sx={{ pb: 5, overflowY: 'auto'}}>
-                        <CreateBusinessProfile onSuccess={onClose} hasInvestorProfile={hasInvestorProfile} />
+                        <CreateBusinessProfile onSuccess={onClose} />
                     </Box>
                 </Box>
             </Box>

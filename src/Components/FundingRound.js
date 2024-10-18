@@ -12,6 +12,11 @@ const drawerWidth = 240;
 
 function createData(id, transactionName, startupName, fundingType, moneyRaised, moneyRaisedCurrency, announcedDate, closedDate, avatar, preMoneyValuation, capTableInvestors, 
   minimumShare, startupId, fundingName, targetFunding ) {
+  const currentDate = new Date();
+  const isClosedDatePassed = new Date(closedDate) < currentDate;
+  const isFundingCompleted = targetFunding !== '---' && moneyRaised !== '---' && Number(moneyRaised) >= Number(targetFunding);
+  const status = (isClosedDatePassed || isFundingCompleted) ? 'Completed' : 'Ongoing';
+    
   return {
     id,
     transactionName,
@@ -27,7 +32,8 @@ function createData(id, transactionName, startupName, fundingType, moneyRaised, 
     minimumShare,
     startupId,
     fundingName,
-    targetFunding: isNaN(targetFunding) ? '---' : targetFunding
+    targetFunding: isNaN(targetFunding) ? '---' : targetFunding,
+    status
   };
 }
 
@@ -60,12 +66,13 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-  { id: 'startupName', numeric: false, disablePadding: false, label: 'StartUp Name', width: '25%' },
+  { id: 'startupName', numeric: false, disablePadding: false, label: 'StartUp Name', width: '15%' },
   { id: 'fundingName', numeric: false, disablePadding: false, label: 'Funding Name', width: '15%' },
   { id: 'fundingType', numeric: false, disablePadding: false, label: 'Funding Type', width: '15%' },
   { id: 'moneyRaised', numeric: true, disablePadding: false, label: 'Money Raised', width: '15%' },
   { id: 'announcedDate', numeric: false, disablePadding: false, label: 'Announced Date', width: '15%' },
-  { id: 'closedDate', numeric: false, disablePadding: true, label: 'Closed Date', width: '15%' },
+  { id: 'closedDate', numeric: false, disablePadding: false, label: 'Closed Date', width: '15%' },
+  { id: 'Status', numeric: false, disablePadding: false, label: 'Status', width: '15%' },
 ];
 
 function EnhancedTableHead(props) {
@@ -132,14 +139,12 @@ export default function FundingRound() {
   const [loading, setLoading] = useState(true); // Loading state
   const navigate = useNavigate();
 
-
   useEffect(() => {
     const fetchFundingRounds = async () => {
       setLoading(true);
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/funding-rounds/all`);
         const fetchedRows = response.data
-          .filter(fundingRound => new Date(fundingRound.closedDate) > new Date())
           .map(fundingRound => createData(
             fundingRound.id,
             fundingRound.transactionName || '---',
@@ -155,7 +160,7 @@ export default function FundingRound() {
             fundingRound.minimumShare || '---',
             fundingRound.startup?.id,
             fundingRound.fundingName || '---',
-            fundingRound.targetFunding || '---'  // Fixed: Accessing targetFunding directly from fundingRound
+            fundingRound.targetFunding || '---' 
           ));
           
         setRows(fetchedRows);
@@ -257,6 +262,7 @@ export default function FundingRound() {
                     <StyledTableCell><Skeleton variant="text" width="30%" /></StyledTableCell>
                     <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
                     <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
+                    <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>                    
                   </TableRow>
                 ))
               ) : (
@@ -275,6 +281,7 @@ export default function FundingRound() {
                     </StyledTableCell>
                     <StyledTableCell>{formatDate(row.announcedDate)}</StyledTableCell>
                     <StyledTableCell>{formatDate(row.closedDate)}</StyledTableCell>
+                    <StyledTableCell>{row.status}</StyledTableCell>
                   </StyledTableRow>
                 ))
               )}

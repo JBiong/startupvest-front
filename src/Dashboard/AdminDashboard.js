@@ -5,7 +5,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import axios from 'axios';
 import UserRegistrationsChart from '../Components/ChartAdmin';
 
-import { TopInfoBox, TopInfoText, TopInfoTitle, } from '../styles/UserDashboard';
+import { TopInfoBox, TopInfoText, TopInfoTitle, } from '../styles/StartupDashboard';
 
 const AdminDashboard = () => {
   const [filter, setFilter] = useState('all');

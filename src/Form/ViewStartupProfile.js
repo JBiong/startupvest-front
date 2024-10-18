@@ -80,7 +80,6 @@ function ViewStartupProfile({ profile }) {
         if (!typeOfCompany.trim()) newErrors.typeOfCompany = emptyFieldError;
         if (!numberOfEmployees.trim()) newErrors.numberOfEmployees = emptyFieldError;
         
-        
         if (!phoneNumber.trim()) 
             newErrors.phoneNumber = emptyFieldError;
         else if (!phoneNumberRegex.test(phoneNumber)) 
@@ -92,12 +91,6 @@ function ViewStartupProfile({ profile }) {
                 newErrors.contactEmail = 'Contact Email is invalid';
         }
 
-        if (!streetAddress.trim()) newErrors.streetAddress = emptyFieldError;
-        if (!country) newErrors.country = emptyFieldError;
-        if (!city.trim()) newErrors.city = emptyFieldError;
-        if (!state.trim()) newErrors.state = emptyFieldError;
-        if (!postalCode.trim()) newErrors.postalCode = emptyFieldError;
-
         if (!industry || industry.trim() === '') {
             newErrors.industry = emptyFieldError;
         }
@@ -105,22 +98,12 @@ function ViewStartupProfile({ profile }) {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
       };
-
-      const handleUpdateAddress = async () => {
-        if (isEditable) {
-            if (!validateFields()) {
-                        return;
-                    }
-                }
-            }
             
     const handleUpdateProfile = async () => {
         if (isEditable) {
             if (!validateFields()) {
                 return;
             }
-
-                    
 
             setIsLoading(true);
     
@@ -223,22 +206,8 @@ function ViewStartupProfile({ profile }) {
 
     return (
       <>
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            width: "100%",
-            overflowX: "hidden",
-            maxWidth: "1000px",
-            background: "#F2F2F2",
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{ color: "#414a4c", fontWeight: "500", pl: 5, pb: 3 }}
-          >
-            Upload Profile
-          </Typography>
+        <Box component="main" sx={{ flexGrow: 1, width: "100%", overflowX: "hidden", maxWidth: "1000px", background: "#F2F2F2", }}>
+          <Typography variant="h6" sx={{ color: "#414a4c", fontWeight: "500", pl: 5, pb: 3 }}>Upload Profile</Typography>
 
           <Grid item xs={12} sm={3}>
             <label htmlFor="avatar-upload" onClick={handleAvatarClick}>
@@ -252,8 +221,7 @@ function ViewStartupProfile({ profile }) {
                   border: "5px #336FB0 solid",
                 }}
                 src={avatar}
-                onClick={handleAvatarClick}
-              />
+                onClick={handleAvatarClick} />
             </label>
 
             <input
@@ -263,23 +231,17 @@ function ViewStartupProfile({ profile }) {
               onChange={handleAvatarChange}
               disabled={!isEditable}
               ref={fileInputRef}
-              style={{ display: "none" }}
-            />
+              style={{ display: "none" }} />
           </Grid>
 
           <Box component="main" sx={{ mr: 5, borderRadius: 2 }}>
-            <Typography
-              variant="h6"
-              sx={{ color: "#414a4c", fontWeight: "500", pl: 5, pt: 3, pb: 3 }}
-            >
-              Overview
-            </Typography>
+            <Typography variant="h6" sx={{ color: "#414a4c", fontWeight: "500", pl: 5, pt: 3, pb: 3 }}>Overview</Typography>
 
             <Grid container spacing={3} sx={{ ml: 2 }}>
               <Grid item xs={12} sm={11.4}>
                 <Grid container spacing={2}>
                   <Grid item xs={4}>
-                    <label>Startup Code </label>
+                    <label>Startup Code</label>
                     <TextField
                       fullWidth
                       required
@@ -289,8 +251,7 @@ function ViewStartupProfile({ profile }) {
                       sx={{
                         height: "45px",
                         "& .MuiInputBase-root": { height: "45px" },
-                      }}
-                    />
+                      }}/>
                   </Grid>
                   <Grid item xs={8}>
                     <label>Company Name {RequiredAsterisk}</label>
@@ -323,8 +284,7 @@ function ViewStartupProfile({ profile }) {
                       disabled={!isEditable}
                       multiline
                       rows={6}
-                      error={!!errors.companyDescription}
-                    />
+                      error={!!errors.companyDescription}/>
                     {errors.companyDescription && (
                       <FormHelperText error>
                         {errors.companyDescription}
@@ -345,8 +305,7 @@ function ViewStartupProfile({ profile }) {
                         onChange={(e) => setFoundedMonth(e.target.value)}
                         disabled={!isEditable}
                         sx={{ height: "45px" }}
-                        error={!!errors.foundedMonth}
-                      >
+                        error={!!errors.foundedMonth}>
                         {months.map((month) => (
                           <MenuItem key={month} value={month}>
                             {month}
@@ -373,8 +332,7 @@ function ViewStartupProfile({ profile }) {
                         onChange={(e) => setFoundedDay(e.target.value)}
                         disabled={!isEditable}
                         sx={{ height: "45px" }}
-                        error={!!errors.foundedDay}
-                      >
+                        error={!!errors.foundedDay}>
                         {days.map((day) => (
                           <MenuItem key={day} value={day}>
                             {day}
@@ -401,8 +359,7 @@ function ViewStartupProfile({ profile }) {
                         onChange={(e) => setFoundedYear(e.target.value)}
                         disabled={!isEditable}
                         sx={{ height: "45px" }}
-                        error={!!errors.foundedYear}
-                      >
+                        error={!!errors.foundedYear}>
                         {years.map((year) => (
                           <MenuItem key={year} value={year}>
                             {year}
@@ -428,8 +385,7 @@ function ViewStartupProfile({ profile }) {
                           onChange={(e) => setTypeOfCompany(e.target.value)}
                           disabled={!isEditable}
                           sx={{ height: "45px" }}
-                          error={!!errors.typeOfCompany}
-                        >
+                          error={!!errors.typeOfCompany}>
                           <MenuItem value={"profit"}>Profit</MenuItem>
                           <MenuItem value={"non-profit"}>Non-Profit</MenuItem>
                         </Select>
@@ -453,8 +409,7 @@ function ViewStartupProfile({ profile }) {
                           onChange={(e) => setNumberOfEmployees(e.target.value)}
                           disabled={!isEditable}
                           sx={{ height: "45px" }}
-                          error={!!errors.numberOfEmployees}
-                        >
+                          error={!!errors.numberOfEmployees}>
                           {quantityOptions.map((option) => (
                             <MenuItem key={option.value} value={option.value}>
                               {option.label}
@@ -504,14 +459,13 @@ function ViewStartupProfile({ profile }) {
                       variant="outlined"
                       type="email"
                       value={contactEmail}
-                      onChange={(e) => setContactEmail(e.target.value)} // Update value without validation on change
+                      onChange={(e) => setContactEmail(e.target.value)}
                       error={!!errors.contactEmail}
                       disabled={!isEditable}
                       sx={{
                         height: "45px",
                         "& .MuiInputBase-root": { height: "45px" },
-                      }}
-                    />
+                      }}/>
                     {errors.contactEmail && (
                       <FormHelperText error>
                         {errors.contactEmail}
@@ -522,121 +476,44 @@ function ViewStartupProfile({ profile }) {
               </Grid>
             </Grid>
 
-            <Typography
-              variant="h6"
-              sx={{ color: "#414a4c", fontWeight: "500", pl: 5, pt: 3, pb: 3 }}
-            >
-              Location
-            </Typography>
+            <Grid container alignItems="center" spacing={3} sx={{ ml: 2, display: 'flex', pt: 5, pb: 3 }}>
+            < Grid item>
+                <Typography variant="h6" sx={{ color: "#414a4c", fontWeight: "500", }}>Location</Typography>
+              </Grid>
+              
+              <Grid item>
+                <Button disabled={!isEditable} variant="contained"
+                  sx={{ width: 120, background: "#336FB0", textTransform: 'none',
+                    "&:hover": {
+                      boxShadow: "0 0 10px rgba(0,0,0,0.5)",
+                      backgroundColor: "#336FB0",
+                      textTransform: 'none'
+                    },
+                  }}
+                  onClick={() =>
+                    (window.location.href = `https://startupsphere.mugnavo.com/startup/${profile.id}`)
+                  }>
+                  Set Location
+                </Button>
+              </Grid>
+            </Grid>
 
             <Grid container spacing={3} sx={{ ml: 2 }}>
               <Grid item xs={12} sm={11.4}>
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
-                    <label>Address {RequiredAsterisk}</label>
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      value={streetAddress}
+                    <label>Full Address {RequiredAsterisk}</label>
+                    <TextField fullWidth variant="outlined" value={streetAddress} disabled
                       onChange={(e) => setStreetAddress(e.target.value)}
-                      disabled
                       sx={{
                         height: "45px",
                         "& .MuiInputBase-root": { height: "45px" },
                       }}
-                      error={!!errors.streetAddress}
-                    />
+                      error={!!errors.streetAddress}/>
                     {errors.streetAddress && (
                       <FormHelperText error>
                         {errors.streetAddress}
                       </FormHelperText>
-                    )}
-                  </Grid>
-                  <Grid item xs={4} sm={11.4}>
-                    <Button
-                      variant="contained"
-                      sx={{
-                        width: 150,
-                        background: "#336FB0",
-                        "&:hover": {
-                          boxShadow: "0 0 10px rgba(0,0,0,0.5)",
-                          backgroundColor: "#336FB0",
-                        },
-                      }}
-                      onClick={() =>
-                        (window.location.href = `https://startupsphere.mugnavo.com/startup/${profile.id}`)
-                      }
-                    >
-                      Set Location
-                    </Button>
-                  </Grid>
-
-                  <Grid item xs={8}>
-                    <label>Country {RequiredAsterisk}</label>
-                    <Autocomplete
-                      options={countries}
-                      getOptionLabel={(option) => option.label}
-                      value={countries.find((c) => c.label === country) || null}
-                      onChange={(event, newValue) => {
-                        setCountry(newValue ? newValue.label : "");
-                      }}
-                      renderOption={(props, option) => (
-                        <Box
-                          component="li"
-                          sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                          {...props}
-                        >
-                          <img
-                            loading="lazy"
-                            width="20"
-                            src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-                            srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-                            alt=""
-                          />
-                          {option.label} ({option.code}) +{option.phone}
-                        </Box>
-                      )}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          fullWidth
-                          variant="outlined"
-                          inputProps={{
-                            ...params.inputProps,
-                            autoComplete: "new-password",
-                          }}
-                          disabled={!isEditable}
-                          error={!!errors.country}
-                        />
-                      )}
-                      clearIcon={isEditable ? undefined : null}
-                      disabled={!isEditable}
-                      sx={{
-                        height: "45px",
-                        "& .MuiInputBase-root": { height: "45px" },
-                      }}
-                    />
-                    {errors.country && (
-                      <FormHelperText error>{errors.country}</FormHelperText>
-                    )}
-                  </Grid>
-
-                  <Grid item xs={4}>
-                    <label>Postal/Zip Code {RequiredAsterisk}</label>
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value)}
-                      disabled={!isEditable}
-                      sx={{
-                        height: "45px",
-                        "& .MuiInputBase-root": { height: "45px" },
-                      }}
-                      error={!!errors.postalCode}
-                    />
-                    {errors.postalCode && (
-                      <FormHelperText error>{errors.postalCode}</FormHelperText>
                     )}
                   </Grid>
                 </Grid>

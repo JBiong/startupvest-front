@@ -33,9 +33,6 @@ const InvestmentTable = ({ filteredRows, page, rowsPerPage, handleRowClick, prof
             <TableCell sx={tableStyles.head}>
               <Typography sx={tableStyles.typography}>Total Investment</Typography>
             </TableCell>
-            <TableCell sx={tableStyles.head}>
-              <Typography sx={tableStyles.typography}>Percentage</Typography>
-            </TableCell>
           </TableRow>
         </TableHead>
 
@@ -55,10 +52,7 @@ const InvestmentTable = ({ filteredRows, page, rowsPerPage, handleRowClick, prof
                   <TableCell sx={tableStyles.cell}>{row.fundingName}</TableCell>
                   <TableCell sx={tableStyles.cell}>{row.fundingType}</TableCell>
                   <TableCell sx={tableStyles.cell}>{Number(totalShares).toLocaleString()}</TableCell>
-                  <TableCell sx={tableStyles.cell}>
-                    {row.moneyRaisedCurrency} {Number(totalInvestment).toLocaleString()}
-                  </TableCell>
-                  <TableCell sx={tableStyles.cell}>{percentage}%</TableCell>
+                  <TableCell sx={tableStyles.cell}>{row.moneyRaisedCurrency} {Number(totalInvestment).toLocaleString()}</TableCell>
                 </TableRow>
               );
             })

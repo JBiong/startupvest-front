@@ -11,7 +11,6 @@ import People from './Components/People';
 import LandingPage from './Components/LandingPage';
 
 import ViewStartupProfile from './Form/ViewStartupProfile';
-import ViewInvestorProfile from './Form/ViewInvestorProfile';
 import ViewFundingRound from './Form/ViewFundingRound';
 
 import StartUpView from './VisitorView/startupProfileView';
@@ -19,15 +18,16 @@ import FundingRoundView from './VisitorView/fundingRoundView';
 import UserView from './VisitorView/userProfileView';
 import Faqs from './Components/Faqs';
 
-import InvestorOverview from './Dashboard/InvestorOverview';
-import UserDashboard from './Dashboard/UserDashboard';
+import InvestorDashboard from './Dashboard/InvestorDashboard';
+import StartupDashboard from './Dashboard/StartupDashboard';
 import AdminDashboard from './Dashboard/AdminDashboard';
 import ProtectedRoute from './Components/ProtectedRoute';
-import { ProfileProvider } from './Context/ProfileContext';
+
+import { AuthProvider } from './Context/AuthContext';
 
 function App() {
   return (
-    <ProfileProvider>
+    <AuthProvider>
       <Router>
         <Routes>
           {/* Public routes */}
@@ -43,10 +43,9 @@ function App() {
             <Route path="/fundinground" element={<FundingRound />} />
             <Route path="/people" element={<People />} />
             <Route path="/startupprofile" element={<ViewStartupProfile />} />
-            <Route path="/investorprofile" element={<ViewInvestorProfile />} />
             <Route path="/fundingprofile" element={<ViewFundingRound />} />
-            <Route path="/asCompanyOwnerOverview" element={<UserDashboard />} />
-            <Route path="/asInvestorOverview" element={<InvestorOverview />} />
+            <Route path="/startupDashboard" element={<StartupDashboard />} />
+            <Route path="/investorDashboard" element={<InvestorDashboard />} />
           </Route>
 
           {/* Admin-only route */}
@@ -60,7 +59,7 @@ function App() {
           <Route path="/userview" element={<UserView />} />
         </Routes>
       </Router>
-    </ProfileProvider>
+    </AuthProvider>
   );
 }
 
