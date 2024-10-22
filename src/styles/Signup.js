@@ -20,14 +20,11 @@ export const styles = {
     width: '100%',                  
   },
   title: {
-    fontSize: '4.5em',
+    fontSize: '5.5em',
     fontWeight: 'bold',
   },
   formContainer: {
-    pl: { xs: 2, md: 6, lg: 8 },
-    pr: { xs: 2, md: 6, lg: 8 },
-    pt: { xs: 2, md: 6, lg: 7 },
-    pb: { xs: 2, md: 6, lg: 7 },
+    p: 8,
     background: '#004A98',
     borderRadius: 2,
     boxShadow: '10px 3px 8px rgba(0,0,0,.15)',

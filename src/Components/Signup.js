@@ -10,6 +10,11 @@ import SignupDialog from '../Dialogs/SignupDialog';
 import { styles } from '../styles/Signup';
 
 function Signup() {
+    const [isScaled, setIsScaled] = useState(window.devicePixelRatio > 1);
+    const [tooltipVisible, setTooltipVisible] = useState(false);
+    const [contactNumberErrorVisible, setContactNumberErrorVisible] = useState(false);
+    const [emailErrorVisible, setEmailErrorVisible] = useState(false);
+
     const navigate = useNavigate();
     const [role, setRole] = useState('CEO');
     const [openDialog, setOpenDialog] = useState(false);
@@ -32,18 +37,6 @@ function Signup() {
             hasSpecialChar: false,
         },
     });
-    const [zoomLevel, setZoomLevel] = useState(window.devicePixelRatio);
-
-    // Adjust zoom level on window resize
-    useEffect(() => {
-        const handleResize = () => {
-            setZoomLevel(window.devicePixelRatio);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
 
     const handlePasswordChange = (e) => {
         const value = e.target.value;
@@ -153,17 +146,46 @@ function Signup() {
         navigate('/login');
     };
 
-    const scaleFactor = zoomLevel >= 1.25 ? 0.85 : 1;
+    // Detect Windows display scaling (via devicePixelRatio)
+    useEffect(() => {
+        const handleResize = () => {
+            setIsScaled(window.devicePixelRatio > 1.24); // Detect when scaling is at 125% or higher
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    const adjustedTextFieldStyle = {
+        ...styles.textField,
+        height: isScaled ? '40px' : '50px',
+        '& .MuiInputBase-root': { height: isScaled ? '40px' : '50px' },
+    };
+
+    const adjustedButtonStyle = {
+        ...styles.submitButton,
+        height: isScaled ? '40px' : '50px',
+    };
+
+    const adjustedTitleStyle = {
+        fontSize: isScaled ? '4.5em' : '5.5em',
+        fontWeight: 'bold',
+        color: '#004A98',
+    };
 
     return (
-        <div style={{ ...styles.container, transform: `scale(${scaleFactor})` }}>
+        <div style={ styles.container }>
             <Grid container>
                 <Grid item xs={12} sm={1} sx={styles.sideBar}></Grid>
+                
                 <Grid item xs={12} sm={6} sx={styles.titleContainer}>
-                    <Typography sx={styles.title}>
+                    <Typography sx={adjustedTitleStyle}>
                         "Empowering <br /> Startups, <br /> Tracking <br /> Investments"
                     </Typography>
                 </Grid>
+
                 <Grid item xs={12} sm={4} sx={styles.formContainer}>
                     <Typography variant="h5" component="header" sx={styles.formTitle}>
                         Create Account
@@ -172,94 +194,92 @@ function Signup() {
                     <form onSubmit={handleSubmit} className="signup-form">
                         <Grid container spacing={1.5} className="signup-details">
                             <Grid item xs={6}>
-                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>First Name</Typography>
-                                <TextField fullWidth name="firstName" placeholder="John" required sx={styles.textField} />
+                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>First Name *</Typography>
+                                <TextField fullWidth name="firstName" placeholder="John" required sx={{ width: '100%', ...adjustedTextFieldStyle }} />
                             </Grid>
                             <Grid item xs={6}>
-                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Last Name</Typography>
-                                <TextField fullWidth name="lastName" placeholder="Doe" required sx={styles.textField} />
+                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Last Name *</Typography>
+                                <TextField fullWidth name="lastName" placeholder="Doe" required sx={{ width: '100%', ...adjustedTextFieldStyle }} />
                             </Grid>
-                            <Grid item xs={12}>
-                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Role</Typography>
+
+                            <Grid item xs={12} sm={role === 'CFO' && isScaled ? 6 : 12}>
+                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Role *</Typography>
                                 <FormControl fullWidth>
-                                    <Select name="role" sx={styles.textField} defaultValue='CEO' onChange={(e) => setRole(e.target.value)}>
+                                    <Select name="role" sx={{ width: '100%', ...adjustedTextFieldStyle }} defaultValue="CEO"
+                                        onChange={(e) => setRole(e.target.value)}>
                                         {roleOptions.map((option) => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.label}
-                                            </MenuItem> 
+                                            </MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
                             </Grid>
 
+                            {/* Startup Code: only shown when role is CFO */}
                             {role === 'CFO' && (
-                                <Grid item xs={12}>
-                                    <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Startup Code</Typography>
+                                <Grid item xs={12} sm={isScaled ? 6 : 12}>
+                                    <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Startup Code *</Typography>
                                     <TextField required fullWidth name="startupCode" placeholder="Enter Startup Code"
                                         value={startupCode}
                                         onChange={(e) => setStartupCode(e.target.value)}
-                                        sx={styles.textField} />
+                                        sx={{ width: '100%', ...adjustedTextFieldStyle }} />
                                 </Grid>
                             )}
 
                             <Grid item xs={12}>
-                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Email</Typography>
-                                <Tooltip title={error} open={!!error} placement="bottom-start"
-                                    PopperProps={{
-                                        modifiers: [
-                                            {
-                                                name: 'offset',
-                                                options: {
-                                                    offset: [0, 10],
-                                                },
-                                            },
-                                        ],
-                                    }}>
-                                    <span>
-                                        <TextField fullWidth name="email" placeholder="johndoe@gmail.com"type="email"
-                                            value={email} sx={styles.textField}
-                                            error={emailExists || !!error}
-                                            onChange={(e) => {
-                                                const emailInput = e.target.value;
-                                                setEmail(emailInput);
-                                                validateEmail(emailInput);
-                                            }}
-                                            onBlur={checkEmailExists} />
-                                    </span>
-                                </Tooltip>
+                                <Typography variant="body2" sx={{ color: '#F2F2F2', fontSize: '16px' }}>Email *</Typography>
+                                <span>
+                                    <TextField fullWidth name="email" placeholder="johndoe@gmail.com" type="email" value={email}
+                                        sx={{ width: '100%', ...adjustedTextFieldStyle, fontSize: '16px' }} 
+                                        error={emailExists || !!error} 
+                                        onChange={(e) => {
+                                            const emailInput = e.target.value;
+                                            setEmail(emailInput);
+                                            validateEmail(emailInput);
+                                        }}
+                                        onFocus={() => setEmailErrorVisible(true)} 
+                                        onBlur={() => {
+                                            checkEmailExists();
+                                            setEmailErrorVisible(false); 
+                                        }}/>
+                                </span>
+                                {error && emailErrorVisible && ( 
+                                    <div style={{ backgroundColor: '#333', color: 'white',  borderRadius: '4px',  padding: '10px',  marginTop: '5px',  fontSize: '14px', 
+                                        position: 'absolute', zIndex: 1000,  }}>
+                                        {error}
+                                    </div>
+                                )}
                             </Grid>
 
                             <Grid item xs={6}>
-                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Phone Number</Typography>
-                                <Tooltip title={contactNumberError} open={!!contactNumberError} placement="bottom-start"
-                                    PopperProps={{
-                                        modifiers: [
-                                            {
-                                                name: 'offset',
-                                                options: {
-                                                    offset: [0, 10],
-                                                },
-                                            },
-                                        ],
-                                    }}>
-                                    <span>
-                                        <TextField fullWidth name="contactNumber" placeholder="09231321889" type="tel"
-                                            value={contactNumber} sx={styles.textField}
-                                            onChange={(e) => {
-                                                const numberInput = e.target.value;
-                                                const cleanedInput = numberInput.replace(/\D/g, '');
-                                                setContactNumber(cleanedInput);
-                                                validateContactNumber(cleanedInput);
-                                            }}
-                                            error={!!contactNumberError} />
-                                    </span>
-                                </Tooltip>
+                                <Typography variant="body2" sx={{ color: '#F2F2F2', fontSize: '16px' }}>Phone Number *</Typography>
+                                <span>
+                                    <TextField fullWidth name="contactNumber" placeholder="09231321889" type="tel" value={contactNumber}
+                                        sx={{ width: '100%', ...adjustedTextFieldStyle, fontSize: '16px' }}
+                                        onChange={(e) => {
+                                            const numberInput = e.target.value;
+                                            const cleanedInput = numberInput.replace(/\D/g, '');
+                                            setContactNumber(cleanedInput);
+                                            validateContactNumber(cleanedInput);
+                                        }}
+                                        error={!!contactNumberError}
+                                        onFocus={() => setContactNumberErrorVisible(true)} 
+                                        onBlur={() => setContactNumberErrorVisible(false)} 
+                                    />
+                                </span>
+                                {contactNumberError && contactNumberErrorVisible && (
+                                    <div style={{ backgroundColor: '#333', color: 'white',  borderRadius: '4px',  padding: '10px',  marginTop: '5px',  fontSize: '14px', 
+                                        position: 'absolute', zIndex: 1000,  }}>
+                                        {contactNumberError}
+                                    </div>
+                                )}
                             </Grid>
                             
                             <Grid item xs={6}>
-                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Gender</Typography>
+                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Gender *</Typography>
                                 <FormControl fullWidth>
-                                    <Select name="gender" sx={styles.textField} defaultValue='Male'>
+                                    <Select name="gender" sx={{ width: '100%', ...adjustedTextFieldStyle }} defaultValue='Male'>
                                         {genderOptions.map((option) => (
                                             <MenuItem key={option.value} value={option.value}>
                                                 {option.label}
@@ -270,64 +290,54 @@ function Signup() {
                             </Grid>
 
                             <Grid item xs={12}>
-                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Password</Typography>
-                                <Tooltip
-                                    title={
-                                        <div>
-                                            <div style={{ color: passwordValidation.feedback.length ? 'lightgreen' : 'white' }}>
-                                                Must be at least 8 characters long.
-                                            </div>
-                                            <div style={{ color: passwordValidation.feedback.hasLowerCase ? 'lightgreen' : 'white' }}>
-                                               Must contain at least one uppercase letter.
-                                            </div>
-                                            <div style={{ color: passwordValidation.feedback.hasUpperCase ? 'lightgreen' : 'white' }}>
-                                              Must contain at least one lowercase letter.
-                                            </div>
-                                            <div style={{ color: passwordValidation.feedback.hasNumber ? 'lightgreen' : 'white' }}>
-                                                Must contain at least one number.
-                                            </div>
-                                            <div style={{ color: passwordValidation.feedback.hasSpecialChar ? 'lightgreen' : 'white' }}>
-                                                Must contain at least one special character.
-                                            </div>
+                                <Typography variant="body2" sx={{ color: '#F2F2F2', fontSize: '16px' }}>Password *</Typography>
+                                <span>
+                                    <TextField fullWidth name="password" placeholder="Your Password" type={showPassword ? 'text' : 'password'} value={password}
+                                        onChange={handlePasswordChange}
+                                        onFocus={() => setTooltipVisible(true)} 
+                                        onBlur={() => setTooltipVisible(false)} 
+                                        sx={{ width: '100%', ...adjustedTextFieldStyle, fontSize: '16px' }} 
+                                        error={!!passwordError}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        onClick={togglePasswordVisibility}
+                                                        edge="end"
+                                                        sx={{ p: '10px' }}>
+                                                        {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            ),
+                                        }}/>
+                                </span>
+                                {tooltipVisible && ( 
+                                    <div style={{ backgroundColor: '#333',  color: 'white',  borderRadius: '4px',  padding: '10px', marginTop: '5px', fontSize: '14px',  
+                                        position: 'absolute',  zIndex: 1000, }}>
+                                        <div style={{ color: passwordValidation.feedback.length ? 'lightgreen' : 'white' }}>
+                                            Must be at least 8 characters long.
                                         </div>
-                                    }
-                                    PopperProps={{
-                                        modifiers: [
-                                            {
-                                                name: 'offset',
-                                                options: {
-                                                    offset: [0, 10],
-                                                },
-                                            },
-                                        ],
-                                    }}
-                                    placement="bottom-start">
-                                    <span>
-                                        <TextField fullWidth name="password" placeholder="Your Password"
-                                            type={showPassword ? 'text' : 'password'} value={password}
-                                            onChange={handlePasswordChange} sx={styles.textField}
-                                            error={!!passwordError}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <IconButton
-                                                            onClick={togglePasswordVisibility}
-                                                            edge="end"
-                                                            sx={{ p: '10px' }}>
-                                                            {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                ),
-                                            }}/>
-                                    </span>
-                                </Tooltip>
+                                        <div style={{ color: passwordValidation.feedback.hasUpperCase ? 'lightgreen' : 'white' }}>
+                                            Must contain at least one uppercase letter.
+                                        </div>
+                                        <div style={{ color: passwordValidation.feedback.hasLowerCase ? 'lightgreen' : 'white' }}>
+                                            Must contain at least one lowercase letter.
+                                        </div>
+                                        <div style={{ color: passwordValidation.feedback.hasNumber ? 'lightgreen' : 'white' }}>
+                                            Must contain at least one number.
+                                        </div>
+                                        <div style={{ color: passwordValidation.feedback.hasSpecialChar ? 'lightgreen' : 'white' }}>
+                                            Must contain at least one special character.
+                                        </div>
+                                    </div>
+                                )}
                                 {passwordError && (
-                                    <Typography variant="body2" sx={{ color: 'white' }}>{passwordError}</Typography>
+                                    <Typography variant="body2" sx={{ color: 'white', fontSize: '14px' }}>{passwordError}</Typography>
                                 )}
                             </Grid>
                         </Grid>
 
-                        <Button type="submit" fullWidth sx={styles.submitButton}>
+                        <Button type="submit" fullWidth sx={adjustedButtonStyle}>
                             Sign up
                         </Button>
 
