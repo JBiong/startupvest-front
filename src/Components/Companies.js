@@ -33,7 +33,7 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-  { id: 'startup', numeric: false, disablePadding: false, label: 'StartUp Name' },
+  { id: 'startup', numeric: false, disablePadding: false, label: 'Startup Name' },
   { id: 'location', numeric: false, disablePadding: false, label: 'Location' },
   { id: 'founded', numeric: false, disablePadding: false, label: 'Founded Date' },
   { id: 'description', numeric: false, disablePadding: false, label: 'Description', width: '38%' },
@@ -84,7 +84,7 @@ function EnhancedTableToolbar({ onRequestSearch }) {
 
   return (
     <Toolbar sx={{ pt: 12, mb: 3, ml: -3 }}>
-      <Title>Search Companies</Title>
+      <Title>Search Startups</Title>
       <TextField variant="outlined" placeholder="Search…" onChange={handleSearch} value={searchText} 
       sx={{ width: 350, mr: -3, '& .MuiInputBase-root': { height: '45px' }, '& input': { padding: '10px 14px' } }}
         InputProps={{ startAdornment: <SearchIcon /> }} />
@@ -159,7 +159,7 @@ export default function Companies() {
   const handleSearch = (searchText) => {
     const filtered = rows.filter(row => {
       return Object.keys(row).some(key => {
-        return row[key].toString().toLowerCase().includes(searchText.toLowerCase());
+        return row[key] !== null && row[key].toString().toLowerCase().includes(searchText.toLowerCase());
       });
     });
     setFilteredRows(filtered);

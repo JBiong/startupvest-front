@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Box, Divider, Toolbar, Typography, Grid, IconButton, Skeleton } from '@mui/material';
-import LanguageIcon from '@mui/icons-material/Language';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
@@ -100,7 +99,7 @@ function UserProfileView() {
                         {loading ? (
                           <Skeleton variant="text" width="100%" />
                         ) : (
-                          <Typography variant="body1">{profile.emailAddress}</Typography>
+                          <Typography variant="body1">{profile.email}</Typography>
                         )}
                       </Grid>
 
@@ -109,7 +108,7 @@ function UserProfileView() {
                         {loading ? (
                           <Skeleton variant="text" width="100%" />
                         ) : (
-                          <Typography variant="body1">{profile.contactInformation}</Typography>
+                          <Typography variant="body1">{profile.contactNumber}</Typography>
                         )}
                       </Grid>
 
@@ -143,13 +142,6 @@ function UserProfileView() {
                             </>
                           ) : (
                             <>
-                              <IconButton href={profile.website || "#"} target="_blank" disabled={!profile.website}
-                                sx={{ backgroundColor: profile.website ? '#007bff' : '#e0e0e0',color: 'white',
-                                  '&:hover': { backgroundColor: profile.website ? '#0069d9' : '#e0e0e0' }, borderRadius: '50%',
-                                }}>
-                                <LanguageIcon />
-                              </IconButton>
-
                               <IconButton href={profile.linkedIn || "#"} target="_blank" disabled={!profile.linkedIn}
                                 sx={{ backgroundColor: profile.linkedIn ? '#0A66C2' : '#e0e0e0', color: 'white',
                                   '&:hover': { backgroundColor: profile.linkedIn ? '#004182' : '#e0e0e0' },borderRadius: '50%',

@@ -12,6 +12,7 @@ function Profile() {
   const [isEditable, setIsEditable] = useState(false);
   const [openChangePassword, setOpenChangePassword] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [formErrors, setFormErrors] = useState({});
 
   const [userData, setUserData] = useState({
     firstName: '',
@@ -120,7 +121,23 @@ function Profile() {
     }
   };
 
+  const validateFields = () => {
+    const emptyFieldError = "This field is required";
+    const errors = {};
+    
+    if (!userData.firstName.trim()) errors.firstName = emptyFieldError;
+    if (!userData.lastName.trim()) errors.lastName = emptyFieldError;
+    if (!userData.email.trim()) errors.email = emptyFieldError;
+    if (!userData.contactNumber.trim()) errors.contactNumber = emptyFieldError;
+    if (!userData.gender.trim()) errors.gender = emptyFieldError;
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSaveChanges = async () => {
+    if (!validateFields()) return;
+
     try {
       await updateUser(userData);
       setIsEditable(false);
@@ -135,11 +152,15 @@ function Profile() {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
       });
       console.log('User data updated successfully:', response.data);
-      setUserData(userData); // Update local state with new user data
+      setUserData(userData); 
     } catch (error) {
       console.error('Failed to update user data:', error);
       throw error;
     }
+  };
+
+  const areRequiredFieldsFilled = () => {
+    return userData.firstName && userData.lastName && userData.email && userData.contactNumber && userData.gender && userData.biography && userData.facebook && userData.twitter && userData.instagram && userData.linkedIn && userData.location;
   };
 
   const handleSavePassword = (currentPassword, newPassword) => {
@@ -156,12 +177,12 @@ function Profile() {
           Account Information
         </Typography>
 
-        {userData.role === 'Investor' && (
-        <Box sx={{ backgroundColor: '#FFEB3B', padding: 2, borderRadius: 2, marginTop: 2, ml: 8, mr: 5, mb: -1 }}>
-          <Typography variant="body1" sx={{ color: '#1E1E1E', fontWeight: 'bold' }}>
-            ⚠️ To enhance your credibility and legitimacy, please ensure that your profile is fully completed.
-          </Typography>
-        </Box>
+        {userData.role === 'Investor' && !areRequiredFieldsFilled() && (
+          <Box sx={{ backgroundColor: '#FFEB3B', padding: 2, borderRadius: 2, marginTop: 2, ml: 8, mr: 5, mb: -1 }}>
+            <Typography variant="body1" sx={{ color: '#1E1E1E', fontWeight: 'bold' }}>
+              ⚠️ To enhance your credibility and legitimacy, please ensure that your profile is fully completed.
+            </Typography>
+          </Box>
         )}
 
         <Box component="main" sx={{ mr: 5, borderRadius: 2, ml: 8, pb: 6, mt: 3, boxShadow: '0 0 10px rgba(0,0,0,0.25)' }}>
@@ -212,28 +233,34 @@ function Profile() {
                     <TextField fullWidth variant="outlined" value={userData.role} disabled
                       InputProps={{ sx: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' } }} />
                   </Grid>
+                  
                   <Grid item xs={4.5}>
-                    <label>First Name</label>
+                  <label>First Name</label>
                     <TextField fullWidth variant="outlined" value={userData.firstName}
                       onChange={(e) => setUserData((prevData) => ({ ...prevData, firstName: e.target.value }))} 
+                      error={!!formErrors.firstName} helperText={formErrors.firstName}
                       InputProps={{
                         disabled: !isEditable,
                         style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' },
                       }} />
                   </Grid>
+
                   <Grid item xs={6}>
                     <label>Last Name</label>
                     <TextField fullWidth variant="outlined" value={userData.lastName}
                       onChange={(e) => setUserData((prevData) => ({ ...prevData, lastName: e.target.value }))} 
+                      error={!!formErrors.lastName} helperText={formErrors.lastName}  
                       InputProps={{
                         disabled: !isEditable,
                         style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' },
                       }} />
                   </Grid>
+
                   <Grid item xs={6}>
                     <label>Email Address</label>
                     <TextField fullWidth variant="outlined" value={userData.email}
                       onChange={(e) => setUserData((prevData) => ({ ...prevData, email: e.target.value }))} 
+                      error={!!formErrors.email} helperText={formErrors.email}
                       InputProps={{
                         disabled: !isEditable,
                         style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' },
@@ -266,11 +293,15 @@ function Profile() {
                   <Grid item xs={6}>
                     <label>Phone Number</label>
                     <TextField fullWidth variant="outlined" value={userData.contactNumber}
-                      onChange={(e) => setUserData((prevData) => ({ ...prevData, contactNumber: e.target.value }))} 
-                      InputProps={{
-                        disabled: !isEditable,
-                        style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' },
-                      }} />
+                    onChange={(e) => {
+                      const numericValue = e.target.value.replace(/[^0-9]/g, '');
+                      setUserData((prevData) => ({ ...prevData, contactNumber: numericValue }));
+                    }}
+                    error={!!formErrors.contactNumber} helperText={formErrors.contactNumber}
+                        InputProps={{
+                          disabled: !isEditable,
+                          style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' },
+                        }} />
                   </Grid>
 
                   <Grid item xs={6}>
@@ -327,8 +358,7 @@ function Profile() {
                           onClick={() => {
                               window.location.href = `https://startupsphere.mugnavo.com/investor/${userData.id}`;
                             } 
-                              }
-                           >
+                              }>
                           Click to Set Your Current Location
                         </Typography>
                       ) : (

@@ -216,9 +216,7 @@ const InvestorDashboard = () => {
           {loading ? (
             <Skeleton variant="text" width={200} height={40} />
           ) : (
-            <Typography variant="h5" color='#232023'>
-              Investor Dashboard
-            </Typography>
+            <Typography variant="h5" color='#232023'>Investor Dashboard</Typography>
           )}
         </Grid>
 

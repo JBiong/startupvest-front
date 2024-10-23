@@ -121,7 +121,7 @@ function InvestorRequest({ onPendingRequestsCountChange }) {
           <TableHead sx={tableStyles.head}>
             <TableRow>
               <TableCell sx={{ ...tableStyles.head }}><Typography sx={tableStyles.typography}>Date</Typography></TableCell>
-              <TableCell><Typography sx={tableStyles.typography}>Company Name</Typography></TableCell>
+              <TableCell><Typography sx={tableStyles.typography}>Startup Name</Typography></TableCell>
               <TableCell sx={{ ...tableStyles.head }}><Typography sx={tableStyles.typography}>Shares</Typography></TableCell>
               <TableCell sx={{ ...tableStyles.head }}><Typography sx={tableStyles.typography}>Total Shares</Typography></TableCell>
               <TableCell sx={{ ...tableStyles.head }}><Typography sx={tableStyles.typography}>Status</Typography>

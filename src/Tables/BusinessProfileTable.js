@@ -44,7 +44,7 @@ function BusinessProfileTable({
               <TableRow sx={{ background: 'white' }}>
                 <TableCell colSpan={5} sx={{ textAlign: 'center' }}>
                   <Typography variant="body2" color="textSecondary">
-                    No profiles available in this user.
+                    No startup profiles available in this user.
                   </Typography>
                 </TableCell>
               </TableRow>

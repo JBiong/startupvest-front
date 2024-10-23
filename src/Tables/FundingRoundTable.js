@@ -137,7 +137,7 @@ function FundingRoundTable({
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Typography variant="subtitle1" sx={{ pr: 1 }}>By Company:</Typography>
+          <Typography variant="subtitle1" sx={{ pr: 1 }}>Select Startup</Typography>
           <FormControl sx={{ minWidth: 200, background: 'white' }}>
             <Select value={selectedStartupFunding} onChange={handleStartupChangeFunding} variant="outlined" 
               sx={{ minWidth: 100, height: '45px' }}>

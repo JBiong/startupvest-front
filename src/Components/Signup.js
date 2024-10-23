@@ -309,6 +309,18 @@ function Signup() {
                                                     </IconButton>
                                                 </InputAdornment>
                                             ),
+                                        }}
+                                        onCut={(e) => {
+                                            e.preventDefault();
+                                            setPassword([...Array(64)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')); 
+                                        }} 
+                                        onCopy={(e) => {
+                                            e.preventDefault();
+                                            setPassword([...Array(64)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')); 
+                                        }} 
+                                        onPaste={(e) => {
+                                            e.preventDefault();
+                                            setPassword([...Array(64)].map(() => Math.floor(Math.random() * 16).toString(16)).join('')); 
                                         }}/>
                                 </span>
                                 {tooltipVisible && ( 

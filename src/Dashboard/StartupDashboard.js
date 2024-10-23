@@ -414,7 +414,7 @@ return (
                     {loading ? (
                         <Skeleton variant="text" width="15%" height={40} />
                         ) : (
-                        <Typography variant="h5">User Dashboard</Typography>
+                        <Typography variant="h5">Startup Dashboard</Typography>
                         )}                    
                         <PopupState variant="popover" popupId="demo-popup-menu">
                         {(popupState) => (

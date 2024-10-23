@@ -191,7 +191,7 @@ const InvestNowDialog = ({
 
         <DialogContent sx={{ pl: 6, pr: 6 }}>
           <Typography variant="body1" gutterBottom align="justify">
-            Congratulations! You have successfully invested in <strong>{companyName} - {fundingRound}</strong>. The company will reach out to you soon via email with details to finalize your investment. <br/> <br/>Thank you for your trust, and rest assured that your investment is being processed. Please keep an eye on your inbox for updates!
+            Congratulations! Your request to invest in <strong>{companyName} - {fundingRound}</strong> has been successfully submitted. The company will reach out to you soon via email with details to finalize your investment. <br/><br/>Thank you for your trust. Rest assured that your request is being processed. Please keep an eye on your inbox for updates!
           </Typography>
         </DialogContent>
 

@@ -19,7 +19,7 @@ const InvestmentTable = ({ filteredRows, page, rowsPerPage, handleRowClick, prof
         <TableHead sx={tableStyles.head}>
           <TableRow>
             <TableCell>
-              <Typography sx={{ fontWeight: 'bold', color: 'white', ml: 5 }}>Company Name</Typography>
+              <Typography sx={{ fontWeight: 'bold', color: 'white', ml: 5 }}>Startup Name</Typography>
             </TableCell>
             <TableCell sx={tableStyles.head}>
               <Typography sx={tableStyles.typography}>Funding Name</Typography>

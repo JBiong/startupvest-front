@@ -118,7 +118,7 @@ function PendingRequestInvestor({ onPendingRequestsCountChange }) {
                 <Typography sx={tableStyles.typography}>Date</Typography>
               </TableCell>
               <TableCell>
-                <Typography sx={{ fontWeight: 'bold', color: 'white', ml: 5 }}>Company Name</Typography>
+                <Typography sx={{ fontWeight: 'bold', color: 'white', ml: 5 }}>Startup Name</Typography>
               </TableCell>
               <TableCell sx={{ ...tableStyles.cell }}>
                 <Typography sx={tableStyles.typography}>Email</Typography>

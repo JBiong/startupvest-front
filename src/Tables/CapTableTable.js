@@ -51,14 +51,13 @@ function CapTable({
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
     <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', mb: 2 }}>
-      <Typography variant="subtitle1" sx={{ pr: 1 }}>By Company:</Typography>
+      <Typography variant="subtitle1" sx={{ pr: 1 }}>Select Startup</Typography>
       <FormControl sx={{ minWidth: 200 }}>
         <Select
           value={filterValue}
           onChange={handleFilterChange}
           variant="outlined"
           sx={{ minWidth: 150, height: '45px', background: 'white' }}>
-          <MenuItem value="Select Company" disabled>Select Company</MenuItem>
           {businessProfiles.filter(profile => profile.type === 'Startup').map((startup) => (
             <MenuItem key={startup.id} value={startup.id}>{startup.companyName}</MenuItem>
           ))}
@@ -107,7 +106,7 @@ function CapTable({
             ) : (
               <TableRow sx={{ background: 'white' }}>
                 <TableCell colSpan={5} sx={tableStyles.cell}>
-                  <Typography variant="body2" color="textSecondary">No investors found in this company.</Typography>
+                  <Typography variant="body2" color="textSecondary">No investors found in this startup.</Typography>
                 </TableCell>
               </TableRow>
             )}

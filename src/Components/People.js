@@ -118,7 +118,8 @@ export default function Companies() {
     const fetchInvestors = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/all`);
-        setInvestors(response.data);
+        const filteredInvestors = response.data.filter(investor => investor.role !== 'Admin');
+        setInvestors(filteredInvestors);
       } catch (error) {
         console.error('Error fetching investors:', error);
       } finally {
@@ -240,10 +241,7 @@ export default function Companies() {
                     <StyledTableCell>{row.role}</StyledTableCell>
                     <StyledTableCell>{formatAddress(row.locationName)}</StyledTableCell>
                     <StyledTableCell>{row.email}</StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: 'justify' }}>
-  {(row.contactNumber || '').split(' ').slice(0, 20).join(' ')}...
-</StyledTableCell>
-
+                    <StyledTableCell sx={{ textAlign: 'justify' }}>{(row.contactNumber || '').split(' ').slice(0, 20).join(' ')}...</StyledTableCell>
                   </StyledTableRow>
                 ))
               )}
