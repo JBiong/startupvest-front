@@ -79,7 +79,7 @@ function Login() {
               }, 2000);
             } else {
               // startupvest, no redirect to other systems
-              if (response.data.role === 'admin') {
+              if (response.data.role === 'Admin') {
                 navigate('/admindashboard');
             } else if (response.data.role === 'Investor') {
                 navigate('/investorDashboard');

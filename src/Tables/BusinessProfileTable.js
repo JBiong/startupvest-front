@@ -55,7 +55,7 @@ function BusinessProfileTable({
                   <TableRow
                     key={`${profile.type}-${profile.id}`}
                     sx={{ backgroundColor: 'white', }}>
-                    <TableCell sx={{ ...tableStyles.cell, pl: 5 }}>{profile.industry}</TableCell>
+                    <TableCell sx={{ ...tableStyles.cell, pl: 5 }}>{profile.startupCode}</TableCell>
                     <TableCell sx={{ ...tableStyles.cell, display: 'flex', alignItems: 'center', pl: 8}}>
                       <Avatar src={profile.photo} alt={profile.companyName}
                         sx={{  border: '2px rgba(0, 116, 144, 1) solid',  borderRadius: 1,  mr: 2,  width: 40,  height: 40 

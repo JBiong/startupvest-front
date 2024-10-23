@@ -202,20 +202,11 @@ function StartUpView() {
                           {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.industry}</Typography>}
                         </Grid>
 
-                        <Grid item xs={12}>
+                        <Grid item xs={3}>
                           <Typography>
-                            <strong>Location</strong>
+                            <strong>location</strong>
                           </Typography>
-                          {loading ? (
-                            <Skeleton width="60%" />
-                          ) : (
-                            <Typography variant="body1">
-                              {startup.location_name && <>{startup.location_name}{(city || state) ? ", " : ""}</>}
-                              {city && <>{city}{state ? ", " : ""}</>}
-                              {state}
-                              {!streetAddress && !city && !state && <span>No address available</span>}
-                            </Typography>
-                          )}
+                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.location_name}</Typography>}
                         </Grid>
 
                         {/* Icons */}

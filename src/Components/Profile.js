@@ -324,14 +324,10 @@ function Profile() {
                       <label>Location</label>
                       {isEditable ? (
                         <Typography variant="caption" sx={{ color: '#336FB0', ml: 1, textDecoration: 'underline',cursor: 'pointer', }}
-                          // onClick={() => {
-                          //   const isValidId = profile?.id && typeof profile.id === 'string';
-                          //   if (isValidId) {
-                          //     window.location.href = `https://startupsphere.mugnavo.com/investor/${profile.id}`;
-                          //   } else {
-                          //     console.error('Invalid profile ID');
-                          //   }
-                          // }}
+                          onClick={() => {
+                              window.location.href = `https://startupsphere.mugnavo.com/investor/${userData.id}`;
+                            } 
+                              }
                            >
                           Click to Set Your Current Location
                         </Typography>

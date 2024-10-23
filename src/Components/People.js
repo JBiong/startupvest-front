@@ -12,9 +12,10 @@ const drawerWidth = 240;
 
 const headCells = [
   { id: 'name', numeric: false, disablePadding: false, label: 'Full Name' },
+  { id: 'role', numeric: false, disablePadding: false, label: 'Role',width:'13%' },
   { id: 'location', numeric: false, disablePadding: false, label: 'Location' },
   { id: 'email', numeric: false, disablePadding: false, label: 'Email Address' },
-  { id: 'biography', numeric: false, disablePadding: false, label: 'Biography', width: '38%' },
+  { id: 'contactNumber', numeric: false, disablePadding: false, label: 'Contact Number', width: '38%' },
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -116,7 +117,7 @@ export default function Companies() {
   useEffect(() => {
     const fetchInvestors = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/investors/all`);
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/all`);
         setInvestors(response.data);
       } catch (error) {
         console.error('Error fetching investors:', error);
@@ -132,9 +133,9 @@ export default function Companies() {
     setFilteredRows(investors);
   }, [investors]);
 
-  const fetchProfilePicture = async (investorId) => {
+  const fetchProfilePicture = async (userId) => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_URL}/profile-picture/investor/${investorId}`, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/profile-picture/${userId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
@@ -145,14 +146,14 @@ export default function Companies() {
   
       setProfilePictures((prevState) => ({
         ...prevState,
-        [investorId]: imageUrl,
+        [userId]: imageUrl,
       }));
     } catch (error) {
       console.error('Failed to fetch profile picture:', error);
       // Set a null value to indicate the image failed to load
       setProfilePictures((prevState) => ({
         ...prevState,
-        [investorId]: null,
+        [userId]: null,
       }));
     }
   };
@@ -179,8 +180,8 @@ export default function Companies() {
     const filtered = investors.filter((row) =>
       row.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
       row.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
-      row.emailAddress.toLowerCase().includes(searchText.toLowerCase()) ||
-      row.contactInformation.toLowerCase().includes(searchText.toLowerCase())
+      row.email.toLowerCase().includes(searchText.toLowerCase()) ||
+      row.contactNumber.toLowerCase().includes(searchText.toLowerCase())
     );
     setFilteredRows(filtered);
   };
@@ -219,6 +220,7 @@ export default function Companies() {
 
                     <StyledTableCell><Skeleton variant="text" width="80%" /></StyledTableCell>
                     <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
+                    <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
                     <StyledTableCell><Skeleton variant="text" width="100%" /></StyledTableCell>
                   </StyledTableRow>
                 ))
@@ -235,11 +237,13 @@ export default function Companies() {
                         {row.firstName} {row.lastName}
                       </StyledStack>
                     </StyledTableCell>
+                    <StyledTableCell>{row.role}</StyledTableCell>
                     <StyledTableCell>{formatAddress(row.locationName)}</StyledTableCell>
-                    <StyledTableCell>{row.emailAddress}</StyledTableCell>
+                    <StyledTableCell>{row.email}</StyledTableCell>
                     <StyledTableCell sx={{ textAlign: 'justify' }}>
-                      {row.biography.split(' ').slice(0, 20).join(' ')}...
-                    </StyledTableCell>
+  {(row.contactNumber || '').split(' ').slice(0, 20).join(' ')}...
+</StyledTableCell>
+
                   </StyledTableRow>
                 ))
               )}
