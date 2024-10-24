@@ -11,11 +11,11 @@ import { StyledPaper, StyledAvatar, StyledTableRow, StyledTableCell, StyledStack
 const drawerWidth = 240;
 
 const headCells = [
-  { id: 'name', numeric: false, disablePadding: false, label: 'Full Name' },
-  { id: 'role', numeric: false, disablePadding: false, label: 'Role',width:'13%' },
-  { id: 'location', numeric: false, disablePadding: false, label: 'Location' },
-  { id: 'email', numeric: false, disablePadding: false, label: 'Email Address' },
-  { id: 'contactNumber', numeric: false, disablePadding: false, label: 'Contact Number', width: '38%' },
+  { id: 'role', numeric: false, disablePadding: false, label: 'Role', width: '5%'},
+  { id: 'name', numeric: false, disablePadding: false, label: 'Full Name', width: '20%' },
+  { id: 'location', numeric: false, disablePadding: false, label: 'Location', width:'25%' },
+  { id: 'email', numeric: false, disablePadding: false, label: 'Email Address', width:'20%' },
+  { id: 'contactNumber', numeric: false, disablePadding: false, label: 'Contact Number' },
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -228,6 +228,7 @@ export default function Companies() {
               ) : (
                 visibleRows.map((row) => (
                   <StyledTableRow key={row.id} onClick={() => handleRowClick(row)}>
+                    <StyledTableCell>{row.role}</StyledTableCell>
                     <StyledTableCell>
                       <StyledStack direction='row'>
                         <StyledAvatar variant="rounded" src={profilePictures[row.id] || ''}
@@ -238,10 +239,9 @@ export default function Companies() {
                         {row.firstName} {row.lastName}
                       </StyledStack>
                     </StyledTableCell>
-                    <StyledTableCell>{row.role}</StyledTableCell>
                     <StyledTableCell>{formatAddress(row.locationName)}</StyledTableCell>
                     <StyledTableCell>{row.email}</StyledTableCell>
-                    <StyledTableCell sx={{ textAlign: 'justify' }}>{(row.contactNumber || '').split(' ').slice(0, 20).join(' ')}...</StyledTableCell>
+                    <StyledTableCell>{row.contactNumber}</StyledTableCell>
                   </StyledTableRow>
                 ))
               )}

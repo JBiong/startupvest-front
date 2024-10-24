@@ -195,9 +195,7 @@ function ForgotPasswordDialog({ open, onClose }) {
 
         {activeStep === 2 && (
           <Box>
-            <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 2 }}>
-              Password Requirements:
-            </Typography>
+            <Typography variant="subtitle1" color="text.secondary" sx={{ mt: 2 }}>Password Requirements:</Typography>
             <ul>
               <li style={{ color: newPassword.length >= passwordRequirements.minLength ? 'green' : 'inherit' }}>
                 Must be at least {passwordRequirements.minLength} characters long.
@@ -229,6 +227,15 @@ function ForgotPasswordDialog({ open, onClose }) {
                   </InputAdornment>
                 ),
               }}
+              onCut={(e) => {
+                e.preventDefault();
+              }} 
+              onCopy={(e) => {
+                e.preventDefault();
+              }} 
+              onPaste={(e) => {
+                e.preventDefault();
+              }}
               sx={{ mb: 2 }}/>
 
               <LinearProgress variant="determinate"value={getPasswordStrength()}
@@ -247,7 +254,16 @@ function ForgotPasswordDialog({ open, onClose }) {
                 newPassword !== confirmNewPassword && confirmNewPassword !== ''
                   ? 'Passwords do not match'
                   : ''
-              } />
+              } 
+              onCut={(e) => {
+                e.preventDefault();
+              }} 
+              onCopy={(e) => {
+                e.preventDefault();
+              }} 
+              onPaste={(e) => {
+                e.preventDefault();
+              }}/>
           </Box>
         )}
 

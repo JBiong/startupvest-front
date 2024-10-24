@@ -1,17 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-  Button,
-  Box,
-  IconButton,
-  InputAdornment,
-  Typography,
-  LinearProgress,
-} from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Box, IconButton, InputAdornment, Typography, LinearProgress, } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -113,7 +101,16 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
 
             <Typography variant="body2">Current Password</Typography>
             <TextField fullWidth placeholder="**********" type='password' value={currentPassword}sx={{ mb: 3 }}
-            onChange={(e) => setCurrentPassword(e.target.value)} />
+            onChange={(e) => setCurrentPassword(e.target.value)} 
+            onCut={(e) => {
+              e.preventDefault();
+            }} 
+            onCopy={(e) => {
+              e.preventDefault();
+            }} 
+            onPaste={(e) => {
+              e.preventDefault();
+            }}/>
 
             <Typography variant="body2">New Password</Typography>
             <TextField fullWidth placeholder="**********" type='password' value={newPassword}
@@ -139,7 +136,16 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
                     borderColor: 'success.main',
                 },
                 },
-            }} />
+            }} 
+            onCut={(e) => {
+              e.preventDefault();
+            }} 
+            onCopy={(e) => {
+              e.preventDefault();
+            }} 
+            onPaste={(e) => {
+              e.preventDefault();
+            }}/>
             <LinearProgress variant="determinate" value={getPasswordStrength()}
             sx={{ mb: 2, height: 8, borderRadius: 4, backgroundColor: (theme) => theme.palette.grey[300] }}/>
 
@@ -161,12 +167,21 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
                     borderColor: 'success.main',
                 },
                 },
+            }}
+            onCut={(e) => {
+              e.preventDefault();
+            }} 
+            onCopy={(e) => {
+              e.preventDefault();
+            }} 
+            onPaste={(e) => {
+              e.preventDefault();
             }}/>
         </Box>
     </DialogContent>
 
     <DialogActions sx={{ justifyContent: 'flex-end', padding: '16px', mr: 1 }}>
-        <Button onClick={handleSave} color="primary" variant="contained" disabled={isSaveDisabled}>Save</Button></DialogActions>
+        <Button onClick={handleSave} color="primary" variant="contained" disabled={isSaveDisabled}>Confirm</Button></DialogActions>
     </Dialog>
   );
 };

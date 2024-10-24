@@ -18,6 +18,8 @@ export const tableStyles = {
       color: '#333333',
     },
     actionButton: {
+      width: '100px',
+      textTransform: 'none',
       background: '#336FB0',
       '&:hover': {
         boxShadow: '0 0 10px rgba(0,0,0,0.5)',
@@ -25,10 +27,14 @@ export const tableStyles = {
       },
     },
     deleteButton: {
+      textTransform: 'none',
+      width: '50px',
       ml: 1,
       color: '#ED262A',
     },
     acceptButton: {
+      textTransform: 'none',
+      width: '100px',
       mr: 1,
       background: '#22bb33',
       '&:hover': {
@@ -37,6 +43,7 @@ export const tableStyles = {
       },
     },
     rejectButton: {
+      textTransform: 'none',
       width: '50px',
       color: '#bb2124',
     },
