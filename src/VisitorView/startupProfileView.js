@@ -55,15 +55,77 @@ function StartUpView() {
     return <div>No startup data available</div>;
   }
 
+    // Helper function to get only accepted investors
+    const getAcceptedInvestors = () => {
+      return startup.fundingRounds
+        .flatMap(round => round.capTableInvestors)
+        .filter(investorDetail => 
+          !investorDetail.isDeleted && 
+          !investorDetail.investorRemoved &&
+          investorDetail.status === 'accepted'
+        );
+    };
+  
+    // Calculate total money raised from accepted investments only
+    const totalMoneyRaised = startup.fundingRounds
+      .flatMap(round => round.capTableInvestors)
+      .filter(investorDetail => 
+        !investorDetail.isDeleted && 
+        !investorDetail.investorRemoved &&
+        investorDetail.status === 'accepted'
+      )
+      .reduce((total, investor) => total + (investor.totalInvestment || 0), 0);
+  
+    // Get unique accepted investors count
+    const uniqueAcceptedInvestorsCount = getAcceptedInvestors()
+      .map(investorDetail => investorDetail.investor.id)
+      .filter((value, index, self) => self.indexOf(value) === index)
+      .length;
+  
+    // Get lead investor (highest total investment among accepted investors)
+    const getLeadInvestor = () => {
+      const acceptedInvestors = getAcceptedInvestors();
+      if (acceptedInvestors.length === 0) return 'N/A';
+  
+      const leadInvestor = acceptedInvestors.reduce((prev, current) => {
+        return (prev.totalInvestment > current.totalInvestment) ? prev : current;
+      }, { totalInvestment: 0 });
+  
+      return leadInvestor.investor?.firstName 
+        ? `${leadInvestor.investor.firstName} ${leadInvestor.investor.lastName}`
+        : 'N/A';
+    };
+  
+    // Get repeat investor (investor with multiple accepted investments)
+    const getRepeatInvestor = () => {
+      const investmentCounts = {};
+      const acceptedInvestors = getAcceptedInvestors();
+  
+      acceptedInvestors.forEach(investorDetail => {
+        const investorId = investorDetail.investor.id;
+        if (investmentCounts[investorId]) {
+          investmentCounts[investorId].count += 1;
+          investmentCounts[investorId].investor = investorDetail.investor;
+        } else {
+          investmentCounts[investorId] = { 
+            count: 1, 
+            investor: investorDetail.investor 
+          };
+        }
+      });
+  
+      const repeatInvestors = Object.values(investmentCounts)
+        .filter(investor => investor.count > 1)
+        .sort((a, b) => b.count - a.count);
+  
+      return repeatInvestors.length > 0
+        ? `${repeatInvestors[0].investor.firstName} ${repeatInvestors[0].investor.lastName}`
+        : 'N/A';
+    };
+
   const streetAddress = startup.streetAddress === "N/A" ? "" : startup.streetAddress || "";
   const city = startup.city === "N/A" ? "" : startup.city || "";
   const state = startup.state === "N/A" ? "" : startup.state || "";
-
-  const totalMoneyRaised = startup.fundingRounds
-  .filter(fundingRound => !fundingRound.isDeleted) 
-  .reduce((total, fundingRound) => {
-    return total + (fundingRound.moneyRaised || 0); 
-  }, 0);
 
   return (
     <Box sx={{ width: '100%', paddingLeft: `${drawerWidth}px`, mt: 5 }}>
@@ -296,57 +358,17 @@ function StartUpView() {
                   <CardStyled>
                     <FundingTitle>Investors</FundingTitle>
                     <Divider sx={{ mb: 2 }} />
-
-                    {/* Total Number of Investors */}
+                    
                     <FundingDescription>
-                      Total Number of Investors: <strong>{startup.fundingRounds.flatMap(round => round.capTableInvestors)
-                        .filter(investorDetail => !investorDetail.isDeleted && !investorDetail.investorRemoved)
-                        .map(investorDetail => investorDetail.investor.id) // To get unique investor IDs
-                        .filter((value, index, self) => self.indexOf(value) === index).length}</strong>
+                      Total Number of Investors: <strong>{uniqueAcceptedInvestorsCount}</strong>
                     </FundingDescription>
-
-                    {/* Lead Investor */}
+                    
                     <FundingNote>
-                      Lead Investor: <strong>
-                        {
-                          (() => {
-                            const allInvestors = startup.fundingRounds.flatMap(round => round.capTableInvestors)
-                              .filter(investorDetail => !investorDetail.isDeleted && !investorDetail.investorRemoved);
-
-                            const leadInvestor = allInvestors.reduce((prev, current) => {
-                              return (prev.totalInvestment > current.totalInvestment) ? prev : current;
-                            }, { totalInvestment: 0 });
-
-                            return leadInvestor.investor?.firstName ? `${leadInvestor.investor.firstName} ${leadInvestor.investor.lastName}` : 'N/A';
-                          })()
-                        }
-                      </strong>
+                      Lead Investor: <strong>{getLeadInvestor()}</strong>
                     </FundingNote>
-
-                    {/* Repeat Investor */}
+                    
                     <FundingNote>
-                      Repeat Investor: <strong>
-                        {
-                          (() => {
-                            const investmentCounts = {};
-                            const allInvestors = startup.fundingRounds.flatMap(round => round.capTableInvestors)
-                              .filter(investorDetail => !investorDetail.isDeleted && !investorDetail.investorRemoved);
-
-                            allInvestors.forEach(investorDetail => {
-                              const investorId = investorDetail.investor.id;
-                              if (investmentCounts[investorId]) {
-                                investmentCounts[investorId].count += 1;
-                                investmentCounts[investorId].investor = investorDetail.investor;
-                              } else {
-                                investmentCounts[investorId] = { count: 1, investor: investorDetail.investor };
-                              }
-                            });
-
-                            const repeatInvestors = Object.values(investmentCounts).filter(investor => investor.count > 1);
-                            return repeatInvestors.length > 0 ? `${repeatInvestors[0].investor.firstName} ${repeatInvestors[0].investor.lastName}` : 'N/A';
-                          })()
-                        }
-                      </strong>
+                      Repeat Investor: <strong>{getRepeatInvestor()}</strong>
                     </FundingNote>
                   </CardStyled>
                 </FundingBox>
