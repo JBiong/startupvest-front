@@ -3,8 +3,10 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, B
 import CloseIcon from '@mui/icons-material/Close';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import axios from 'axios';
 
 const ChangePasswordDialog = ({ open, onClose, onSave }) => {
+  const userId = localStorage.getItem('userId');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -34,13 +36,36 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
     return (strength / 5) * 100; 
   };
 
-  const handleSave = () => {
+  const passwordData = {
+    currentPassword,
+    newPassword
+  }
+
+  const handleSave = async () => {
     if (newPassword !== confirmNewPassword) {
       alert('New passwords do not match');
       return;
     }
-    onSave(currentPassword, newPassword);
-    onClose();
+  
+    try {
+      const passwordData = {
+        currentPassword,
+        newPassword
+      };
+  
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/${userId}/change-password`, passwordData, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      });
+  
+      // Handle successful password change
+      console.log('Password changed successfully!', response.data);
+  
+      // Replace with appropriate success message/action
+      onClose(); // Close the dialog
+  
+    } catch (error) {
+      console.error('Error changing password:', error);
+    }
   };
 
   const isSaveDisabled =

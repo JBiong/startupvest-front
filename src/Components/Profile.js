@@ -141,8 +141,11 @@ function Profile() {
     if (!userData.email.trim()) errors.email = emptyFieldError;
     if (!userData.contactNumber.trim()) errors.contactNumber = emptyFieldError;
     if (!userData.gender.trim()) errors.gender = emptyFieldError;
-    if (userData.biography.length > maxDescriptionLength) 
-        errors.biography = `Biography cannot exceed ${maxDescriptionLength} characters.`;
+    if (userData.biography && userData.biography.trim().length === 0) {
+      errors.biography = "Biography cannot be empty.";
+    } else if (userData.biography && userData.biography.length > maxDescriptionLength) {
+      errors.biography = `Biography cannot exceed ${maxDescriptionLength} characters.`;
+    }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
