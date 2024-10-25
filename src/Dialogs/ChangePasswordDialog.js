@@ -10,6 +10,8 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Updated Password requirements
   const passwordRequirements = {
@@ -36,11 +38,6 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
     return (strength / 5) * 100; 
   };
 
-  const passwordData = {
-    currentPassword,
-    newPassword
-  }
-
   const handleSave = async () => {
     if (newPassword !== confirmNewPassword) {
       alert('New passwords do not match');
@@ -56,25 +53,22 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/${userId}/change-password`, passwordData, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
       });
-  
-      // Handle successful password change
-      console.log('Password changed successfully!', response.data);
-  
-      // Replace with appropriate success message/action
-      onClose(); // Close the dialog
-  
+
+      setShowSuccessDialog(true);
+      setTimeout(() => {
+        localStorage.clear(); 
+        window.location.href = '/login'; 
+      }, 3000);
+
     } catch (error) {
-      console.error('Error changing password:', error);
+      if (error.response && error.response.status === 400) {
+        setErrorMessage("Current password is incorrect.");
+      } else {
+        setErrorMessage('An error occurred. Please try again.');
+      }
     }
   };
 
-  const isSaveDisabled =
-    !currentPassword ||
-    !newPassword ||
-    !confirmNewPassword ||
-    newPassword !== confirmNewPassword;
-
-  // Check if password meets requirements
   const passwordMeetsRequirements = () => {
     return (
       newPassword.length >= passwordRequirements.minLength &&
@@ -85,6 +79,13 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
     );
   };
 
+  const isSaveDisabled =
+    !currentPassword ||
+    !newPassword ||
+    !confirmNewPassword ||
+    newPassword !== confirmNewPassword ||
+    !passwordMeetsRequirements();
+
   const handleDialogClose = () => {
     setCurrentPassword('');
     setNewPassword('');
@@ -93,6 +94,7 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
   };
 
   return (
+    <>
     <Dialog open={open} onClose={handleDialogClose} fullWidth maxWidth="sm">
       <DialogTitle sx={{ position: 'relative', padding: '16px 24px' }}>
         <Typography variant="h6" fontWeight="bold">Change Password</Typography>
@@ -125,7 +127,7 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
             </ul>
 
             <Typography variant="body2">Current Password</Typography>
-            <TextField fullWidth placeholder="**********" type='password' value={currentPassword}sx={{ mb: 3 }}
+            <TextField fullWidth placeholder="**********" type='password' value={currentPassword} sx={{ mb: 3 }}
             onChange={(e) => setCurrentPassword(e.target.value)} 
             onCut={(e) => {
               e.preventDefault();
@@ -174,7 +176,7 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
             <LinearProgress variant="determinate" value={getPasswordStrength()}
             sx={{ mb: 2, height: 8, borderRadius: 4, backgroundColor: (theme) => theme.palette.grey[300] }}/>
 
-            <Typography variant="body2">Confirm Current Password</Typography>
+            <Typography variant="body2">Confirm New Password</Typography>
             <TextField fullWidth placeholder="**********"  type='password' value={confirmNewPassword}
             onChange={(e) => setConfirmNewPassword(e.target.value)}
             error={newPassword !== confirmNewPassword && confirmNewPassword !== ''}
@@ -208,6 +210,17 @@ const ChangePasswordDialog = ({ open, onClose, onSave }) => {
     <DialogActions sx={{ justifyContent: 'flex-end', padding: '16px', mr: 1 }}>
         <Button onClick={handleSave} color="primary" variant="contained" disabled={isSaveDisabled}>Confirm</Button></DialogActions>
     </Dialog>
+
+    {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onClose={() => setShowSuccessDialog(false)} maxWidth="sm">
+        <DialogTitle variant="h5" sx={{ padding: '24px 24px 16px', fontWeight: 'bold'  }}>Password Updated</DialogTitle>
+        <DialogContent sx={{ padding: '0 24px 24px' }}>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 1, lineHeight: 1.6 }}>
+            Your password has been updated successfully. For security purposes, you will now be signed out. Please log in again to confirm these changes.
+          </Typography>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

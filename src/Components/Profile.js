@@ -9,7 +9,7 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
-const drawerWidth = 280;
+const drawerWidth = 265;
 
 function Profile() {
   const [businessProfiles, setBusinessProfiles] = useState([]);
@@ -142,7 +142,7 @@ function Profile() {
     if (!userData.contactNumber.trim()) errors.contactNumber = emptyFieldError;
     if (!userData.gender.trim()) errors.gender = emptyFieldError;
     if (userData.biography && userData.biography.trim().length === 0) {
-      errors.biography = "Biography cannot be empty.";
+      errors.biography = emptyFieldError;
     } else if (userData.biography && userData.biography.length > maxDescriptionLength) {
       errors.biography = `Biography cannot exceed ${maxDescriptionLength} characters.`;
     }
@@ -187,17 +187,12 @@ function Profile() {
         .join(' ');
   };
 
-  const handleSavePassword = (currentPassword, newPassword) => {
-    console.log('Current Password:', currentPassword);
-    console.log('New Password:', newPassword);
-  };
-
 return (
   <>
     <Navbar />
     <Toolbar />
-    <Box component="main" sx={{ flexGrow: 1, p: 4, paddingLeft: `${drawerWidth}px`, width: '100%', overflowX: 'hidden', backgroundColor: '#f5f5f5' }}>
-      <Typography variant="h5" sx={{ paddingLeft: 4, color: '#1E1E1E', fontWeight: 'bold', mt: 3 }}>Account Information</Typography>
+    <Box component="main" sx={{ flexGrow: 1, pt: 6, pb: 6, paddingLeft: `${drawerWidth}px`, width: '100%', overflowX: 'hidden', backgroundColor: '#f5f5f5' }}>
+      <Typography variant="h5" sx={{ paddingLeft: 4, color: '#1E1E1E', mt: 3 }}>Account Information</Typography>
 
       {userData.role === 'Investor' && !areRequiredFieldsFilled() && (
           <Box sx={{ backgroundColor: '#FFEB3B', padding: 2, borderRadius: 2, marginTop: 2, ml: 3, mr: 5, mb: -1 }}>
@@ -414,32 +409,13 @@ return (
 
         {/* Change Password and Startup Vest promo*/}
         <Grid item xs={12} md={2.2} sx={{ display: 'flex', flexDirection: 'column', }}>
-          {userData.role === 'CEO' && (
-            <Box sx={{ pt: 5, pb: 5, pl: 4, pr: 4, mb: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.15)', borderRadius: '12px',
-              background: 'linear-gradient(135deg, #4A90E2 30%, #357ABD)',color: '#fff',}}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'white', mb: 2 }}>Startup Vest</Typography>
-                <Typography variant="body2" sx={{ color: 'white', textAlign: 'justify', lineHeight: '1.7em'}}>
-                  Our application equips startup owners with essential tools for effective
-                  funding management. Users can access key metrics like the highest-funded
-                  companies, top investors, and total funding amounts. They can also track
-                  investor counts, review funding rounds, and visualize monthly funding
-                  trends.
-                </Typography>
-              </Grid>
-            </Grid>
-          </Box>
-          )}
-
           <Box sx={{ pt: 5, pb: 5, pl: 4, pr: 4, boxShadow: '0 4px 15px rgba(0,0,0,0.1)', borderRadius: '12px', background: 'white', maxWidth: '400px', margin: '0 auto', }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1E1E1E', mb: 2 }}>Change Password</Typography>
                 <Typography variant="body1" color="textSecondary"
-                  sx={{ textAlign: 'justify', fontSize: '15px', lineHeight: '1.6', }}>
-                  Keep your account secure by regularly updating your password. Click the
-                  button below to set a new password.
+                  sx={{ textAlign: 'justify', fontSize: '15px', lineHeight: '1.6em', }}>
+                  Keep your account secure by regularly updating your password. Click the button below to set a new password.
                 </Typography>
 
                 <Button variant="outlined" color="primary" fullWidth
@@ -471,7 +447,7 @@ return (
         </Grid>
       </Grid>
     </Box>
-    <ChangePasswordDialog open={openChangePassword} onClose={() => setOpenChangePassword(false)} onSave={handleSavePassword} />
+    <ChangePasswordDialog open={openChangePassword} onClose={() => setOpenChangePassword(false)} />
   </>
 );
 }
