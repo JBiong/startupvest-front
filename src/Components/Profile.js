@@ -9,7 +9,7 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
-const drawerWidth = 265;
+const drawerWidth = 250;
 
 function Profile() {
   const [businessProfiles, setBusinessProfiles] = useState([]);
@@ -191,7 +191,7 @@ return (
   <>
     <Navbar />
     <Toolbar />
-    <Box component="main" sx={{ flexGrow: 1, pt: 6, pb: 6, paddingLeft: `${drawerWidth}px`, width: '100%', overflowX: 'hidden', backgroundColor: '#f5f5f5' }}>
+    <Box component="main" sx={{ flexGrow: 1, pt: 4, pb: 6, paddingLeft: `${drawerWidth}px`, width: '100%', overflowX: 'hidden', backgroundColor: '#f5f5f5' }}>
       <Typography variant="h5" sx={{ paddingLeft: 4, color: '#1E1E1E', mt: 3 }}>Account Information</Typography>
 
       {userData.role === 'Investor' && !areRequiredFieldsFilled() && (
@@ -204,6 +204,9 @@ return (
 
       <Grid container spacing={3} sx={{ mt: 1, ml: 'auto', mr: 'auto', width: '100%', display: 'flex'}}>
         <Grid item xs={12} md={3} sx={{ display: 'flex', flexDirection: 'column', }}>
+        {loading ? (
+                    <Skeleton variant="rectangular" height={400} width="100%" />
+                ) : (
           <Box component="main" sx={{ borderRadius: 2, pb: 3, boxShadow: '0 0 10px rgba(0,0,0,0.25)', textAlign: 'center', display: 'flex', flexDirection: 'column',
               alignItems: 'center', background: 'white' }}>
             <Grid container justifyContent="center" sx={{ mt: 2, mb: 2 }}>
@@ -265,8 +268,12 @@ return (
               </Grid>
             </Grid>
           </Box>
+          )}
 
           {/* Biography Section */}
+          {loading ? (
+                    <Skeleton variant="rectangular" height={400} width="100%" sx={{ mt: 3 }}/>
+                ) : (
           <Box sx={{ p: 4, mt: 3, boxShadow: '0 0 10px rgba(0,0,0,0.25)', borderRadius: 2, textAlign: 'justify', flexGrow: 1, background: 'white'  }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>About Me</Typography>
             <Typography variant="body1" color="textSecondary" sx={{ whiteSpace: 'pre-wrap' }}>{showFullBio ? userData.biography : `${userData.biography?.slice(0,380) || ''}`}
@@ -278,10 +285,14 @@ return (
               )}
             </Typography>
           </Box>
+          )}
         </Grid>
 
         {/* Editable Profile Fields */}
         <Grid item xs={12} md={6.5} sx={{ display: 'flex', flexDirection: 'column', }}>
+          {loading ? (
+                    <Skeleton variant="rectangular" height={800} width="100%" sx={{ flexGrow: 1 }} />
+                ) : (
           <Box sx={{ pt: 5, pb: 5, pl: 7, pr: 7, boxShadow: '0 0 10px rgba(0,0,0,0.25)', borderRadius: 2, flexGrow: 1, background: 'white' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Edit Profile</Typography>
@@ -339,20 +350,6 @@ return (
                 error={!!formErrors.contactNumber} helperText={formErrors.contactNumber}
                 InputProps={{ disabled: !isEditable, style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }, }} />
               </Grid>
-              
-              {/* <Grid item xs={6}>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <label>Password</label>
-                  {isEditable ? (
-                    <Typography variant="caption" sx={{ color: '#336FB0', ml: 1, textDecoration: 'underline', cursor: 'pointer' }}
-                    onClick={() => setOpenChangePassword(true)}>Change Password</Typography>
-                  ) : (
-                        <Typography variant="caption" sx={{ color: 'gray', ml: 1, textDecoration: 'underline' }}>Change Password</Typography>
-                      )}
-                </Box>
-                <TextField fullWidth variant="outlined" type="password" disabled 
-                  InputProps={{ style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)', }, }} />
-              </Grid> */}
 
               {userData.role === 'Investor' && (
                 <Grid item xs={12}>
@@ -405,10 +402,14 @@ return (
               </Grid>
             </Grid>
           </Box>
+          )}
         </Grid>
 
         {/* Change Password and Startup Vest promo*/}
         <Grid item xs={12} md={2.2} sx={{ display: 'flex', flexDirection: 'column', }}>
+        {loading ? (
+                    <Skeleton variant="rectangular" height={300} width="100%" />
+                ) : (
           <Box sx={{ pt: 5, pb: 5, pl: 4, pr: 4, boxShadow: '0 4px 15px rgba(0,0,0,0.1)', borderRadius: '12px', background: 'white', maxWidth: '400px', margin: '0 auto', }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
@@ -426,8 +427,9 @@ return (
               </Grid>
             </Grid>
           </Box>
+          )}
 
-          {userData.role === 'Investor' && (
+        {userData.role === 'Investor' && (
           <Box sx={{ mt: 3, pt: 5, pb: 5, pl: 4, pr: 4, boxShadow: '0 4px 15px rgba(0,0,0,0.1)', borderRadius: '12px', background: 'white', maxWidth: '400px', }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
