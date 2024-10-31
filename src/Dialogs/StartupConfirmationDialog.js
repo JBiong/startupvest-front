@@ -28,7 +28,7 @@ const StartupConfirmationDialog = ({ open, onClose, onConfirm, title, message, s
         aria-describedby="confirmation-dialog-description" 
         maxWidth="sm" 
         fullWidth>
-        <DialogTitle id="confirmation-dialog-title" sx={{ bgcolor: '#f44336', color: 'white', mb: 3 }}>
+        <DialogTitle id="confirmation-dialog-title" sx={{ p: 3 }}>
           <Typography variant="h6">{title}</Typography>
         </DialogTitle>
         <DialogContent>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, Paper, Typography, Toolbar, CssBaseline, AppBar, Box, IconButton, Avatar, Table,
-  TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, } from '@mui/material';
+  TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, Pagination } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import axios from 'axios';
 import UserRegistrationsChart from '../Components/ChartAdmin';
@@ -16,6 +16,8 @@ const AdminDashboard = () => {
   const [profilePictures, setProfilePictures] = useState({});
   const [loading, setLoading] = useState(true);
 
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5;
   
   useEffect(() => {
     const fetchData = async () => {
@@ -36,7 +38,7 @@ const AdminDashboard = () => {
         ]);
 
         // Filter out admin users
-        const nonAdminUsers = usersResponse.data.filter(user => user.role !== 'admin');
+        const nonAdminUsers = usersResponse.data.filter(user => user.role !== 'Admin');
 
         const usersWithPhotos = await Promise.all(
           nonAdminUsers.map(async (user) => {
@@ -132,8 +134,16 @@ const AdminDashboard = () => {
     return new Intl.NumberFormat('en-US').format(value);
   };
 
+  const paginatedData = getFilteredData().slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
   const renderTable = () => {
-    const data = getFilteredData();
     return (
       <TableContainer component={Paper} sx={{ mt: 3 }}>
         <Table>
@@ -180,7 +190,7 @@ const AdminDashboard = () => {
                 <TableCell colSpan={5}>Loading...</TableCell>
               </TableRow>
             ) : (
-              data.map((item) => (
+              paginatedData.map((item) => (
                 <TableRow key={item.id}>
                   {filter === 'startup' ? (
                     <>
@@ -217,26 +227,6 @@ const AdminDashboard = () => {
                       <TableCell>{formatDate(item.announcedDate)}</TableCell>
                       <TableCell>{`${item.moneyRaisedCurrency}${formatCurrency(item.targetFunding)}`}</TableCell>
                       <TableCell>{`${item.moneyRaisedCurrency}${formatCurrency(item.moneyRaised)}`}</TableCell>
-                      {/* <TableCell>
-                        {profilePictures[`startup_${item.startupId}`] ? (
-                          <Avatar src={profilePictures[`startup_${item.startupId}`]} />
-                        ) : (
-                          <Avatar>{getStartupName(item.startupId)[0]}</Avatar>
-                        )}
-                      </TableCell> */}
-                    </>
-                  ) : filter === 'funding' ? (
-                    <>
-                      <TableCell>{getStartupName(item.startupId)}</TableCell>
-                      <TableCell>{item.roundType}</TableCell>
-                      <TableCell>{item.amount}</TableCell>
-                      <TableCell>
-                        {profilePictures[`startup_${item.startupId}`] ? (
-                          <Avatar src={profilePictures[`startup_${item.startupId}`]} />
-                        ) : (
-                          <Avatar>{getStartupName(item.startupId)[0]}</Avatar>
-                        )}
-                      </TableCell>
                     </>
                   ) : (
                     <>
@@ -258,16 +248,21 @@ const AdminDashboard = () => {
             )}
           </TableBody>
         </Table>
+
+        <Box display="flex" justifyContent="center">
+        <Pagination count={Math.ceil(getFilteredData().length / itemsPerPage)} page={page} 
+          onChange={handlePageChange} color="primary" sx={{ m: 2 }} />
+        </Box>
       </TableContainer>
     );
-  };
+  };  
 
   return (
     <div style={{ marginTop: '78px', background: '#f5f5f5' }}>
       <CssBaseline />
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, background: '#004A98' }}>
         <Toolbar>
-          <Avatar sx={{ ml: -3, width: 70, height: 70 }} src='images/logoonly.png'></Avatar>
+          <Avatar sx={{ width: 40, height: 40, mr: 2 }} src='images/logoV1.png'></Avatar>
           <Typography variant="h6" noWrap component="div" sx={{ ml: -1 }}>
             Startup Vest
           </Typography>
@@ -345,7 +340,7 @@ const AdminDashboard = () => {
                       ) : (
                       users
                         .sort((a, b) => b.id - a.id)
-                        .slice(0, 10)
+                        .slice(0, 6)
                         .map((user) => (
                           <TableRow key={user.id}>
                             <TableCell>{user.firstName} {user.lastName}</TableCell>
@@ -368,18 +363,25 @@ const AdminDashboard = () => {
             <Grid item xs={12}>
               <Paper elevation={3} style={{ padding: '20px', textAlign: 'center' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-                <Typography variant="h6">
+                  <Typography variant="h6">
                     {filter === 'all' ? 'User' : filter === 'startup' ? 'Startup' : filter === 'investor' ? 'Investor' : 'Funding Round'} Information
                   </Typography>
-                  <Select value={filter} onChange={(e) => setFilter(e.target.value)} sx={{ minWidth: 200, height: 45, '.MuiSelect-select': { padding: '8px 14px',
-                    display: 'flex', alignItems: 'center', } }}>
+                  <Select 
+                    value={filter} 
+                    onChange={(e) => {
+                      setFilter(e.target.value);
+                      setPage(1); 
+                    }} 
+                    sx={{ minWidth: 200, height: 45, '.MuiSelect-select': { padding: '8px 14px', display: 'flex', alignItems: 'center' } }}>
                     <MenuItem value="all">Users</MenuItem>
                     <MenuItem value="startup">Startups</MenuItem>
                     <MenuItem value="investor">Investors</MenuItem>
                     <MenuItem value="funding">Funding Rounds</MenuItem>
                   </Select>
                 </Box>
-                {renderTable()}
+
+                {/* Render your table based on paginated data */}
+                {renderTable(paginatedData)}
               </Paper>
             </Grid>
           </Grid>

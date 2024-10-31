@@ -114,24 +114,12 @@ function PendingRequestInvestor({ onPendingRequestsCountChange }) {
         <Table>
           <TableHead sx={tableStyles.head}>
             <TableRow>
-              <TableCell sx={{ ...tableStyles.cell }}>
-                <Typography sx={tableStyles.typography}>Date</Typography>
-              </TableCell>
-              <TableCell>
-                <Typography sx={{ fontWeight: 'bold', color: 'white', ml: 5 }}>Startup Name</Typography>
-              </TableCell>
-              <TableCell sx={{ ...tableStyles.cell }}>
-                <Typography sx={tableStyles.typography}>Email</Typography>
-              </TableCell>
-              <TableCell sx={{ ...tableStyles.cell }}>
-                <Typography sx={tableStyles.typography}>Investor</Typography>
-              </TableCell>
-              <TableCell sx={{ ...tableStyles.cell }}>
-                <Typography sx={tableStyles.typography}>Shares</Typography>
-              </TableCell>
-              <TableCell sx={{ ...tableStyles.cell }}>
-                <Typography sx={tableStyles.typography}>Action</Typography>
-              </TableCell>
+              <TableCell sx={{ ...tableStyles.cell }}><Typography sx={tableStyles.typography}>Date</Typography></TableCell>
+              <TableCell><Typography sx={{ fontWeight: 'bold', color: 'white', ml: 5 }}>Startup Name</Typography></TableCell>
+              <TableCell sx={{ ...tableStyles.cell }}><Typography sx={tableStyles.typography}>Email</Typography></TableCell>
+              <TableCell sx={{ ...tableStyles.cell }}><Typography sx={tableStyles.typography}>Investor Name</Typography></TableCell>
+              <TableCell sx={{ ...tableStyles.cell }}><Typography sx={tableStyles.typography}>Shares</Typography></TableCell>
+              <TableCell sx={{ ...tableStyles.cell }}><Typography sx={tableStyles.typography}>Action</Typography></TableCell>
             </TableRow>
           </TableHead>
 
@@ -205,7 +193,7 @@ function PendingRequestInvestor({ onPendingRequestsCountChange }) {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onConfirm={handleConfirm}
-        title={dialogType === 'accept' ? 'Confirm Accept' : 'Confirm Reject'}
+        title={dialogType === 'accept' ? 'Accept Investor Request' : 'Reject Investor Request'}
         message={
           <>
             Are you sure you want to {dialogType === 'accept' ? 'accept' : 'reject'} the investment request from{' '}

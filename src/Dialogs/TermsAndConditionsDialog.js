@@ -5,7 +5,7 @@ import termsAndConditions from '../static/termsandcondition';
 
 const TermsAndConditionsDialog = ({ open, onClose }) => {
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth fullscreen>
+    <Dialog open={open} onClose={onClose} maxWidth="xl" fullWidth fullscreen>
       <DialogTitle sx={{ position: 'relative' }}>
         <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
           Terms and Conditions for Investments

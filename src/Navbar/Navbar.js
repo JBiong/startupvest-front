@@ -8,7 +8,10 @@ import PeopleIcon from '@mui/icons-material/PeopleRounded';
 import LogoutIcon from '@mui/icons-material/LogoutRounded';
 import HelpIcon from '@mui/icons-material/Help';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import NavigationIcon from '@mui/icons-material/Navigation';
 
+import UserGuideStartup from '../Dialogs/UserGuideStartup';
+import UserGuideInvestor from '../Dialogs/UserGuideInvestor';
 import { useAuth } from '../Context/AuthContext';
 
 const drawerWidth = 240;
@@ -19,6 +22,8 @@ export default function Navbar() {
   const [lastName, setLastName] = useState('');
   const [userPhoto, setUserPhoto] = useState('');
   const location = useLocation(); 
+  const [openDialog, setOpenDialog] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
 
   const dashboardPath = role === 'Investor' ? '/investorDashboard' : '/startupDashboard';
 
@@ -73,6 +78,15 @@ export default function Navbar() {
     localStorage.removeItem('userId');
     localStorage.removeItem('role');
     window.location = '/login';
+  };
+
+  const handleClickOpen = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setActiveStep(0); 
   };
 
   return (
@@ -149,8 +163,27 @@ export default function Navbar() {
               </ListItem>
             </List>
           </Box>
+
+          <Box sx={{ p: 1, position: 'relative', bottom: 0}}>
+            <List>
+              <ListItem disablePadding sx={{ background: '#336FB0', borderRadius: 2, color: '#f2f2f2' }}>
+                <ListItemButton onClick={handleClickOpen}>
+                  <ListItemIcon>
+                      <NavigationIcon sx={{ color: '#f2f2f2' }} />
+                  </ListItemIcon>
+                  <ListItemText primary="User Guide" />
+                </ListItemButton>
+              </ListItem>
+            </List>
+          </Box>
         </Box>
       </Drawer>
+      
+      {role === 'CEO' ? (
+        <UserGuideStartup open={openDialog} onClose={handleCloseDialog} activeStep={activeStep} setActiveStep={setActiveStep} />
+      ) : (
+        <UserGuideInvestor open={openDialog} onClose={handleCloseDialog} activeStep={activeStep} setActiveStep={setActiveStep} />
+      )}
     </Box>
   );
 }

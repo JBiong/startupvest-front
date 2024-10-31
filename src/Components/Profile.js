@@ -272,19 +272,28 @@ return (
 
           {/* Biography Section */}
           {loading ? (
-                    <Skeleton variant="rectangular" height={400} width="100%" sx={{ mt: 3 }}/>
-                ) : (
-          <Box sx={{ p: 4, mt: 3, boxShadow: '0 0 10px rgba(0,0,0,0.25)', borderRadius: 2, textAlign: 'justify', flexGrow: 1, background: 'white'  }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>About Me</Typography>
-            <Typography variant="body1" color="textSecondary" sx={{ whiteSpace: 'pre-wrap' }}>{showFullBio ? userData.biography : `${userData.biography?.slice(0,380) || ''}`}
-              {userData.biography && userData.biography.length > 200 && (
-                <Typography component="span" onClick={toggleBio}
-                  sx={{ color: '#336FB0', cursor: 'pointer', fontWeight: 'bold', ml: 1, }}>
-                  {showFullBio ? 'Show less' : 'See more'}
+            <Skeleton variant="rectangular" height={400} width="100%" sx={{ mt: 3 }}/>
+          ) : (
+            <Box sx={{ p: 4, mt: 3, boxShadow: '0 0 10px rgba(0,0,0,0.25)', borderRadius: 2, textAlign: 'justify', flexGrow: 1, background: 'white' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2 }}>About Me</Typography>
+              
+              {/* Check if there is biography data */}
+              {userData.biography ? (
+                <Typography variant="body1" color="textSecondary" sx={{ whiteSpace: 'pre-wrap' }}>
+                  {showFullBio ? userData.biography : `${userData.biography.slice(0, 380)}`}
+                  
+                  {/* Toggle link for long bios */}
+                  {userData.biography.length > 200 && (
+                    <Typography component="span" onClick={toggleBio}
+                      sx={{ color: '#336FB0', cursor: 'pointer', fontWeight: 'bold', ml: 1 }}>
+                      {showFullBio ? 'Show less' : 'See more'}
+                    </Typography>
+                  )}
                 </Typography>
+              ) : (
+                <Typography variant="body1" color="textSecondary">No profile information available for this user.</Typography>
               )}
-            </Typography>
-          </Box>
+            </Box>
           )}
         </Grid>
 
