@@ -248,13 +248,8 @@ function ViewFundingRound({ fundingRoundDetails }) {
                 }
             });
     
-            console.log('Funding round updated successfully:', response.data);
             setIsEditMode(false);
     
-            // Add a small delay before refreshing to ensure the server has processed the update
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
         } catch (error) {
             console.error('Failed to update funding round:', error);
         }
@@ -466,8 +461,7 @@ function ViewFundingRound({ fundingRoundDetails }) {
                             <TextField fullWidth variant="outlined" value={formattedPreMoneyValuation}
                                 onChange={handleNumberChange(setFormattedPreMoneyValuation, 'preMoneyValuation')} disabled={!isEditMode}
                                 sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
-                                error={!!errors.preMoneyValuation}
-                            />
+                                error={!!errors.preMoneyValuation}/>
                             </FormControl>
                             {errors.preMoneyValuation && <FormHelperText sx={{ color: 'red' }}>{errors.preMoneyValuation}</FormHelperText>}
                         </Grid>

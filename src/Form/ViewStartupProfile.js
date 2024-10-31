@@ -143,15 +143,9 @@ function ViewStartupProfile({ profile }) {
     
                 setIsEditable(false);
     
-                // Add a small delay before refreshing to ensure the server has processed the update
-                setTimeout(() => {
-                    window.location.reload();
-                }, 500);
-    
             } catch (error) {
                 console.error('Failed to update profile:', error);
                 setIsLoading(false);
-                // Optionally, show an error message to the user
             }
         } else {
             setIsEditable(true);
@@ -211,26 +205,13 @@ function ViewStartupProfile({ profile }) {
 
           <Grid item xs={12} sm={3}>
             <label htmlFor="avatar-upload" onClick={handleAvatarClick}>
-              <Avatar
-                sx={{
-                  width: 200,
-                  height: 200,
-                  mb: 2,
-                  ml: 49.5,
-                  cursor: "pointer",
-                  border: "5px #336FB0 solid",
-                }}
+              <Avatar sx={{ width: 200, height: 200, mb: 2, ml: 49.5, cursor: "pointer", border: "5px #336FB0 solid", }}
                 src={avatar}
                 onClick={handleAvatarClick} />
             </label>
 
-            <input
-              type="file"
-              accept="image/*"
-              id="avatar-upload"
-              onChange={handleAvatarChange}
-              disabled={!isEditable}
-              ref={fileInputRef}
+            <input type="file" accept="image/*" id="avatar-upload"
+              onChange={handleAvatarChange} disabled={!isEditable} ref={fileInputRef}
               style={{ display: "none" }} />
           </Grid>
 
@@ -265,8 +246,7 @@ function ViewStartupProfile({ profile }) {
                         height: "45px",
                         "& .MuiInputBase-root": { height: "45px" },
                       }}
-                      error={!!errors.companyName}
-                    />
+                      error={!!errors.companyName} />
                     {errors.companyName && (
                       <FormHelperText error>
                         {errors.companyName}
@@ -520,10 +500,7 @@ function ViewStartupProfile({ profile }) {
               </Grid>
             </Grid>
 
-            <Typography
-              variant="h6"
-              sx={{ color: "#414a4c", fontWeight: "500", pl: 5, pt: 3, pb: 3 }}
-            >
+            <Typography variant="h6" sx={{ color: "#414a4c", fontWeight: "500", pl: 5, pt: 3, pb: 3 }}>
               Industry
             </Typography>
             <Grid container spacing={3} sx={{ ml: 2 }}>
@@ -557,8 +534,7 @@ function ViewStartupProfile({ profile }) {
                             }}
                           />
                         )}
-                        readOnly={!isEditable}
-                      />
+                        readOnly={!isEditable} />
                     </FormControl>
                     {errors.industry && (
                       <FormHelperText error>{errors.industry}</FormHelperText>
@@ -567,10 +543,7 @@ function ViewStartupProfile({ profile }) {
                 </Grid>
               </Grid>
             </Grid>
-            <Typography
-              variant="h6"
-              sx={{ color: "#414a4c", fontWeight: "500", pl: 5, pt: 3, pb: 3 }}
-            >
+            <Typography variant="h6" sx={{ color: "#414a4c", fontWeight: "500", pl: 5, pt: 3, pb: 3 }}>
               Links
             </Typography>
 
@@ -588,8 +561,7 @@ function ViewStartupProfile({ profile }) {
                       sx={{
                         height: "45px",
                         "& .MuiInputBase-root": { height: "45px" },
-                      }}
-                    />
+                      }}/>
                   </Grid>
 
                   <Grid item xs={12}>
@@ -603,8 +575,7 @@ function ViewStartupProfile({ profile }) {
                       sx={{
                         height: "45px",
                         "& .MuiInputBase-root": { height: "45px" },
-                      }}
-                    />
+                      }}/>
                   </Grid>
 
                   <Grid item xs={12}>
@@ -618,8 +589,7 @@ function ViewStartupProfile({ profile }) {
                       sx={{
                         height: "45px",
                         "& .MuiInputBase-root": { height: "45px" },
-                      }}
-                    />
+                      }}/>
                   </Grid>
 
                   <Grid item xs={12}>
@@ -633,8 +603,7 @@ function ViewStartupProfile({ profile }) {
                       sx={{
                         height: "45px",
                         "& .MuiInputBase-root": { height: "45px" },
-                      }}
-                    />
+                      }}/>
                   </Grid>
 
                   <Grid item xs={12}>
@@ -648,15 +617,13 @@ function ViewStartupProfile({ profile }) {
                       sx={{
                         height: "45px",
                         "& .MuiInputBase-root": { height: "45px" },
-                      }}
-                    />
+                      }}/>
                   </Grid>
                 </Grid>
               </Grid>
             </Grid>
 
-            <Button
-              variant="contained"
+            <Button variant="contained" 
               sx={{
                 width: 150,
                 background: "#336FB0",
@@ -666,8 +633,7 @@ function ViewStartupProfile({ profile }) {
                 },
               }}
               style={{ marginLeft: "83.5%" }}
-              onClick={handleUpdateProfile}
-            >
+              onClick={handleUpdateProfile}>
               {isEditable ? "Save Changes" : "Edit Profile"}
             </Button>
           </Box>

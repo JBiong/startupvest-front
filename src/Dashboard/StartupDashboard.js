@@ -109,8 +109,9 @@ function StartupDashboard() {
         setOpenViewStartup(true);
     };
 
-    const handleCloseStartUp = () => {
+    const handleCloseStartUp = async () => {
         setOpenViewStartup(false);
+        await fetchBusinessProfiles();
     };
 
     const handleOpenInvestor = (profile) => {
