@@ -58,7 +58,7 @@ function Faqs() {
                 
                 <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">What is StartUpVest?</Typography>
+                        <Typography variant="h6">What is Startup Vest?</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography>
@@ -69,7 +69,7 @@ function Faqs() {
 
                 <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">How does StartUpVest work?</Typography>
+                        <Typography variant="h6">How does Startup Vest work?</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography>
@@ -126,7 +126,7 @@ function Faqs() {
 
                 <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">What types of funding can I offer on StartUpVest?</Typography>
+                        <Typography variant="h6">What types of funding can I offer on Startup Vest?</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography>
@@ -169,7 +169,7 @@ function Faqs() {
 
                 <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">Who are the people behind StartUpVest?</Typography>
+                        <Typography variant="h6">Who are the people behind StartUp Vest?</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography>
