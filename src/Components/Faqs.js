@@ -58,22 +58,22 @@ function Faqs() {
                 
                 <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">What is Startup Vest?</Typography>
+                        <Typography variant="h6">What is InvestTrack?</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography>
-                            StartUpVest is a platform designed to connect startups with potential investors. It simplifies the process of showcasing startups and finding investors interested in funding them.
+                            InvestTrack is a platform designed to connect startups with potential investors. It simplifies the process of showcasing startups and finding investors interested in funding them.
                         </Typography>
                     </AccordionDetails>
                 </Accordion>
 
                 <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">How does Startup Vest work?</Typography>
+                        <Typography variant="h6">How does InvestTrack work?</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography>
-                            StartUpVest allows users to create a profile either as a startup company, an investor, or both. Startup owners can create and manage their business profiles, manually add shareholders or investors, and showcase their company to potential backers. Investors can explore different startups and connect with them through external links provided in user profiles. Users have the flexibility to act as both a startup owner and an investor at the same time.</Typography>
+                            InvestTrack allows users to create a profile either as a startup company, an investor, or both. Startup owners can create and manage their business profiles, manually add shareholders or investors, and showcase their company to potential backers. Investors can explore different startups and connect with them through external links provided in user profiles. Users have the flexibility to act as both a startup owner and an investor at the same time.</Typography>
                     </AccordionDetails>
                 </Accordion>
 
@@ -126,7 +126,7 @@ function Faqs() {
 
                 <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">What types of funding can I offer on Startup Vest?</Typography>
+                        <Typography variant="h6">What types of funding can I offer on InvestTrack?</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography>
@@ -169,11 +169,11 @@ function Faqs() {
 
                 <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant="h6">Who are the people behind StartUp Vest?</Typography>
+                        <Typography variant="h6">Who are the people behind InvestTrack?</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
                         <Typography>
-                            Our team is dedicated to creating a seamless experience for both startups and investors. Here’s a brief introduction to the key members behind StartUpVest:
+                            Our team is dedicated to creating a seamless experience for both startups and investors. Here’s a brief introduction to the key members behind InvestTrack:
                         </Typography>
                         <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '20px' }}>
                             <div style={{ textAlign: 'center' }}>

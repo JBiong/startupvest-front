@@ -95,7 +95,7 @@ export default function Navbar() {
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, background: '#004A98' }}>
         <Toolbar>
           <Avatar sx={{ ml: -1, width: 40, height: 40, mr: 1 }} src='images/logo_nav.png' />
-          <Typography variant="h6" noWrap component="div">Startup Vest</Typography>
+          <Typography variant="h6" noWrap component="div">InvestTrack</Typography>
           <Box sx={{ flexGrow: 1 }} />
           <Avatar sx={{ mr: 1, width: 40, height: 40, border: '2px #F2F2F2 solid' }}>
             {userPhoto ? (
