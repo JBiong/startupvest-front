@@ -147,7 +147,7 @@ function Login() {
                   <Button onClick={() => handleButtonClick('Startup Vest')}
                     variant={selected === 'Startup Vest' ? 'contained' : 'outlined'}
                     sx={{ borderRadius: 4, textTransform: 'none', flexGrow: 1 }}>
-                    <Typography sx={{ fontSize: '13px' }}>Startup Vest</Typography>
+                    <Typography sx={{ fontSize: '13px' }}>InvestTrack</Typography>
                   </Button>
 
                   <Button onClick={() => handleButtonClick('Finease')}
