@@ -189,7 +189,7 @@ export default function Companies() {
                   <StyledTableRow key={index}>
                     <StyledTableCell>
                       <StyledStack direction="row" alignItems="center">
-                        <Skeleton variant="rounded" width={40} height={40} />
+                        <Skeleton variant="rounded" width={50} height={50} />
                         <Skeleton variant="text" width="30%" sx={{ ml: 2 }} />
                       </StyledStack>
                     </StyledTableCell>

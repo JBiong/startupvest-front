@@ -6,7 +6,7 @@ const investorUserGuideSteps = [
         content: (
             <Box>
                 <Typography variant="body1" textAlign='justify' sx={{ mt: 5}}>
-                    Welcome to Startup Vest! This guide will help you navigate the Investor Dashboard, where you can effectively manage your investments and track funding activities. Our platform is designed to provide you with a comprehensive view of your investment portfolio and streamline your interactions with startups seeking funding.
+                    Welcome to InvestTrack! This guide will help you navigate the Investor Dashboard, where you can effectively manage your investments and track funding activities. Our platform is designed to provide you with a comprehensive view of your investment portfolio and streamline your interactions with startups seeking funding.
                 </Typography>
 
                 <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -44,7 +44,7 @@ const investorUserGuideSteps = [
         content: (
             <Box>
                 <Typography variant="body1">
-                    This section will walk you through the process of requesting an investment in a startup through the Startup Vest platform. Follow these steps to make your investment request seamless and straightforward.
+                    This section will walk you through the process of requesting an investment in a startup through the InvestTrack platform. Follow these steps to make your investment request seamless and straightforward.
                 </Typography>
 
                 <Grid container spacing={2} sx={{ mt: 2 }}>
