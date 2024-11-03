@@ -80,8 +80,8 @@ function ViewStartupProfile({ profile }) {
             newErrors.companyDescription = `Company Description cannot exceed ${maxDescriptionLength} characters.`;
         }
         if (!foundedMonth.trim()) newErrors.foundedMonth = emptyFieldError;
-        if (!foundedDay.trim()) newErrors.foundedDay = emptyFieldError;
-        if (!foundedYear.trim()) newErrors.foundedYear = emptyFieldError;
+        if (!foundedDay?.toString().trim()) newErrors.foundedDay = emptyFieldError;
+        if (!foundedYear?.toString().trim()) newErrors.foundedYear = emptyFieldError;
         if (!typeOfCompany.trim()) newErrors.typeOfCompany = emptyFieldError;
         if (!numberOfEmployees.trim()) newErrors.numberOfEmployees = emptyFieldError;
         
