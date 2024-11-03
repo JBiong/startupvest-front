@@ -252,7 +252,7 @@ export default function FundingRound() {
                   <TableRow key={index}>
                     <StyledTableCell>
                       <StyledStack direction="row" alignItems="center">
-                        <Skeleton variant="rectangular" width={40} height={40} sx={{ borderRadius: '4px' }} />
+                        <Skeleton variant="rectangular" width={50} height={50} sx={{ borderRadius: '4px' }} />
                         <Skeleton variant="text" width="30%" sx={{ ml: 2 }} />
                       </StyledStack>
                     </StyledTableCell>

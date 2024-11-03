@@ -15,8 +15,8 @@ export const StyledPaper = styled(Paper)(({ theme }) => ({
 }));
 
 export const StyledAvatar = styled(Avatar)(({ theme }) => ({
-  width: 40,
-  height: 40,
+  width: 50,
+  height: 50,
   marginRight: theme.spacing(2),
   border: `2px solid #336FB0`,
 }));

@@ -6,7 +6,7 @@ const startupUserGuideSteps = [
         content: (
             <Box>
                 <Typography variant="body1" textAlign='justify' sx={{ mt: 5}}>
-                    Welcome to Startup Vest! This guide will help you manage your startup profile, funding rounds, and investments. Our platform is designed to provide a comprehensive view of your startup's funding activities and manage investor relations seamlessly.
+                    Welcome to InvestTrack! This guide will help you manage your startup profile, funding rounds, and investments. Our platform is designed to provide a comprehensive view of your startup's funding activities and manage investor relations seamlessly.
                 </Typography>
 
                 <Grid container spacing={2} sx={{ mt: 1 }}>
@@ -57,7 +57,7 @@ const startupUserGuideSteps = [
         content: (
             <Box>
                 <Typography variant="body1" textAlign='justify' sx={{ mt: 5}}>
-                    Managing your startup profile is crucial for attracting investors and presenting your company effectively. Here’s how to create, edit, and delete your startup profile in Startup Vest.
+                    Managing your startup profile is crucial for attracting investors and presenting your company effectively. Here’s how to create, edit, and delete your startup profile in InvestTrack.
                 </Typography>
 
                 <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -75,7 +75,7 @@ const startupUserGuideSteps = [
                             <Typography variant="body1" sx={{ mt: 2,  mb: 1, fontWeight: 'bold' }}>Step 3: Create Profile</Typography>
                             <ul>
                                 <li>Once all necessary fields are filled, click the <strong>Create Profile</strong> button to save your startup profile.</li>
-                                <li>Your newly created profile will now be visible in the My Startups section.</li>
+                                <li>Your newly created profile will now be visible in the <strong>My Startups</strong> section.</li>
                             </ul>
                             <img src="/images/userGuideStartup/tabStartup.png" alt="Overview" style={{ width: '100%', borderRadius: '8px' }} /> 
                     </Grid>
@@ -117,7 +117,7 @@ const startupUserGuideSteps = [
         content: (
             <Box>
                 <Typography variant="body1" textAlign='justify' sx={{ mt: 5}}>
-                    Managing your funding rounds is essential for tracking investment opportunities and maintaining clear communication with investors. Here’s how to create, edit, and delete funding rounds in Startup Vest.
+                    Managing your funding rounds is essential for tracking investment opportunities and maintaining clear communication with investors. Here’s how to create, edit, and delete funding rounds in InvestTrack.
                 </Typography>
 
                 <Grid container spacing={2} sx={{ mt: 1, mb: 1 }}>
@@ -214,7 +214,7 @@ const startupUserGuideSteps = [
         content: (
             <Box>
                 <Typography variant="body1" textAlign='justify' sx={{ mt: 5}}>
-                    Managing investor requests is crucial for maintaining relationships with potential investors and ensuring that you select the right partners for your startup. Here’s how to view and manage investor requests in Startup Vest.
+                    Managing investor requests is crucial for maintaining relationships with potential investors and ensuring that you select the right partners for your startup. Here’s how to view and manage investor requests in InvestTrack.
                 </Typography>
 
                 <Grid container spacing={2} sx={{ mt: 1, mb: 1 }}>
