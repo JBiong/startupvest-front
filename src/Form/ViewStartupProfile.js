@@ -71,9 +71,14 @@ function ViewStartupProfile({ profile }) {
     const validateFields = () => {
         const newErrors = {};
         const emptyFieldError = 'This field cannot be empty';
+        const maxDescriptionLength = 1000;
 
         if (!companyName.trim()) newErrors.companyName = emptyFieldError;
-        if (!companyDescription.trim()) newErrors.companyDescription = emptyFieldError;
+        if (!companyDescription || companyDescription.trim().length === 0) {
+          newErrors.companyDescription = emptyFieldError;
+        } else if (companyDescription.length > maxDescriptionLength) {
+            newErrors.companyDescription = `Company Description cannot exceed ${maxDescriptionLength} characters.`;
+        }
         if (!foundedMonth.trim()) newErrors.foundedMonth = emptyFieldError;
         if (!foundedDay.trim()) newErrors.foundedDay = emptyFieldError;
         if (!foundedYear.trim()) newErrors.foundedYear = emptyFieldError;
@@ -84,7 +89,6 @@ function ViewStartupProfile({ profile }) {
             newErrors.phoneNumber = emptyFieldError;
         else if (!phoneNumberRegex.test(phoneNumber)) 
             newErrors.phoneNumber = 'Enter a valid phone number (10-15 digits).';
-        
         if (!contactEmail.trim()) {
                 newErrors.contactEmail = emptyFieldError;
         } else if (!contactEmailRegex.test(contactEmail)) {
