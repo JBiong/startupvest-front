@@ -267,7 +267,7 @@ function ViewStartupProfile({ profile }) {
                       onChange={(e) => setCompanyDescription(e.target.value)}
                       disabled={!isEditable}
                       multiline
-                      rows={6}
+                      rows={8}
                       error={!!errors.companyDescription}/>
                     {errors.companyDescription && (
                       <FormHelperText error>
