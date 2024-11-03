@@ -76,7 +76,7 @@ const AdminDashboard = () => {
           }),
           ...investorsResponse.data.map(async (investor) => {
             try {
-              const response = await axios.get(`${process.env.REACT_APP_API_URL}/profile-picture/investor/${investor.id}`, {
+              const response = await axios.get(`${process.env.REACT_APP_API_URL}/profile-picture/${investor.id}`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 responseType: 'blob', 
               });
