@@ -174,12 +174,11 @@ function FundingRoundView() {
                           <Skeleton variant="text" height={100} />
                         ) : (
                           <Typography variant="body1" textAlign="justify">
-                            To invest in our company, we require a minimum purchase of{' '}
+                            To invest in our company, a minimum purchase of 1 share is required, which is valued at {' '}
                             <b>
                               {fundinground.moneyRaisedCurrency}
                               {parseInt(fundinground.minimumShare, 10).toLocaleString()}
-                            </b>{' '}
-                            worth of shares. This ensures a significant commitment to our long-term growth and aligns investors with our strategic goals. By setting this threshold, we aim to attract serious investors who are dedicated to supporting our vision and contributing to our future success. We appreciate your consideration in joining us on this journey.
+                            </b>{' '}. This investment reflects a significant commitment to our long-term growth and aligns investors with our strategic goals. By setting this threshold, we aim to attract serious investors who are dedicated to supporting our vision and contributing to our future success. We appreciate your consideration in joining us on this journey.
                             <br />
                             <br />
                             For more information, please contact us.
