@@ -102,10 +102,11 @@ function ForgotPasswordDialog({ open, onClose }) {
   };
 
   const handleOtpChange = (element, index) => {
-    if (isNaN(element.value)) return; // Only allow numbers
+    if (isNaN(element.value)) return; 
     const otpArray = [...otp];
     otpArray[index] = element.value;
     setOtp(otpArray);
+    setErrorMessage(''); 
 
     // Automatically focus next input box
     if (element.nextSibling && element.value !== '') {
@@ -171,11 +172,11 @@ function ForgotPasswordDialog({ open, onClose }) {
         )}
 
         {activeStep === 1 && isOtpSent && (
-          <Box>
-            <Typography variant="body1" align="justify" sx={{ mb: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}> 
+            <Typography variant="body1" align="justify" sx={{ m: 2 }}>
               An OTP has been sent to your email. Please enter it below to verify your identity and continue the password reset process.
             </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', maxWidth: '400px', margin: '0 auto' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
               {otp.map((data, index) => (
                 <TextField
                   key={index}
@@ -186,8 +187,15 @@ function ForgotPasswordDialog({ open, onClose }) {
                   inputProps={{ maxLength: 1 }}
                   value={data}
                   onChange={(e) => handleOtpChange(e.target, index)}
-                  sx={{ width: '50px' }}
-                />
+                  onInput={(e) => {
+                    if (e.target.value.length === 1 && index < otp.length - 1) {
+                      document.getElementById(`otp-input-${index + 1}`).focus();
+                    }
+                  }}
+                  id={`otp-input-${index}`}
+                  sx={{ width: '69px'}}
+                  InputProps={{
+                    sx: { fontSize: '24px',    pl: '13px', }, }}/>
               ))}
             </Box>
           </Box>
