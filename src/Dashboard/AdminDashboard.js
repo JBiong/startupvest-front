@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, Paper, Typography, Toolbar, CssBaseline, AppBar, Box, IconButton, Avatar, Table,
-  TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, Pagination } from '@mui/material';
+  TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, Pagination, 
+  Button} from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import axios from 'axios';
 import UserRegistrationsChart from '../Components/ChartAdmin';
+
+import Papa from 'papaparse';
 
 import { TopInfoBox, TopInfoText, TopInfoTitle, } from '../styles/StartupDashboard';
 
@@ -104,6 +107,60 @@ const AdminDashboard = () => {
     window.location = '/';
   };
 
+  const downloadData = () => {
+    const filteredData = getFilteredData();
+    const headers = getTableHeaders(filter); // Pass the filter to getHeaders
+  
+    // Filter the data based on selected filter for download
+    const formattedData = filteredData.map((item) => {
+      switch (filter) {
+        case 'startup':
+          return {
+            'Company Name': item.companyName,
+            'Founded Date': item.foundedDate,
+            Industry: item.industry,
+            'Contact Email': item.contactEmail,
+          };
+        case 'investor':
+          return {
+            Name: `${item.firstName} ${item.lastName}`,
+            Email: item.emailAddress,
+            'Contact Information': item.contactInformation,
+            Address: `${item.locationLat}, ${item.locationLng}, ${item.locationName}`,
+          };
+        case 'funding':
+          return {
+            'Company Name': item.startup.companyName,
+            'Funding Type': item.fundingType,
+            'Announced Date': formatDate(item.announcedDate),
+            'Target Funding': formatCurrency(item.targetFunding),
+            'Money Raised': formatCurrency(item.moneyRaised),
+          };
+        default:
+          return {
+            Name: `${item.firstName} ${item.lastName}`,
+            Gender: item.gender,
+            Email: item.email,
+            'Contact Number': item.contactNumber,
+          };
+      }
+    });
+  
+    const csvData = Papa.unparse(formattedData, {
+      headers: headers,
+    });
+  
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+  
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `InvestTrack_${filter}.csv`; // Set filename based on filter
+    link.click();
+  
+    window.URL.revokeObjectURL(url); // Clean up memory leak
+  };
+
   const getFilteredData = () => {
     switch (filter) {
       case 'all':
@@ -114,6 +171,21 @@ const AdminDashboard = () => {
         return investors;
       case 'funding':
         return fundingRounds;
+      default:
+        return [];
+    }
+  };
+
+  const getTableHeaders = () => {
+    switch (filter) {
+      case 'all':
+        return ['Name', 'Gender', 'Email', 'Contact Number', 'User Photo'];
+      case 'startup':
+        return ['Company Name', 'Founded Date', 'Industry', 'Contact Email', 'Company Photo'];
+      case 'investor':
+        return ['Name', 'Email', 'Contact Information', 'Address', 'Investor Photo'];
+      case 'funding':
+        return ['Company Name', 'Funding Type', 'Announced Date', 'Target Funding', 'Money Raised'];
       default:
         return [];
     }
@@ -149,45 +221,15 @@ const AdminDashboard = () => {
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: '#336FB0' }}>
-              {filter === 'startup' ? (
-                <>
-                  <TableCell sx={{ color: 'white' }}>Company Name</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Founded Date</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Industry</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Contact Email</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Company Photo</TableCell>
-                </>
-              ) : filter === 'investor' ? (
-                <>
-                  <TableCell sx={{ color: 'white' }}>Name</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Email</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Contact Information</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Address</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Investor Photo</TableCell>
-                </>
-              ) : filter === 'funding' ? (
-                <>
-                  <TableCell sx={{ color: 'white' }}>Company Name</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Funding Type</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Announced Date</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Target Funding</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Money Raised</TableCell>
-                </>
-              ) : (
-                <>
-                  <TableCell sx={{ color: 'white' }}>Name</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Gender</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Email</TableCell>
-                  <TableCell sx={{ color: 'white' }}>Contact Number</TableCell>
-                  <TableCell sx={{ color: 'white' }}>User Photo</TableCell>
-                </>
-              )}
+              {getTableHeaders().map((header) => (
+                <TableCell key={header} sx={{ color: 'white' }}>{header}</TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={5}>Loading...</TableCell>
+                <TableCell colSpan={getTableHeaders().length}>Loading...</TableCell>
               </TableRow>
             ) : (
               paginatedData.map((item) => (
@@ -211,7 +253,7 @@ const AdminDashboard = () => {
                       <TableCell>{`${item.firstName} ${item.lastName}`}</TableCell>
                       <TableCell>{item.emailAddress}</TableCell>
                       <TableCell>{item.contactInformation}</TableCell>
-                      <TableCell>{item.streetAddress}, {item.city}, {item.country}</TableCell>
+                      <TableCell>{item.locationLng}, {item.locationLat}, {item.locationName}</TableCell>
                       <TableCell>
                         {profilePictures[`investor_${item.id}`] ? (
                           <Avatar src={profilePictures[`investor_${item.id}`]} />
@@ -366,6 +408,10 @@ const AdminDashboard = () => {
                   <Typography variant="h6">
                     {filter === 'all' ? 'User' : filter === 'startup' ? 'Startup' : filter === 'investor' ? 'Investor' : 'Funding Round'} Information
                   </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1 }}>
+                    <Button variant="contained" onClick={downloadData} sx={{ ml: 2 }}>
+                      Download {filter} Data
+                    </Button>
                   <Select 
                     value={filter} 
                     onChange={(e) => {
@@ -378,6 +424,7 @@ const AdminDashboard = () => {
                     <MenuItem value="investor">Investors</MenuItem>
                     <MenuItem value="funding">Funding Rounds</MenuItem>
                   </Select>
+                </Box>
                 </Box>
 
                 {/* Render your table based on paginated data */}

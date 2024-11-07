@@ -1,6 +1,7 @@
 import React from 'react';
-import { Typography, Table, TableBody, TableCell, TableHead, TableRow, Avatar, TableContainer, Paper, Stack, Pagination, Box } from "@mui/material";
+import { Typography, Table, TableBody, TableCell, TableHead, TableRow, Avatar, TableContainer, Paper, Stack, Pagination, Box, Button } from "@mui/material";
 import { tableStyles } from '../styles/tables';
+import Papa from 'papaparse';
 
 const InvestmentTable = ({ filteredRows, page, rowsPerPage, handleRowClick, profilePictures, handleChangePage }) => {
   const calculateInvestmentData = (row) => {
@@ -11,6 +12,43 @@ const InvestmentTable = ({ filteredRows, page, rowsPerPage, handleRowClick, prof
     const percentage = overallTotalShares > 0 ? ((totalShares / overallTotalShares) * 100).toFixed(2) : '0.00';
 
     return { totalShares, totalInvestment, percentage };
+  };
+
+  const getInvestmentHeaders = () => {
+    return ['Startup Name', 'Funding Name', 'Type', 'Shares', 'Total Investment'];
+  };
+
+  const handleDownloadCSV = () => {
+
+    const csvData = filteredRows.map((row) => {
+      const { totalShares, totalInvestment, percentage } = calculateInvestmentData(row);
+      return {
+        'Startup Name': row.startupName,
+        'Funding Name': row.fundingName,
+        'Type': row.fundingType,
+        'Shares': totalShares,
+        'Total Investment': `${row.moneyRaisedCurrency} ${totalInvestment.toFixed(2)}`
+      };
+    });
+
+    const headers = getInvestmentHeaders();
+
+    // const csvString = parse(csvData, { header: true }).data.join('\n');
+    const csvFile = Papa.unparse(csvData, {
+      headers: headers,
+    });
+
+    const blob = new Blob(["\uFEFF" + csvFile], { type: 'text/csv;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download   
+ = 'investment_records.csv';
+    link.click();
+
+    // Revoke the temporary URL after download
+    window.URL.revokeObjectURL(url);
   };
 
   return (
@@ -76,9 +114,11 @@ const InvestmentTable = ({ filteredRows, page, rowsPerPage, handleRowClick, prof
             onChange={handleChangePage} 
             size="medium"
           />
+          <Button variant="contained" onClick={handleDownloadCSV}>Download CSV</Button>
         </Stack>
       )}
     </TableContainer>
+    
   );
 };
 

@@ -6,6 +6,7 @@ import fundingOptions from '../static/fundingOptions';
 import currencyOptions from '../static/currencyOptions';
 import axios from 'axios';
 import { Form } from 'react-router-dom';
+import Papa from 'papaparse';
 
 function ViewFundingRound({ fundingRoundDetails }) {
     const [startups, setStartups] = useState([]);
@@ -277,6 +278,48 @@ function ViewFundingRound({ fundingRoundDetails }) {
     const toggleEditMode = () => {
         setIsEditMode(!isEditMode);
     };
+
+    const getFundingRoundHeaders = () => {
+        return [
+          'Startup Name', 'Funding Name', 'Funding Type', 'Announced Date', 
+          'Closed Date', 'Money Raised', 'Currency', 'Target Funding', 
+          'Pre-money Valuation', 'Price Per Share', 'Investor Name', 'Title', 'Shares'
+        ];
+      };
+
+      const handleDownloadFundingRoundCSV = () => {
+        const csvData = fundingRoundDetails.capTableInvestors
+            .filter(investor => !investor.investorRemoved && investor.status === 'accepted')
+            .map((capInvestor) => ({
+                'Startup Name': fundingRoundDetails ? fundingRoundDetails.startup.companyName : '',
+                'Funding Name': fundingName,
+                'Funding Type': fundingType,
+                'Announced Date': `${announcedYear}-${String(announcedMonth).padStart(2, '0')}-${String(announcedDay).padStart(2, '0')}`,
+                'Closed Date': `${closedYear}-${String(closedMonth).padStart(2, '0')}-${String(closedDay).padStart(2, '0')}`,
+                'Money Raised': `${currency} ${formatNumber(moneyRaised)}`,
+                'Currency': currency,
+                'Target Funding': formatNumber(targetFunding),
+                'Pre-money Valuation': formatNumber(preMoneyValuation),
+                'Price Per Share': formatNumber(minimumShare),
+                'Investor Name': `${capInvestor.investor.firstName} ${capInvestor.investor.lastName}`,
+                'Title': capInvestor.title,
+                'Shares': formatNumber(capInvestor.shares),
+            }));
+    
+        const csvFile = Papa.unparse(csvData, { header: true, columns: getFundingRoundHeaders() });
+    
+        // Add UTF-8 BOM to fix special character display issues
+        const blob = new Blob(["\uFEFF" + csvFile], { type: 'text/csv;charset=utf-8' });
+        const url = window.URL.createObjectURL(blob);
+    
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${fundingName}_funding_round.csv`;
+        link.click();
+    
+        window.URL.revokeObjectURL(url);
+    };
+    
 
     return (
         <Box component="main" sx={{ flexGrow: 1, width: '100%', overflowX: 'hidden', maxWidth: '1000px', background: '#F2F2F2' }}>
@@ -566,6 +609,11 @@ function ViewFundingRound({ fundingRoundDetails }) {
                 </Grid>
             </Grid>
 
+            <Button variant="contained"
+                sx={{ width: 275, background: '#336FB0', '&:hover': { boxShadow: '0 0 10px rgba(0,0,0,0.5)',backgroundColor: '#336FB0' } }} style={{ marginLeft: '50%' }}
+                onClick={handleDownloadFundingRoundCSV}>
+                Download Funding Round
+            </Button>
             <Button variant="contained"
                 sx={{ width: 150, background: '#336FB0', '&:hover': { boxShadow: '0 0 10px rgba(0,0,0,0.5)',backgroundColor: '#336FB0' } }} style={{ marginLeft: '80%' }}
                 onClick={() => {
