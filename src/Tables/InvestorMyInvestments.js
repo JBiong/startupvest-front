@@ -53,7 +53,7 @@ const InvestmentTable = ({ filteredRows, page, rowsPerPage, handleRowClick, prof
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', }}>
-        <Button variant="contained" onClick={handleDownloadCSV} sx={{ mt: 3, background: '#336FB0' }}>
+        <Button variant="contained" onClick={handleDownloadCSV} sx={{ mt: 3, background: '#336FB0', textTransform: 'none' }}>
           <DescriptionIcon sx={{ mr: 1 }} />Generate Report
         </Button>
       </Box>

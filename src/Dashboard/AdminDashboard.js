@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, Paper, Typography, Toolbar, CssBaseline, AppBar, Box, IconButton, Avatar, Table,
-  TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, Pagination, 
+  TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, Pagination, Tooltip,
   Button} from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import axios from 'axios';
 import UserRegistrationsChart from '../Components/ChartAdmin';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 import Papa from 'papaparse';
-
 import { TopInfoBox, TopInfoText, TopInfoTitle, } from '../styles/StartupDashboard';
 
 const AdminDashboard = () => {
@@ -155,10 +155,10 @@ const AdminDashboard = () => {
   
     const link = document.createElement('a');
     link.href = url;
-    link.download = `InvestTrack_${filter}.csv`; // Set filename based on filter
+    link.download = `InvestTrack_${filter}.csv`; 
     link.click();
   
-    window.URL.revokeObjectURL(url); // Clean up memory leak
+    window.URL.revokeObjectURL(url);
   };
 
   const getFilteredData = () => {
@@ -242,9 +242,9 @@ const AdminDashboard = () => {
                       <TableCell>{item.contactEmail}</TableCell>
                       <TableCell>
                         {profilePictures[`startup_${item.id}`] ? (
-                          <Avatar src={profilePictures[`startup_${item.id}`]} />
+                          <Avatar src={profilePictures[`startup_${item.id}`]} sx={{ width: 50, height: 50, border: '1px solid #336FB0' }}/>
                         ) : (
-                          <Avatar>{item.companyName[0]}</Avatar>
+                          <Avatar sx={{ width: 50, height: 50, border: '1px solid #336FB0' }}>{item.companyName[0]}</Avatar>
                         )}
                       </TableCell>
                     </>
@@ -256,9 +256,9 @@ const AdminDashboard = () => {
                       <TableCell>{item.locationLng}, {item.locationLat}, {item.locationName}</TableCell>
                       <TableCell>
                         {profilePictures[`investor_${item.id}`] ? (
-                          <Avatar src={profilePictures[`investor_${item.id}`]} />
+                          <Avatar src={profilePictures[`investor_${item.id}`]} sx={{ width: 50, height: 50, border: '1px solid #336FB0' }}/>
                         ) : (
-                          <Avatar>{item.firstName[0]}{item.lastName[0]}</Avatar>
+                          <Avatar sx={{ width: 50, height: 50, border: '1px solid #336FB0' }}>{item.firstName[0]}{item.lastName[0]}</Avatar>
                         )}
                       </TableCell>
                     </>
@@ -278,9 +278,9 @@ const AdminDashboard = () => {
                       <TableCell>{item.contactNumber}</TableCell>
                       <TableCell>
                         {item.photo ? (
-                          <Avatar src={item.photo} />
+                          <Avatar src={item.photo} sx={{ width: 50, height: 50, border: '1px solid #336FB0' }} />
                         ) : (
-                          <Avatar>{item.firstName[0]}{item.lastName[0]}</Avatar>
+                          <Avatar sx={{ width: 50, height: 50, border: '1px solid #336FB0' }}>{item.firstName[0]}{item.lastName[0]}</Avatar>
                         )}
                       </TableCell>
                     </>
@@ -315,7 +315,7 @@ const AdminDashboard = () => {
         </Toolbar>
       </AppBar>
 
-      <Grid container spacing={3} sx={{ padding: 6 }}>
+      <Grid container spacing={3} sx={{ padding: 3 }}>
         <Grid item xs={12}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={12}>
@@ -355,7 +355,7 @@ const AdminDashboard = () => {
         </Grid>
 
         <Grid item xs={12}>
-          <Grid container spacing={2}>
+          <Grid container spacing={3}>
             <Grid item xs={12} md={8}>
               <Paper elevation={3} style={{ padding: '20px', height: '100%' }}>
                 <Typography variant="h6" color="#1E1E1E">User Growth Graph</Typography>
@@ -388,9 +388,9 @@ const AdminDashboard = () => {
                             <TableCell>{user.firstName} {user.lastName}</TableCell>
                             <TableCell>
                               {user.photo ? (
-                                <Avatar src={user.photo} sx={{ border: '1px solid #336FB0' }}/>
+                                <Avatar src={user.photo} sx={{ border: '1px solid #336FB0', width: 50, height: 50 }}/>
                               ) : (
-                                <Avatar sx={{ border: '1px solid #336FB0' }}>{user.firstName[0]}{user.lastName[0]}</Avatar>
+                                <Avatar sx={{ border: '1px solid #336FB0', width: 50, height: 50 }}>{user.firstName[0]}{user.lastName[0]}</Avatar>
                               )}
                             </TableCell>
                           </TableRow>
@@ -409,11 +409,7 @@ const AdminDashboard = () => {
                     {filter === 'all' ? 'User' : filter === 'startup' ? 'Startup' : filter === 'investor' ? 'Investor' : 'Funding Round'} Information
                   </Typography>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1 }}>
-                    <Button variant="contained" onClick={downloadData} sx={{ ml: 2 }}>
-                      Download {filter} Data
-                    </Button>
-                  <Select 
-                    value={filter} 
+                  <Select value={filter} 
                     onChange={(e) => {
                       setFilter(e.target.value);
                       setPage(1); 
@@ -424,6 +420,10 @@ const AdminDashboard = () => {
                     <MenuItem value="investor">Investors</MenuItem>
                     <MenuItem value="funding">Funding Rounds</MenuItem>
                   </Select>
+                  
+                  <Tooltip title={`Generate Report for ${filter}`} arrow>
+                  <Button variant="contained" onClick={downloadData}><DescriptionIcon /></Button>
+                  </Tooltip>
                 </Box>
                 </Box>
 
