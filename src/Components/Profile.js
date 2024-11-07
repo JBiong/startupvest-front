@@ -280,7 +280,7 @@ return (
               {/* Check if there is biography data */}
               {userData.biography ? (
                 <Typography variant="body1" color="textSecondary" sx={{ whiteSpace: 'pre-wrap' }}>
-                  {showFullBio ? userData.biography : `${userData.biography.slice(0, 380)}`}
+                  {showFullBio ? userData.biography : `${userData.biography.slice(0, 460)}`}
                   
                   {/* Toggle link for long bios */}
                   {userData.biography.length > 200 && (
@@ -373,7 +373,7 @@ return (
                   value={userData.biography}
                   onChange={(e) => setUserData((prevData) => ({ ...prevData, biography: e.target.value }))} 
                   InputProps={{ disabled: !isEditable, style: { boxShadow: '0 0 10px rgba(0,0,0,0.1)', },}} 
-                  sx={{ height: 'auto', '& textarea': { height: 'auto', minHeight: '6em', },}} 
+                  sx={{ height: 'auto', '& textarea': { height: 'auto', minHeight: '5em', },}} 
                   error={!!formErrors.biography} helperText={formErrors.biography} />
               </Grid>
 
