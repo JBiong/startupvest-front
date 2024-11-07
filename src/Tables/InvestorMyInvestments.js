@@ -2,6 +2,7 @@ import React from 'react';
 import { Typography, Table, TableBody, TableCell, TableHead, TableRow, Avatar, TableContainer, Paper, Stack, Pagination, Box, Button } from "@mui/material";
 import { tableStyles } from '../styles/tables';
 import Papa from 'papaparse';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 const InvestmentTable = ({ filteredRows, page, rowsPerPage, handleRowClick, profilePictures, handleChangePage }) => {
   const calculateInvestmentData = (row) => {
@@ -43,82 +44,83 @@ const InvestmentTable = ({ filteredRows, page, rowsPerPage, handleRowClick, prof
 
     const link = document.createElement('a');
     link.href = url;
-    link.download   
- = 'investment_records.csv';
+    link.download   = 'Investment Summary.csv';
     link.click();
 
-    // Revoke the temporary URL after download
     window.URL.revokeObjectURL(url);
   };
 
   return (
-    <TableContainer component={Paper} sx={{ mt: 3 }}>
-      <Table sx={tableStyles} aria-label="investments table">
-        <TableHead sx={tableStyles.head}>
-          <TableRow>
-            <TableCell>
-              <Typography sx={{ fontWeight: 'bold', color: 'white', ml: 5 }}>Startup Name</Typography>
-            </TableCell>
-            <TableCell sx={tableStyles.head}>
-              <Typography sx={tableStyles.typography}>Funding Name</Typography>
-            </TableCell>
-            <TableCell sx={tableStyles.head}>
-              <Typography sx={tableStyles.typography}>Type</Typography>
-            </TableCell>
-            <TableCell sx={tableStyles.head}>
-              <Typography sx={tableStyles.typography}>Shares</Typography>
-            </TableCell>
-            <TableCell sx={tableStyles.head}>
-              <Typography sx={tableStyles.typography}>Total Investment</Typography>
-            </TableCell>
-          </TableRow>
-        </TableHead>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', }}>
+        <Button variant="contained" onClick={handleDownloadCSV} sx={{ mt: 3, background: '#336FB0' }}>
+          <DescriptionIcon sx={{ mr: 1 }} />Generate Report
+        </Button>
+      </Box>
 
-        <TableBody>
-          {filteredRows.length > 0 ? (
-            filteredRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row) => {
-              const { totalShares, totalInvestment, percentage } = calculateInvestmentData(row);
-
-              return (
-                <TableRow key={row.id} hover onClick={() => handleRowClick(row)} sx={{ cursor: 'pointer' }}>
-                  <TableCell sx={{ ...tableStyles.cell, width: '20%' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', ml: 5 }}>
-                      <Avatar src={profilePictures[row.startupId]} sx={{ mr: 2, border: '2px rgba(0, 116, 144, 1) solid', borderRadius: 1 }} variant='square' />
-                      {row.startupName}
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={tableStyles.cell}>{row.fundingName}</TableCell>
-                  <TableCell sx={tableStyles.cell}>{row.fundingType}</TableCell>
-                  <TableCell sx={tableStyles.cell}>{Number(totalShares).toLocaleString()}</TableCell>
-                  <TableCell sx={tableStyles.cell}>{row.moneyRaisedCurrency} {Number(totalInvestment).toLocaleString()}</TableCell>
-                </TableRow>
-              );
-            })
-          ) : (
+      {/* Investment Table */}
+      <TableContainer component={Paper} sx={{ mt: 3 }}>
+        <Table sx={tableStyles} aria-label="investments table">
+          <TableHead sx={tableStyles.head}>
             <TableRow>
-              <TableCell colSpan={6} sx={{ textAlign: 'center' }}>
-                <Typography variant="body2" color="textSecondary">
-                  You currently have no active investments.
-                </Typography>
+              <TableCell>
+                <Typography sx={{ fontWeight: 'bold', color: 'white', ml: 5 }}>Startup Name</Typography>
+              </TableCell>
+              <TableCell sx={tableStyles.head}>
+                <Typography sx={tableStyles.typography}>Funding Name</Typography>
+              </TableCell>
+              <TableCell sx={tableStyles.head}>
+                <Typography sx={tableStyles.typography}>Type</Typography>
+              </TableCell>
+              <TableCell sx={tableStyles.head}>
+                <Typography sx={tableStyles.typography}>Shares</Typography>
+              </TableCell>
+              <TableCell sx={tableStyles.head}>
+                <Typography sx={tableStyles.typography}>Total Investment</Typography>
               </TableCell>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHead>
 
-      {filteredRows.length > 0 && (
-        <Stack spacing={2} sx={{ p: 2, display: 'flex', alignItems: 'center' }}>
-          <Pagination 
-            count={Math.ceil(filteredRows.length / rowsPerPage)}
-            page={page} 
-            onChange={handleChangePage} 
-            size="medium"
-          />
-          <Button variant="contained" onClick={handleDownloadCSV}>Download CSV</Button>
-        </Stack>
-      )}
-    </TableContainer>
+          <TableBody>
+            {filteredRows.length > 0 ? (
+              filteredRows.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((row) => {
+                const { totalShares, totalInvestment, percentage } = calculateInvestmentData(row);
+
+                return (
+                  <TableRow key={row.id} hover onClick={() => handleRowClick(row)} sx={{ cursor: 'pointer' }}>
+                    <TableCell sx={{ ...tableStyles.cell, width: '20%' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', ml: 5 }}>
+                        <Avatar src={profilePictures[row.startupId]} sx={{ mr: 2, border: '2px rgba(0, 116, 144, 1) solid', borderRadius: 1 }} variant='square' />
+                        {row.startupName}
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={tableStyles.cell}>{row.fundingName}</TableCell>
+                    <TableCell sx={tableStyles.cell}>{row.fundingType}</TableCell>
+                    <TableCell sx={tableStyles.cell}>{Number(totalShares).toLocaleString()}</TableCell>
+                    <TableCell sx={tableStyles.cell}>{row.moneyRaisedCurrency} {Number(totalInvestment).toLocaleString()}</TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} sx={{ textAlign: 'center' }}>
+                  <Typography variant="body2" color="textSecondary">
+                    You currently have no active investments.
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+
+        {filteredRows.length > 0 && (
+          <Stack spacing={2} sx={{ p: 2, display: 'flex', alignItems: 'center' }}>
+            <Pagination count={Math.ceil(filteredRows.length / rowsPerPage)} page={page} onChange={handleChangePage} size="medium" />
+          </Stack>
+        )}
+      </TableContainer>
     
+    </Box>
   );
 };
 

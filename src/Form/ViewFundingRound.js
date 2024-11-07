@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, TextField, Button, Select, MenuItem, Grid, FormControl, FormHelperText, Autocomplete } from '@mui/material';
+import { Box, Typography, TextField, Button, Select, MenuItem, Grid, FormControl, FormHelperText, Autocomplete, Tooltip } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import fundingOptions from '../static/fundingOptions';
 import currencyOptions from '../static/currencyOptions';
 import axios from 'axios';
-import { Form } from 'react-router-dom';
+import DescriptionIcon from '@mui/icons-material/Description';
 import Papa from 'papaparse';
 
 function ViewFundingRound({ fundingRoundDetails }) {
@@ -314,18 +314,27 @@ function ViewFundingRound({ fundingRoundDetails }) {
     
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${fundingName}_funding_round.csv`;
+        link.download = `Funding Round Details for ${fundingName}.csv`;
         link.click();
     
         window.URL.revokeObjectURL(url);
     };
     
-
     return (
         <Box component="main" sx={{ flexGrow: 1, width: '100%', overflowX: 'hidden', maxWidth: '1000px', background: '#F2F2F2' }}>
-            <Typography variant="h5" sx={{ color: '#414a4c', fontWeight: '500', pl: 5, pb: 3 }}>
-                Organization
-            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center',  mt: 1, mb: 1 }}>
+                <Typography variant="h5" sx={{ color: '#414a4c', fontWeight: '500', pl: 5,}}>
+                    Organization
+                </Typography>
+
+                <Tooltip title="Generate Report for this Funding Round" arrow>
+                <Button  variant="contained" sx={{ width: 'auto', background: '#336FB0', '&:hover': {  boxShadow: '0 0 10px rgba(0,0,0,0.5)',  backgroundColor: '#336FB0' }, 
+                            ml: 'auto', mr: 5.6 }}
+                    onClick={handleDownloadFundingRoundCSV}>
+                    <DescriptionIcon  />
+                </Button>
+                </Tooltip>
+            </Box>
 
             <Grid container spacing={3} sx={{ ml: 2 }}>
                 <Grid item xs={12} sm={11}>
@@ -609,11 +618,6 @@ function ViewFundingRound({ fundingRoundDetails }) {
                 </Grid>
             </Grid>
 
-            <Button variant="contained"
-                sx={{ width: 275, background: '#336FB0', '&:hover': { boxShadow: '0 0 10px rgba(0,0,0,0.5)',backgroundColor: '#336FB0' } }} style={{ marginLeft: '50%' }}
-                onClick={handleDownloadFundingRoundCSV}>
-                Download Funding Round
-            </Button>
             <Button variant="contained"
                 sx={{ width: 150, background: '#336FB0', '&:hover': { boxShadow: '0 0 10px rgba(0,0,0,0.5)',backgroundColor: '#336FB0' } }} style={{ marginLeft: '80%' }}
                 onClick={() => {

@@ -37,7 +37,7 @@ export const OverviewBox = styled(Box)(({ theme }) => ({
 
 export const OverviewTitle = styled(Typography)(({ theme }) => ({
     fontWeight: 'bold',
-    color: '#336FB0',
+    color: '#1E1E1E',
 }));
 
 export const InvestorTitle = styled(Typography)(({ theme }) => ({
