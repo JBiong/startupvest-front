@@ -50,6 +50,18 @@ const InvestmentTable = ({ filteredRows, page, rowsPerPage, handleRowClick, prof
     window.URL.revokeObjectURL(url);
   };
 
+  // Calculate total shares and total investment for all rows
+  const totalShares = filteredRows.reduce((sum, row) => {
+    const { totalShares } = calculateInvestmentData(row);
+    return sum + totalShares;
+  }, 0);
+
+  const totalInvestment = filteredRows.reduce((sum, row) => {
+    const { totalInvestment } = calculateInvestmentData(row);
+    return sum + totalInvestment;
+  }, 0);
+
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', width: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', }}>
@@ -108,6 +120,16 @@ const InvestmentTable = ({ filteredRows, page, rowsPerPage, handleRowClick, prof
                     You currently have no active investments.
                   </Typography>
                 </TableCell>
+              </TableRow>
+            )}
+
+            {/* Total Row */}
+            {filteredRows.length > 0 && (
+              <TableRow>
+                <TableCell colSpan={2} />
+                <TableCell sx={{...tableStyles.cell, fontWeight: 'bold'}}>Total</TableCell>
+                <TableCell sx={{...tableStyles.cell, fontWeight: 'bold'}}>{totalShares.toLocaleString()}</TableCell>
+                <TableCell sx={{...tableStyles.cell, fontWeight: 'bold'}}>{filteredRows[0]?.moneyRaisedCurrency} {totalInvestment.toLocaleString()}</TableCell>
               </TableRow>
             )}
           </TableBody>
