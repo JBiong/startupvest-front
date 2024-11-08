@@ -268,7 +268,19 @@ function StartUpView() {
                           <Typography>
                             <strong>location</strong>
                           </Typography>
-                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.location_name}</Typography>}
+                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.locationName}</Typography>}
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Typography>
+                            <strong>Telephone Number</strong>
+                          </Typography>
+                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.phoneNumber}</Typography>}
+                        </Grid>
+                        <Grid item xs={3}>
+                          <Typography>
+                            <strong>Email</strong>
+                          </Typography>
+                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.contactEmail}</Typography>}
                         </Grid>
 
                         {/* Icons */}
