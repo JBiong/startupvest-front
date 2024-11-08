@@ -32,10 +32,13 @@ function FundingRoundTable({
   const [fundingRoundsWithMoneyRaised, setFundingRoundsWithMoneyRaised] = useState(0);
   const [highestMoneyRaisedCompany, setHighestMoneyRaisedCompany] = useState({ companyName: '', totalMoneyRaised: 0 });
 
-  const [openHistoryDialog, setOpenHistoryDialog] = useState(false);
-
   const handleStartupChangeFunding = (event) => {
     setSelectedStartupFunding(event.target.value);
+  };
+
+  const getFundingRoundStatus = (closedDate) => {
+    const today = new Date();
+    return new Date(closedDate) < today ? 'Completed' : 'Ongoing';
   };
 
   // Get list of startup IDs the user created
@@ -155,24 +158,13 @@ function FundingRoundTable({
         <Table>
           <TableHead sx={tableStyles.head}>
             <TableRow>
-              <TableCell sx={tableStyles.head}>
-                <Typography sx={tableStyles.typography}>Closed on Date</Typography>
-              </TableCell>
-              <TableCell sx={tableStyles.head}>
-                <Typography sx={tableStyles.typography}>Funding Name</Typography>
-              </TableCell>
-              <TableCell sx={tableStyles.head}>
-                <Typography sx={tableStyles.typography}>Funding Type</Typography>
-              </TableCell>
-              <TableCell sx={tableStyles.head}>
-                <Typography sx={tableStyles.typography}>Money Raised</Typography>
-              </TableCell>
-              <TableCell sx={tableStyles.head}>
-                <Typography sx={tableStyles.typography}>Target Funding</Typography>
-              </TableCell>
-              <TableCell sx={tableStyles.head}>
-                <Typography sx={tableStyles.typography}>Action</Typography>
-              </TableCell>        
+              <TableCell sx={tableStyles.head}><Typography sx={tableStyles.typography}>Status</Typography></TableCell>
+              <TableCell sx={tableStyles.head}><Typography sx={tableStyles.typography}>Closed on Date</Typography></TableCell>
+              <TableCell sx={tableStyles.head}><Typography sx={tableStyles.typography}>Funding Name</Typography></TableCell>
+              <TableCell sx={tableStyles.head}><Typography sx={tableStyles.typography}>Funding Type</Typography></TableCell>
+              <TableCell sx={tableStyles.head}><Typography sx={tableStyles.typography}>Money Raised</Typography></TableCell>
+              <TableCell sx={tableStyles.head}><Typography sx={tableStyles.typography}>Target Funding</Typography></TableCell>
+              <TableCell sx={tableStyles.head}><Typography sx={tableStyles.typography}>Action</Typography></TableCell>        
             </TableRow>
           </TableHead>
           
@@ -182,6 +174,7 @@ function FundingRoundTable({
                 return (
                   <TableRow key={round.id}
                   sx={{ backgroundColor: 'white' }}>
+                    <TableCell sx={tableStyles.cell}>{getFundingRoundStatus(round.closedDate)}</TableCell>
                     <TableCell sx={tableStyles.cell}>{formatDate(round.closedDate)}</TableCell>
                     <TableCell sx={tableStyles.cell}>{round.fundingName}</TableCell>
                     <TableCell sx={tableStyles.cell}>{round.fundingType}</TableCell>
@@ -213,6 +206,7 @@ function FundingRoundTable({
           {paginatedFundingRounds.length > 0 && (
             <TableBody>
               <TableRow sx={{ background: 'white' }}>
+                <TableCell sx={tableStyles.cell}></TableCell>
                 <TableCell sx={tableStyles.cell}></TableCell>
                 <TableCell sx={tableStyles.cell}></TableCell>
                 <TableCell sx={tableStyles.cell}><Typography sx={{ fontWeight: 'bold' }}>Total</Typography></TableCell>
