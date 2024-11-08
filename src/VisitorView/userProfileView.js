@@ -90,34 +90,20 @@ function UserProfileView() {
                         {loading ? (
                           <Skeleton variant="text" width="100%" height={100} />
                         ) : (
-                          <Typography variant="body1" textAlign="justify" sx={{ whiteSpace: 'pre-wrap' }}>{profile.biography}</Typography>
-                        )}
-                      </Grid>
-
-                      <Grid item xs={10} lg={5}>
-                        <Typography><strong>Email Address</strong></Typography>
-                        {loading ? (
-                          <Skeleton variant="text" width="100%" />
-                        ) : (
-                          <Typography variant="body1">{profile.email}</Typography>
-                        )}
-                      </Grid>
-
-                      <Grid item xs={10} lg={4}>
-                        <Typography><strong>Contact Number</strong></Typography>
-                        {loading ? (
-                          <Skeleton variant="text" width="100%" />
-                        ) : (
-                          <Typography variant="body1">{profile.contactNumber}</Typography>
-                        )}
-                      </Grid>
-
-                      <Grid item xs={10} lg={3}>
-                        <Typography><strong>Gender</strong></Typography>
-                        {loading ? (
-                          <Skeleton variant="text" width="100%" />
-                        ) : (
-                          <Typography variant="body1">{profile.gender}</Typography>
+                          <>
+                            <Typography variant="body1" textAlign="justify" sx={{ whiteSpace: 'pre-wrap' }}>{profile.biography || `Additional information for ${profile.lastName} is currently unavailable.`}</Typography>
+                            
+                            <Typography variant="body1" sx={{ marginTop: 3 }}>
+                              Should you have any questions or require further assistance, please feel free to contact me via email at{' '}
+                              <strong>
+                                <a href={`mailto:${profile.email}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                  {profile.email}
+                                </a>
+                              </strong>{' '}
+                              or by phone at{' '}
+                              <strong>{profile.contactNumber}</strong>.
+                            </Typography>
+                          </>
                         )}
                       </Grid>
 
