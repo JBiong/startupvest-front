@@ -280,7 +280,7 @@ return (
               {/* Check if there is biography data */}
               {userData.biography ? (
                 <Typography variant="body1" color="textSecondary" sx={{ whiteSpace: 'pre-wrap' }}>
-                  {showFullBio ? userData.biography : `${userData.biography.slice(0, 460)}`}
+                  {showFullBio ? userData.biography : `${userData.biography.slice(0, 350)}`}
                   
                   {/* Toggle link for long bios */}
                   {userData.biography.length > 200 && (
@@ -302,7 +302,7 @@ return (
           {loading ? (
                     <Skeleton variant="rectangular" height={800} width="100%" sx={{ flexGrow: 1 }} />
                 ) : (
-          <Box sx={{ pt: 5, pb: 5, pl: 7, pr: 7, boxShadow: '0 0 10px rgba(0,0,0,0.25)', borderRadius: 2, flexGrow: 1, background: 'white' }}>
+          <Box sx={{ pt: 5, pb: 5 , pl: 7, pr: 7, boxShadow: '0 0 10px rgba(0,0,0,0.25)', borderRadius: 2, flexGrow: 1, background: 'white' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Edit Profile</Typography>
                 <Button variant="contained" sx={{ background: '#336FB0', '&:hover': { boxShadow: '0 0 10px rgba(0,0,0,0.5)', backgroundColor: '#336FB0' }, width: '150px', textTransform: 'none' }}
@@ -373,7 +373,7 @@ return (
                   value={userData.biography}
                   onChange={(e) => setUserData((prevData) => ({ ...prevData, biography: e.target.value }))} 
                   InputProps={{ disabled: !isEditable, style: { boxShadow: '0 0 10px rgba(0,0,0,0.1)', },}} 
-                  sx={{ height: 'auto', '& textarea': { height: 'auto', minHeight: '5em', },}} 
+                  sx={{ height: 'auto', '& textarea': { height: 'auto', minHeight: '6em', },}} 
                   error={!!formErrors.biography} helperText={formErrors.biography} />
               </Grid>
 
