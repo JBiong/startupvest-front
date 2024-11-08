@@ -20,7 +20,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   const [page, setPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 7;
   
   useEffect(() => {
     const fetchData = async () => {
