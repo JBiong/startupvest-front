@@ -245,16 +245,16 @@ function StartUpView() {
 
                         <Grid item xs={3}>
                           <Typography>
-                            <strong>Industry</strong>
+                            <strong>Founded Date</strong>
                           </Typography>
-                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.industry}</Typography>}
+                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.foundedDate}</Typography>}
                         </Grid>
 
                         <Grid item xs={3}>
                           <Typography>
-                            <strong>Founded Date</strong>
+                            <strong>Industry</strong>
                           </Typography>
-                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.foundedDate}</Typography>}
+                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.industry}</Typography>}
                         </Grid>
 
                         <Grid item xs={3}>
@@ -273,7 +273,7 @@ function StartUpView() {
 
                         <Grid item xs={8}>
                           <Typography>
-                            <strong>location</strong>
+                            <strong>Location</strong>
                           </Typography>
                           {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.locationName || "Location not available"}</Typography>}
                         </Grid>
