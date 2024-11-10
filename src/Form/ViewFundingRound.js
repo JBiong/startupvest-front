@@ -8,17 +8,22 @@ import axios from 'axios';
 import DescriptionIcon from '@mui/icons-material/Description';
 import Papa from 'papaparse';
 
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+
 function ViewFundingRound({ fundingRoundDetails }) {
     const [startups, setStartups] = useState([]);
     const [selectedStartupId, setSelectedStartupId] = useState('');
     const [fundingName, setFundingName] = useState('');
     const [fundingType, setFundingType] = useState('');
-    const [announcedMonth, setAnnouncedMonth] = useState('');
-    const [announcedDay, setAnnouncedDay] = useState('');
-    const [announcedYear, setAnnouncedYear] = useState('');
-    const [closedMonth, setClosedMonth] = useState('');
-    const [closedDay, setClosedDay] = useState('');
-    const [closedYear, setClosedYear] = useState('');
+    const [announcedDate, setAnnouncedDate] = useState(() => {
+        return fundingRoundDetails && fundingRoundDetails.announcedDate
+            ? dayjs(fundingRoundDetails.announcedDate) 
+            : dayjs();  
+    });    
+    const [closedDate, setClosedDate] = useState(null);
     const [moneyRaised, setMoneyRaised] = useState(0);
     const [currency, setCurrency] = useState(''); 
     const [targetFunding, setTargetFunding] = useState('');
@@ -35,14 +40,30 @@ function ViewFundingRound({ fundingRoundDetails }) {
     const [investors, setInvestors] = useState([{ name: null, title: '', shares: '', investorRemoved: false }]);
     const [errors, setErrors] = useState({});
 
-    const days = [...Array(31).keys()].map(i => i + 1);
-    const months = Array.from({ length: 12 }, (_, i) => {
-        return new Intl.DateTimeFormat('en', { month: 'long' }).format(new Date(2000, i, 1));
-    });
-    const years = [...Array(51).keys()].map(i => new Date().getFullYear() + i);
+    const today = dayjs();
+    const twoYearsLater = today.add(2, 'year');
+
+    const handleAnnouncedDateChange = (newDate) => {
+        setAnnouncedDate(newDate);
+    };
+    
+    const handleClosedDateChange = (newDate) => {
+        setClosedDate(newDate);
+        
+        if (!newDate) {
+          setErrors({ closedDate: 'Please select a valid date' });
+        } else {
+          setErrors({ closedDate: '' });
+        }
+    };
+
+    const formattedDateClosed = closedDate ? dayjs(closedDate).format('MMMM D, YYYY') : '';
+    const formattedDateAnnounced = closedDate ? dayjs(announcedDate).format('MMMM D, YYYY') : '';
 
     useEffect(() => {
-        console.log('Received Funding Round Details:', fundingRoundDetails); 
+        if (fundingRoundDetails?.closedDate) {
+            setClosedDate(dayjs(fundingRoundDetails.closedDate));
+        }
     }, [fundingRoundDetails]);
 
     useEffect(() => {
@@ -95,23 +116,7 @@ function ViewFundingRound({ fundingRoundDetails }) {
         const emptyFieldError = 'This field cannot be empty';
 
         // Validate closed date
-        if (!closedMonth) newErrors.closedMonth = "Closed month is required.";
-        if (!closedDay) newErrors.closedDay = 'Closed day is required.';
-        if (!closedYear) newErrors.closedYear = 'Closed year is required.';
-
-        // Check if closedYear is earlier than announcedYear
-        if (announcedYear && closedYear && parseInt(closedYear) < parseInt(announcedYear)) {
-            newErrors.closedYear = 'Closed year can\'t be before announced year.';
-        }
-
-        // If the years are the same, check the months and days
-        if (announcedYear && closedYear && parseInt(closedYear) === parseInt(announcedYear)) {
-            if (closedMonth < announcedMonth) {
-                newErrors.closedMonth = 'Closed month can\'t be before announced month.';
-            } else if (closedMonth === announcedMonth && closedDay < announcedDay) {
-                newErrors.closedDay = 'Closed day can\'t be before announced day.';
-            }
-        }
+        if (!closedDate) newErrors.closedDate = emptyFieldError;
 
         // Validate target funding and pre-money valuation
         if (!formattedTargetFunding) newErrors.targetFunding = emptyFieldError;
@@ -189,17 +194,6 @@ function ViewFundingRound({ fundingRoundDetails }) {
             setFormattedTargetFunding(formatNumber(fundingRoundDetails.targetFunding));
             setFormattedPreMoneyValuation(formatNumber(fundingRoundDetails.preMoneyValuation));
             setFormattedMinimumShare(formatNumber(fundingRoundDetails.minimumShare));
-
-            const announcedDate = new Date(fundingRoundDetails.announcedDate);
-            setAnnouncedDay(announcedDate.getDate());
-            setAnnouncedMonth(announcedDate.getMonth() + 1); 
-            setAnnouncedYear(announcedDate.getFullYear());
-    
-            // Initialize closedDate state variables
-            const closedDate = new Date(fundingRoundDetails.closedDate);
-            setClosedDay(closedDate.getDate());
-            setClosedMonth(closedDate.getMonth() + 1); 
-            setClosedYear(closedDate.getFullYear());
         }
 
         if (fundingRoundDetails?.capTableInvestors) {
@@ -232,8 +226,8 @@ function ViewFundingRound({ fundingRoundDetails }) {
                     startup: { id: selectedStartupId },
                     fundingName,
                     fundingType,
-                    announcedDate: `${announcedYear}-${String(announcedMonth).padStart(2, '0')}-${String(announcedDay).padStart(2, '0')}`,
-                    closedDate: `${closedYear}-${String(closedMonth).padStart(2, '0')}-${String(closedDay).padStart(2, '0')}`,
+                    announcedDate: formattedDateAnnounced,
+                    closedDate: formattedDateClosed,
                     moneyRaised: parseInt(unformatNumber(formattedMoneyRaised)),
                     moneyRaisedCurrency: currency,
                     targetFunding: parseInt(unformatNumber(formattedTargetFunding)),
@@ -281,7 +275,7 @@ function ViewFundingRound({ fundingRoundDetails }) {
 
     const getFundingRoundHeaders = () => {
         return [
-          'Startup Name', 'Funding Name', 'Funding Type', 'Announced Date', 
+          'Startup Name', 'Funding Name', 'Funding Type', 'Opening Date', 
           'Closed Date', 'Money Raised', 'Currency', 'Target Funding', 
           'Pre-money Valuation', 'Price Per Share', 'Investor Name', 'Title', 'Shares'
         ];
@@ -294,8 +288,8 @@ function ViewFundingRound({ fundingRoundDetails }) {
                 'Startup Name': fundingRoundDetails ? fundingRoundDetails.startup.companyName : '',
                 'Funding Name': fundingName,
                 'Funding Type': fundingType,
-                'Announced Date': `${announcedYear}-${String(announcedMonth).padStart(2, '0')}-${String(announcedDay).padStart(2, '0')}`,
-                'Closed Date': `${closedYear}-${String(closedMonth).padStart(2, '0')}-${String(closedDay).padStart(2, '0')}`,
+                'Opening Date': dayjs(announcedDate).format('MMMM D, YYYY'),
+                'Closed Date': dayjs(closedDate).format('MMMM D, YYYY'),
                 'Money Raised': `${currency} ${formatNumber(moneyRaised)}`,
                 'Currency': currency,
                 'Target Funding': formatNumber(targetFunding),
@@ -383,83 +377,35 @@ function ViewFundingRound({ fundingRoundDetails }) {
                             </FormControl>
                         </Grid>
 
-                        <Grid item xs={4}>
-                            <label><b>Announced Date</b><br />Month</label>
-                            <FormControl fullWidth variant="outlined">
-                                <Select labelId="month-label" value={announcedMonth} onChange={(e) => setAnnouncedMonth(e.target.value)} sx={{ height: '45px' }} disabled>
-                                    {months.map((month, index) => (
-                                        <MenuItem key={index} value={index + 1}>{month}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
+                        <Grid item xs={6}>
+                            <label>Opening Date <br /></label>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    value={announcedDate}
+                                    onChange={handleAnnouncedDateChange}
+                                    renderInput={(params) => (
+                                        <TextField {...params} error={!!errors.announcedDate} helperText={errors.announcedDate} />
+                                    )}
+                                    sx={{
+                                        width: '100%',
+                                        height: '45px',
+                                        '& .MuiInputBase-root': { height: '45px', padding: '0px 14px' }
+                                    }} disabled />
+                            </LocalizationProvider>
+                            {errors.announcedDate && (<FormHelperText error>{errors.announcedDate}</FormHelperText>)}
                         </Grid>
 
-                        <Grid item xs={4}>
-                            <label><br />Day</label>
-                            <FormControl fullWidth variant="outlined">
-                                <Select labelId="day-label" value={announcedDay} onChange={(e) => setAnnouncedDay(e.target.value)} 
-                                sx={{ height: '45px' }} disabled>
-                                    {days.map((day) => (
-                                        <MenuItem key={day} value={day}>{day}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={4}>
-                            <label><br />Year</label>
-                            <FormControl fullWidth variant="outlined">
-                                <Select labelId="year-label" value={announcedYear} onChange={(e) => setAnnouncedYear(e.target.value)} sx={{ height: '45px' }} disabled>
-                                    {years.map((year) => (
-                                        <MenuItem key={year} value={year}>{year}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={4}>
-                            <label><b>Closed on Date</b><br />Month</label>
-                            <FormControl fullWidth variant="outlined" error={!!errors.closedMonth}>
-                                <Select labelId="month-label" value={closedMonth} onChange={(e) => {
-                                    setClosedMonth(e.target.value);
-                                    setErrors(prev => ({ ...prev, closedMonth: '' }));
-                                }} disabled={!isEditMode} sx={{ height: '45px' }}>
-                                    {months.map((month, index) => (
-                                        <MenuItem key={index} value={index + 1}>{month}</MenuItem>
-                                    ))}
-                                </Select>
-                                {errors.closedMonth && <FormHelperText>{errors.closedMonth}</FormHelperText>}
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={4}>
-                            <label><br />Day</label>
-                            <FormControl fullWidth variant="outlined" error={!!errors.closedDay}>
-                                <Select labelId="day-label" value={closedDay} onChange={(e) => {
-                                    setClosedDay(e.target.value);
-                                    setErrors(prev => ({ ...prev, closedDay: '' }));
-                                }} disabled={!isEditMode} sx={{ height: '45px' }}>
-                                    {days.map((day) => (
-                                        <MenuItem key={day} value={day}>{day}</MenuItem>
-                                    ))}
-                                </Select>
-                                {errors.closedDay && <FormHelperText>{errors.closedDay}</FormHelperText>}
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={4}>
-                            <label><br />Year</label>
-                            <FormControl fullWidth variant="outlined" error={!!errors.closedYear}>
-                                <Select labelId="year-label" value={closedYear} onChange={(e) => {
-                                    setClosedYear(e.target.value);
-                                    setErrors(prev => ({ ...prev, closedYear: '' }));
-                                }} disabled={!isEditMode} sx={{ height: '45px' }}>
-                                    {years.map((year) => (
-                                        <MenuItem key={year} value={year}>{year}</MenuItem>
-                                    ))}
-                                </Select>
-                                {errors.closedYear && <FormHelperText>{errors.closedYear}</FormHelperText>}
-                            </FormControl>
+                        <Grid item xs={6}>
+                            <label>Closed on Date <br /></label>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker value={closedDate} onChange={handleClosedDateChange} minDate={today} maxDate={twoYearsLater} disabled={!isEditMode}
+                                renderInput={(params) => (
+                                <TextField {...params} error={!!errors.closedDate} helperText={errors.closedDate} />
+                                )}
+                                sx={{ width: '100%', height: '45px',
+                                    '& .MuiInputBase-root': { height: '45px', padding: '0px 14px', } }} />
+                            </LocalizationProvider>
+                            {errors.closedDate && (<FormHelperText error>{errors.closedDate}</FormHelperText>)}
                         </Grid>
 
                         <Grid item xs={8}>
@@ -580,8 +526,7 @@ function ViewFundingRound({ fundingRoundDetails }) {
                                     onChange={(e) => handleInvestorChange(index, 'title', e.target.value)}
                                     disabled={!isEditMode}
                                     sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
-                                    error={!!(errors.investors && errors.investors[index] && errors.investors[index].title)}
-                                />
+                                    error={!!(errors.investors && errors.investors[index] && errors.investors[index].title)} />
                                 </formControl>
                                 {errors.investors && errors.investors[index] && errors.investors[index].title && <FormHelperText sx={{ color: 'red' }}>{errors.investors[index].title}</FormHelperText>}
                             </Grid>

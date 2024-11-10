@@ -2,15 +2,21 @@ import { useState } from 'react';
 import industries from '../static/industries';
 import quantityOptions from '../static/quantityOptions';
 import SuccessCreateBusinessProfileDialog from '../Dialogs/SuccessCreateBusinessProfileDialog';
-import { Box, Typography, TextField, Select, MenuItem, Grid, FormControl, CardContent, Button, Autocomplete, FormHelperText, Tooltip } from '@mui/material';
+import { Box, Typography, TextField, Select, MenuItem, Grid, FormControl, CardContent, Button, Autocomplete, FormHelperText } from '@mui/material';
 import { Business, MonetizationOn } from '@mui/icons-material'; 
 import { StyledCard } from '../styles/CardStyles';
+
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+
 import axios from 'axios';
 
 import { logActivity } from '../utils/activityUtils';
 import { generateStartupCode } from '../Components/StartupCode';
 
-function CreateBusinessProfile({ onSuccess }) {
+function CreateBusinessProfile({ onSuccess, companyCount }) {
     const [selectedProfileType, setSelectedProfileType] = useState('Startup Company');
 
     // Profile Form Data Usestates
@@ -32,9 +38,7 @@ function CreateBusinessProfile({ onSuccess }) {
     const [linkedIn, setLinkedIn] = useState('');
     const [companyName, setCompanyName] = useState('');
     const [companyDescription, setCompanyDescription] = useState('');
-    const [foundedDay, setFoundedDay] = useState('');
-    const [foundedMonth, setFoundedMonth] = useState('');
-    const [foundedYear, setFoundedYear] = useState('');
+    const [foundedDate, setFoundedDate] = useState(null);
     const [typeOfCompany, setTypeOfCompany] = useState('');
     const [numberOfEmployees, setNumberOfEmployees] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -42,19 +46,21 @@ function CreateBusinessProfile({ onSuccess }) {
     const [industry, setIndustry] = useState('');
     const [successDialogOpen, setSuccessDialogOpen] = useState(false);
     const RequiredAsterisk = <span style={{ color: 'red' }}>*</span>;
-
-    const cardTypes = [
-        { label: 'Startup Company', icon: <Business />, color: '#336FB0' },
-        { label: 'Investor', icon: <MonetizationOn />, color: '#336FB0' },
-    ];
     
     // Error State Variables
     const [errors, setErrors] = useState({});
-    const days = [...Array(31).keys()].map(i => i + 1);
-    const months = Array.from({ length: 12 }, (_, i) => {
-        return new Intl.DateTimeFormat('en', { month: 'long' }).format(new Date(2000, i, 1));
-    });
-    const years = [...Array(51).keys()].map(i => new Date().getFullYear() - i);
+
+    const handleDateChange = (newDate) => {
+        setFoundedDate(newDate);
+        
+        if (!newDate) {
+          setErrors({ foundedDate: 'Please select a valid date' });
+        } else {
+          setErrors({ foundedDate: '' });
+        }
+    };
+
+    const formattedDateString = foundedDate ? dayjs(foundedDate).format('MMMM D, YYYY') : '';
 
     const validateFields = () => {
         const newErrors = {};
@@ -67,9 +73,7 @@ function CreateBusinessProfile({ onSuccess }) {
         if (!companyDescription.trim()) newErrors.companyDescription = emptyFieldError;
             else if (companyDescription.length > maxDescriptionLength) 
             newErrors.companyDescription = `Company description cannot exceed ${maxDescriptionLength} characters.`;
-        if (!foundedMonth) newErrors.foundedMonth = emptyFieldError;
-        if (!foundedDay) newErrors.foundedDay = emptyFieldError;
-        if (!foundedYear) newErrors.foundedYear = emptyFieldError;
+        if (!foundedDate) newErrors.foundedDate = emptyFieldError;
         if (!typeOfCompany) newErrors.typeOfCompany = emptyFieldError;
         if (!numberOfEmployees) newErrors.numberOfEmployees = emptyFieldError;
         if (!phoneNumber.trim()) newErrors.phoneNumber = emptyFieldError;
@@ -91,8 +95,8 @@ function CreateBusinessProfile({ onSuccess }) {
         const profileData = {
             firstName, lastName, emailAddress, contactInformation, gender, biography,
             streetAddress, country, city, state, postalCode, website, facebook, twitter, 
+            foundedDate: formattedDateString,
             instagram, linkedIn, companyName, companyDescription, 
-            foundedDate: `${foundedMonth} ${foundedDay}, ${foundedYear}`,
             typeOfCompany, numberOfEmployees, phoneNumber, contactEmail, industry,startupCode: generateStartupCode(),
           };
     
@@ -101,7 +105,7 @@ function CreateBusinessProfile({ onSuccess }) {
           if (selectedProfileType === 'Startup Company') {
             endpoint = `${process.env.REACT_APP_API_URL}/startups/create`;
             logMessage = `${companyName} profile created successfully.`;
-          } else if (selectedProfileType === 'Investor') {
+          } else if (selectedProfileType === 'Investor') {  
             endpoint = `${process.env.REACT_APP_API_URL}/investors/create`;
             logMessage = `${firstName} ${lastName} profile created successfully.`;
           } else {
@@ -166,7 +170,8 @@ function CreateBusinessProfile({ onSuccess }) {
             break;
         }
     };
-
+    
+    console.log(companyCount);
     return (
         <>
         <Box component="main" sx={{ flexGrow: 1, width: '100%', overflowX: 'hidden', maxWidth: '1000px',  background: '#F2F2F2'}}>
@@ -189,80 +194,63 @@ function CreateBusinessProfile({ onSuccess }) {
                 </Box>
 
                 {selectedProfileType === 'Startup Company' && (
-                    <>
-                    <Typography variant="h6" sx={{ color: '#414a4c', fontWeight: '500', pl: 5, pb: 3}}>
-                        Overview
-                    </Typography>
+                <>
+                    {companyCount === 0 && (
+                    <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#FFEB3B', padding: 2, borderRadius: 2, ml: 5, mb: 3 }}>
+                        <Typography variant="body1" sx={{ color: '#1E1E1E', fontWeight: 'bold' }}>
+                            <Business sx={{ mr: 1, color: "#1E1E1E" }} />
+                            Welcome to the platform! To get started, please create your startup profile. This is essential for setting up funding rounds and unlocking other key features tailored to your business.
+                        </Typography>
+                    </Box>
+                )}
+          
+                <Typography variant="h6" sx={{ color: '#414a4c', fontWeight: '500', pl: 5, pb: 3}}>Overview</Typography>
 
-                    <Grid container spacing={3} sx={{ ml: 2 }}>
-                        <Grid item xs={12} sm={11.4}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12}>
-                                    <label>Company Name {RequiredAsterisk}</label>
-                                    <TextField fullWidth  required variant="outlined" value={companyName}
-                                        onChange={(e) => setCompanyName(e.target.value)}
-                                        sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
-                                        error={!!errors.companyName} />
-                                        {errors.companyName && (<FormHelperText error>{errors.companyName}</FormHelperText>)}
-                                </Grid>
-
-                                <Grid item xs={12}>
-                                    <label>Company Description {RequiredAsterisk}</label>
-                                    <TextField fullWidth variant="outlined" value={companyDescription} multiline rows={6}
-                                        onChange={(e) => setCompanyDescription(e.target.value)}
-                                        error={!!errors.companyDescription}/>
-                                        {errors.companyDescription && (<FormHelperText error>{errors.companyDescription}</FormHelperText>)}
-                                </Grid>
-
-                            <Grid item xs={4}>
-                                <label><b>Founded Date {RequiredAsterisk}</b><br/>Month</label>
-                                <FormControl fullWidth variant="outlined">
-                                    <Select labelId="month-label" value={foundedMonth} 
-                                        onChange={(e) => setFoundedMonth(e.target.value)}
-                                        sx={{ height: '45px' }}
-                                        error={!!errors.foundedMonth}>  
-                                        {months.map((month) => (
-                                            <MenuItem key={month} value={month}>{month}</MenuItem>
-                                        )) 
-                                        }
-                                    </Select>
-                                </FormControl>
-                                {errors.foundedMonth && (<FormHelperText error>{errors.foundedMonth}</FormHelperText>)}
-                            </Grid>
-
-                            <Grid item xs={4}>
-                                <label><br/>Day</label>
-                                <FormControl fullWidth variant="outlined">
-                                    <Select labelId="day-label" error={!!errors.foundedDay} value={foundedDay}
-                                        onChange={(e) => setFoundedDay(e.target.value)}
-                                        sx={{ height: '45px' }}>
-                                        {days.map((day) => (
-                                            <MenuItem key={day} value={day}>{day}</MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                                {errors.foundedDay && (<FormHelperText error>{errors.foundedDay}</FormHelperText>)}
-                            </Grid>
-
-                            <Grid item xs={4}>
-                            <label><br/>Year</label>
-                            <FormControl fullWidth variant="outlined">
-                                <Select labelId="year-label" error={!!errors.foundedYear} value={foundedYear}
-                                    onChange={(e) => setFoundedYear(e.target.value)}
-                                    sx={{ height: '45px' }}>
-                                    {years.map((year) => (
-                                        <MenuItem key={year} value={year}>{year}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            {errors.foundedYear && (<FormHelperText error>{errors.foundedYear}</FormHelperText>)}
+                <Grid container spacing={3} sx={{ ml: 2 }}>
+                    <Grid item xs={12} sm={11.4}>
+                        <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                            <label>Startup Name {RequiredAsterisk}</label>
+                            <TextField fullWidth  required variant="outlined" value={companyName}
+                                onChange={(e) => setCompanyName(e.target.value)}
+                               sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
+                                error={!!errors.companyName} />
+                                {errors.companyName && (<FormHelperText error>{errors.companyName}</FormHelperText>)}
                         </Grid>
 
-                        <Grid item xs={4}>
+                        <Grid item xs={12}>
+                            <label>Description {RequiredAsterisk}</label>
+                            <TextField fullWidth variant="outlined" value={companyDescription} multiline rows={6}
+                                onChange={(e) => setCompanyDescription(e.target.value)}
+                                error={!!errors.companyDescription}/>
+                                {errors.companyDescription && (<FormHelperText error>{errors.companyDescription}</FormHelperText>)}
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <label>Founded Date {RequiredAsterisk} <br /></label>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker value={foundedDate} onChange={handleDateChange}
+                                maxDate={dayjs().endOf('day')}
+                                onAccept={(date) => {
+                                    if (date.year() > dayjs().year()) {
+                                        date = dayjs().year(dayjs().year()).month(date.month()).date(date.date());
+                                    }
+                                    handleDateChange(date);
+                                }} 
+                                renderInput={(params) => (
+                                <TextField {...params} error={!!errors.foundedDate} helperText={errors.foundedDate} />
+                                )}
+                                sx={{ width: '100%', height: '45px',
+                                    '& .MuiInputBase-root': { height: '45px', padding: '0px 14px', } }} />
+                            </LocalizationProvider>
+                            {errors.foundedDate && (<FormHelperText error>{errors.foundedDate}</FormHelperText>)}
+                        </Grid>
+
+                        <Grid item xs={6}>
                             <label>Type of Company {RequiredAsterisk}</label>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>  
-                                    <Select  fullWidth  variant="outlined" value={typeOfCompany}
+                                    <Select fullWidth variant="outlined" value={typeOfCompany}
                                         onChange={(e) => setTypeOfCompany(e.target.value)}
                                         sx={{ height: '45px' }}
                                         error={!!errors.typeOfCompany}>
@@ -274,7 +262,7 @@ function CreateBusinessProfile({ onSuccess }) {
                             </Grid>
                         </Grid>
 
-                        <Grid item xs={4}>
+                        <Grid item xs={6}>
                             <label>No. of Employees {RequiredAsterisk}</label>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>  
@@ -293,16 +281,12 @@ function CreateBusinessProfile({ onSuccess }) {
                             </Grid>
                         </Grid>
 
-                        <Grid item xs={4}>
-                            <label>Phone Number {RequiredAsterisk}</label>
-                            <TextField
-                                fullWidth
-                                variant="outlined"
-                                value={phoneNumber}
+                        <Grid item xs={6}>
+                            <label>Contact Number {RequiredAsterisk}</label>
+                            <TextField fullWidth variant="outlined" value={phoneNumber}
                                 onChange={(e) => handleInputChange(e, 'phoneNumber')}
                                 error={!!errors.phoneNumber}
-                                sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' }}}
-                                />
+                                sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' }}} />
                                 {errors.phoneNumber && (<FormHelperText error>{errors.phoneNumber}</FormHelperText>)}
                         </Grid>
 

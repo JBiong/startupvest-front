@@ -36,7 +36,7 @@ const headCells = [
   { id: 'startup', numeric: false, disablePadding: false, label: 'Startup Name' },
   { id: 'location', numeric: false, disablePadding: false, label: 'Location' },
   { id: 'founded', numeric: false, disablePadding: false, label: 'Founded Date' },
-  { id: 'description', numeric: false, disablePadding: false, label: 'Description', width: '38%' },
+  { id: 'description', numeric: false, disablePadding: false, label: 'Description', width: '50%' },
 ];
 
 function EnhancedTableHead(props) {

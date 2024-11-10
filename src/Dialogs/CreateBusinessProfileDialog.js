@@ -3,7 +3,7 @@ import { Box, IconButton } from '@mui/material';
 import CreateBusinessProfile from '../Form/CreateBusinessProfile';
 import CloseIcon from '@mui/icons-material/Close'; 
 
-function CreateBusinessProfileDialog({ open, onClose, hasInvestorProfile }) {
+function CreateBusinessProfileDialog({ open, onClose, companyCount }) {
     return (
         open && (
             <Box
@@ -48,7 +48,7 @@ function CreateBusinessProfileDialog({ open, onClose, hasInvestorProfile }) {
 
                     {/* Form content */}
                     <Box sx={{ pb: 5, overflowY: 'auto'}}>
-                        <CreateBusinessProfile onSuccess={onClose} />
+                        <CreateBusinessProfile onSuccess={onClose} companyCount={companyCount} />
                     </Box>
                 </Box>
             </Box>

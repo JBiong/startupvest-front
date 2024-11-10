@@ -24,7 +24,7 @@ function StartupDashboard() {
         
     // PROFILE
     const [businessProfiles, setBusinessProfiles] = useState([]);
-    const [openCreateBusinessProfile, setCreateBusinessProfile] = useState(false);
+    const [createBusinessProfile, setCreateBusinessProfile] = useState(false);
     const [selectedBusinessProfile, setSelectedBusinessProfile] = useState(null);
     const [openViewStartup, setOpenViewStartup] = useState(false);
     const [openViewInvestor, setOpenViewInvestor] = useState(false);
@@ -68,26 +68,39 @@ function StartupDashboard() {
 
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true); 
+          setLoading(true);
     
-            try {
-                await Promise.all([
-                    fetchBusinessProfiles(),
-                    fetchFundingRounds(),
-                    fetchAllInvestorsByEachUsersCompany(),
-                    fetchRecentActivities(),
-                    fetchCountInvestor(),
-                    fetchTopInvestorContributor(),
-                ]);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            } finally {
-                setLoading(false);
-            }
+          try {
+            await Promise.all([
+              fetchBusinessProfiles(),
+              fetchFundingRounds(),
+              fetchAllInvestorsByEachUsersCompany(),
+              fetchRecentActivities(),
+              fetchCountInvestor(),
+              fetchTopInvestorContributor(),
+            ]);
+          } catch (error) {
+            console.error('Error fetching data:', error);
+          } finally {
+            setLoading(false);
+          }
         };
     
         fetchData();
     }, []);
+    
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (companyCount > 0) {
+                setCreateBusinessProfile(false);
+            } else {
+                setCreateBusinessProfile(true);
+            }
+        }, 500); 
+
+        return () => clearTimeout(timer);
+
+    }, [companyCount]); 
     
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
@@ -112,7 +125,7 @@ function StartupDashboard() {
     const handleCloseStartUp = async () => {
         setOpenViewStartup(false);
         await fetchBusinessProfiles();
-    };
+    };  
 
     const handleOpenInvestor = (profile) => {
         setSelectedBusinessProfile(profile);
@@ -653,7 +666,10 @@ return (
                 </Grid>  
             </Grid>
 
-            <CreateBusinessProfileDialog open={openCreateBusinessProfile} onClose={handleCloseBusinessProfile} />
+            {!loading && createBusinessProfile && (
+                <CreateBusinessProfileDialog open={createBusinessProfile} onClose={handleCloseBusinessProfile} companyCount={companyCount}/>
+            )}
+
             <CreateFundingRoundDialog open={openCreateFundingRound} onClose={handleCloseFundingRound} />
             <ActivitiesDialog open={dialogOpen} onClose={handleCloseDialog} activities={recentActivities}/>
         </Container>
