@@ -231,7 +231,9 @@ function CreateFundingRound({ onSuccess }) {
                                 <Select fullWidth variant="outlined" value={selectedStartupId}
                                     onChange={(e) => setSelectedStartupId(e.target.value)}
                                     sx={{ height: '45px' }}>
-                                    {startups.map((startup) => (
+                                    {startups
+                                    .filter((row) => row.status === 'approved')
+                                    .map((startup) => (
                                         <MenuItem key={startup.id} value={startup.id}>{startup.companyName}</MenuItem>
                                     ))}
                                 </Select>
