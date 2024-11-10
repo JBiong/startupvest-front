@@ -8,6 +8,7 @@ import { History, AddCircle, MonetizationOnRounded, Person2, Business } from '@m
 import Navbar from "../Navbar/Navbar";
 import CreateFundingRoundDialog from "../Dialogs/CreateFundingRoundDialog";
 import CreateBusinessProfileDialog from "../Dialogs/CreateBusinessProfileDialog";
+import ConfirmCancelDialog from '../Dialogs/ConfirmCancelDialog';
 import BusinessProfileTable from "../Tables/BusinessProfileTable";
 import FundingRoundTable from "../Tables/FundingRoundTable";
 import PendingRequestInvestor from "../Tables/PendingRequestInvestorTable";
@@ -34,6 +35,8 @@ function StartupDashboard() {
     const [openViewInvestor, setOpenViewInvestor] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [profileToDelete, setProfileToDelete] = useState(null);
+    const [openCancelDialog, setOpenCancelDialog] = useState(false);
+    const [profileToCancel, setProfileToCancel] = useState(null); 
 
     // FUNDING ROUND
     const [openCreateFundingRound, setOpenCreateFundingRound] = useState(false);
@@ -155,6 +158,16 @@ function StartupDashboard() {
         setOpenDeleteDialog(false);
     };
 
+    const handleOpenCancelDialog = (profile) => {
+        setProfileToCancel(profile);
+        setOpenCancelDialog(true);
+      };
+      
+      const handleCloseCancelDialog = () => {
+        setOpenCancelDialog(false);
+        setProfileToCancel(null);
+      };
+
     const fetchRecentActivities = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/activities`, {
@@ -202,12 +215,15 @@ function StartupDashboard() {
             };
     
             const startups = await Promise.all(responseStartups.data
-                .filter((profile) => !profile.isDeleted && profile.status === 'approved')
+                .filter((profile) => !profile.isDeleted)
                 .map(async (profile) => ({
                     ...profile,
                     type: "Startup",
                     photo: await fetchProfilePicture(profile.id, 'startup')
                 })));
+
+            const approvedStartups = startups.filter(profile => profile.status === 'approved');
+            setCompanyCount(approvedStartups.length);
     
             const investors = await Promise.all(responseInvestors.data
                 .filter((profile) => !profile.isDeleted)
@@ -216,11 +232,18 @@ function StartupDashboard() {
                     type: "Investor",
                     photo: await fetchProfilePicture(profile.id, 'investor')
                 })));
+
+                
     
             const allProfiles = [...investors, ...startups];
-            setBusinessProfiles(allProfiles);
-            setCompanyCount(startups.length);
-            return allProfiles;
+            const sortedProfiles = allProfiles.sort((a, b) => {
+                if (a.status === 'approved' && b.status !== 'approved') return -1;
+                if (b.status === 'approved' && a.status !== 'approved') return 1;
+                return 0;
+            });
+
+            setBusinessProfiles(sortedProfiles);
+            return sortedProfiles;
         } catch (error) {
             console.error('Failed to fetch business profiles:', error);
         }
@@ -255,6 +278,30 @@ function StartupDashboard() {
             console.error('Failed to delete profile:', error);
         }
     };
+
+    const handleCancelStartup = async (startupId) => {
+        try {
+          await axios.put(
+            `${process.env.REACT_APP_API_URL}/startups/${startupId}/cancel`,
+            {},
+            {
+              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+            }
+          );
+    
+          await fetchBusinessProfiles();
+
+        } catch (error) {
+          console.error("Error cancelling startup:", error);
+        }
+      };
+      
+      const handleConfirmCancel = async () => {
+        if (profileToCancel) {
+          await handleCancelStartup(profileToCancel.id);
+          handleCloseCancelDialog();
+        }
+      };
     
     // FUNDING ROUND
     const handleOpenFundingRound = () => {
@@ -706,6 +753,7 @@ return (
                             handleOpenStartUp={handleOpenStartUp}
                             handleOpenInvestor={handleOpenInvestor}
                             handleOpenDeleteDialog={handleOpenDeleteDialog}
+                            handleOpenCancelDialog={handleOpenCancelDialog}
                             selectedBusinessProfile={selectedBusinessProfile}
                             openViewStartup={openViewStartup}
                             openViewInvestor={openViewInvestor}
@@ -713,6 +761,7 @@ return (
                             handleCloseStartUp={handleCloseStartUp}
                             handleCloseInvestor={handleCloseInvestor}
                             handleCloseDeleteDialog={handleCloseDeleteDialog}
+                            handleCloseCancelDialog={handleCloseCancelDialog}
                             handleSoftDelete={handleSoftDelete}
                             profileToDelete={profileToDelete}/>                            
                         )}
@@ -744,6 +793,8 @@ return (
 
             <CreateFundingRoundDialog open={openCreateFundingRound} onClose={handleCloseFundingRound} />
             <ActivitiesDialog open={dialogOpen} onClose={handleCloseDialog} activities={recentActivities}/>
+            <ConfirmCancelDialog open={openCancelDialog} onClose={handleCloseCancelDialog} 
+                onConfirm={handleConfirmCancel} companyName={profileToCancel ? profileToCancel.companyName : ""} />
         </Container>
     </>
   );
