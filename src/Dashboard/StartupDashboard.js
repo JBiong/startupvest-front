@@ -202,7 +202,7 @@ function StartupDashboard() {
             };
     
             const startups = await Promise.all(responseStartups.data
-                .filter((profile) => !profile.isDeleted)
+                .filter((profile) => !profile.isDeleted && profile.status === 'approved')
                 .map(async (profile) => ({
                     ...profile,
                     type: "Startup",
