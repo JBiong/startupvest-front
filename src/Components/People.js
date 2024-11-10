@@ -11,11 +11,9 @@ import { StyledPaper, StyledAvatar, StyledTableRow, StyledTableCell, StyledStack
 const drawerWidth = 240;
 
 const headCells = [
-  { id: 'role', numeric: false, disablePadding: false, label: 'Role', width: '5%'},
-  { id: 'name', numeric: false, disablePadding: false, label: 'Full Name', width: '20%' },
-  { id: 'location', numeric: false, disablePadding: false, label: 'Location', width:'25%' },
-  { id: 'email', numeric: false, disablePadding: false, label: 'Email Address', width:'20%' },
-  { id: 'contactNumber', numeric: false, disablePadding: false, label: 'Contact Number' },
+  { id: 'name', numeric: false, disablePadding: false, label: 'Full Name', width: '15%' },
+  { id: 'location', numeric: false, disablePadding: false, label: 'Location', width:'15%' },
+  { id: 'Biography', numeric: false, disablePadding: false, label: 'Biography', width: '38%' },
 ];
 
 function descendingComparator(a, b, orderBy) {
@@ -212,7 +210,6 @@ export default function Companies() {
               {loading ? (
                 Array.from(new Array(rowsPerPage)).map((_, index) => (
                   <StyledTableRow key={index}>
-                    <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
                     <StyledTableCell>
                       <StyledStack direction="row" alignItems="center">
                         <Skeleton variant="rectangular" width={50} height={50} sx={{ marginRight: 1 }} />
@@ -221,13 +218,11 @@ export default function Companies() {
                     </StyledTableCell>
                     <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
                     <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
-                    <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
                   </StyledTableRow>
                 ))
               ) : (
                 visibleRows.map((row) => (
                   <StyledTableRow key={row.id} onClick={() => handleRowClick(row)}>
-                    <StyledTableCell>{row.role}</StyledTableCell>
                     <StyledTableCell>
                       <StyledStack direction='row'>
                         <StyledAvatar variant="rounded" src={profilePictures[row.id] || ''}
@@ -239,14 +234,15 @@ export default function Companies() {
                       </StyledStack>
                     </StyledTableCell>
                     <StyledTableCell>{formatAddress(row.locationName)}</StyledTableCell>
-                    <StyledTableCell>{row.email}</StyledTableCell>
-                    <StyledTableCell>{row.contactNumber}</StyledTableCell>
+                    <StyledTableCell>
+                      {(row.biography ? row.biography.split(' ').slice(0, 30).join(' ') : 'No biography available')}...
+                    </StyledTableCell>
                   </StyledTableRow>
                 ))
               )}
               {filteredRows.length === 0 && !loading && (
                 <TableRow>
-                  <TableCell colSpan={6} align="center">
+                  <TableCell colSpan={3} align="center">
                     <Typography variant="body2" color="textSecondary">No profiles available.</Typography>
                   </TableCell>
                 </TableRow>

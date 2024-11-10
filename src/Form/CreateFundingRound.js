@@ -9,6 +9,11 @@ import { NumericFormat } from 'react-number-format';
 import SuccessCreateFundingRoundDialog from '../Dialogs/SuccessCreateFundingRoundDialog';
 import CreateBusinessProfileDialog from "../Dialogs/CreateBusinessProfileDialog";
 
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+
 import { logActivity } from '../utils/activityUtils';
 
 function CreateFundingRound({ onSuccess }) {
@@ -16,12 +21,8 @@ function CreateFundingRound({ onSuccess }) {
     const [selectedStartupId, setSelectedStartupId] = useState('');
     const [fundingType, setFundingType] = useState('');
     const [fundingName, setFundingName] = useState('');
-    const [announcedMonth, setAnnouncedMonth] = useState('');
-    const [announcedDay, setAnnouncedDay] = useState('');
-    const [announcedYear, setAnnouncedYear] = useState('');
-    const [closedMonth, setClosedMonth] = useState('');
-    const [closedDay, setClosedDay] = useState('');
-    const [closedYear, setClosedYear] = useState('');
+    const [announcedDate, setAnnouncedDate] = useState(dayjs());
+    const [closedDate, setClosedDate] = useState(null);
     const [moneyRaised, setMoneyRaised] = useState(0);
     const [currency, setCurrency] = useState('₱'); 
     const [targetFunding, setTargetFunding] = useState('');
@@ -34,16 +35,30 @@ function CreateFundingRound({ onSuccess }) {
     const selectedStartup = startups.find(startup => startup.id === selectedStartupId);
     const selectedCompanyName = selectedStartup ? selectedStartup.companyName : '';
 
+    const today = dayjs();
+    const twoYearsLater = today.add(2, 'year');
+
     // CAP TABLE
     const [allInvestors, setAllInvestors] = useState([]);
     const [investors, setInvestors] = useState([{ name: null, title: '', shares: '' }]);
     const [errors, setErrors] = useState({});
 
-    const days = [...Array(31).keys()].map(i => i + 1);
-    const months = Array.from({ length: 12 }, (_, i) => {
-        return new Intl.DateTimeFormat('en', { month: 'long' }).format(new Date(2000, i, 1));
-    });
-    const years = [...Array(51).keys()].map(i => new Date().getFullYear() + i);
+    const handleAnnouncedDateChange = (newDate) => {
+        setAnnouncedDate(newDate);
+    };
+    
+    const handleDateChange = (newDate) => {
+        setClosedDate(newDate);
+        
+        if (!newDate) {
+          setErrors({ closedDate: 'Please select a valid date' });
+        } else {
+          setErrors({ closedDate: '' });
+        }
+    };
+
+    const formattedDateClosed = closedDate ? dayjs(closedDate).format('MMMM D, YYYY') : '';
+    const formattedDateAnnounced = closedDate ? dayjs(announcedDate).format('MMMM D, YYYY') : '';
 
     useEffect(() => {
         const fetchStartups = async () => {
@@ -93,29 +108,11 @@ function CreateFundingRound({ onSuccess }) {
         if (!selectedStartupId) newErrors.selectedStartupId = requiredErrorMessage;
         if (!fundingName) newErrors.fundingName = requiredErrorMessage;
         if (!fundingType) newErrors.fundingType = requiredErrorMessage;
-        if (!announcedMonth) newErrors.announcedMonth = requiredErrorMessage;
-        if (!announcedDay) newErrors.announcedDay = requiredErrorMessage;
-        if (!announcedYear) newErrors.announcedYear = requiredErrorMessage;
-        if (!closedMonth) newErrors.closedMonth = requiredErrorMessage;
-        if (!closedDay) newErrors.closedDay = requiredErrorMessage;
-        if (!closedYear) newErrors.closedYear = requiredErrorMessage;
+        if (!announcedDate) newErrors.announcedDate = requiredErrorMessage;
+        if (!closedDate) newErrors.closedDate = requiredErrorMessage;
         if (!targetFunding) newErrors.targetFunding = requiredErrorMessage;
         if (!preMoneyValuation) newErrors.preMoneyValuation = requiredErrorMessage;
         if (!minimumShare) newErrors.minimumShare = requiredErrorMessage;
-
-        // Check if closedYear is earlier than announcedYear
-        if (announcedYear && closedYear && parseInt(closedYear) < parseInt(announcedYear)) {
-            newErrors.closedYear = 'Closed year can\'t be before announced year.';
-        }
-
-        // If the years are the same, check the months and days
-        if (announcedYear && closedYear && parseInt(closedYear) === parseInt(announcedYear)) {
-            if (closedMonth < announcedMonth) {
-                newErrors.closedMonth = 'Closed month can\'t be before announced month.';
-            } else if (closedMonth === announcedMonth && closedDay < announcedDay) {
-                newErrors.closedDay = 'Closed day can\'t be before announced day.';
-            }
-        }
 
         setErrors(newErrors); 
         return Object.keys(newErrors).length === 0;
@@ -141,8 +138,8 @@ function CreateFundingRound({ onSuccess }) {
                 startup: { id: selectedStartupId },
                 fundingType,
                 fundingName,
-                announcedDate: `${announcedYear}-${announcedMonth}-${announcedDay}`,
-                closedDate: `${closedYear}-${closedMonth}-${closedDay}`,
+                announcedDate: formattedDateAnnounced,
+                closedDate: formattedDateClosed,
                 moneyRaised,
                 moneyRaisedCurrency: currency,
                 targetFunding: parseFloat(parseFormattedNumber(targetFunding)),
@@ -292,76 +289,28 @@ function CreateFundingRound({ onSuccess }) {
                             {errors.fundingType && <FormHelperText sx={{color:'red'}}>{errors.fundingType}</FormHelperText>}
                         </Grid>
 
-                        <Grid item xs={4}>
-                            <label><b>Announced Date {RequiredAsterisk}</b><br />Month</label>
-                            <FormControl fullWidth variant="outlined" error={!!errors.announcedMonth}>
-                                <Select labelId="month-label" value={announcedMonth} onChange={(e) => setAnnouncedMonth(e.target.value)} sx={{ height: '45px' }}>
-                                    {months.map((month, index) => (
-                                        <MenuItem key={index} value={index + 1}>{month}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            {errors.announcedMonth && <FormHelperText sx={{color:'red'}}>{errors.announcedMonth}</FormHelperText>}
+                        <Grid item xs={6}>
+                            <label>Opening Date {RequiredAsterisk} <br /></label>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker value={announcedDate} onChange={handleAnnouncedDateChange} disabled
+                                    renderInput={(params) => (
+                                        <TextField {...params} error={!!errors.announcedDate} helperText={errors.announcedDate} />
+                                    )}
+                                    sx={{ width: '100%', height: '45px', '& .MuiInputBase-root': { height: '45px', padding: '0px 14px' } }}/>
+                            </LocalizationProvider>
+                            {errors.announcedDate && (<FormHelperText error>{errors.announcedDate}</FormHelperText>)}
                         </Grid>
 
-                        <Grid item xs={4}>
-                            <label><br />Day</label>
-                            <FormControl fullWidth variant="outlined" error={!!errors.announcedDay}>
-                                <Select labelId="day-label" value={announcedDay} onChange={(e) => setAnnouncedDay(e.target.value)} sx={{ height: '45px' }}>
-                                    {days.map((day) => (
-                                        <MenuItem key={day} value={day}>{day}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            {errors.announcedDay && <FormHelperText sx={{color:'red'}}>{errors.announcedDay}</FormHelperText>}
-                        </Grid>
-
-                        <Grid item xs={4}>
-                            <label><br />Year</label>
-                            <FormControl fullWidth variant="outlined" error={!!errors.announcedYear}>
-                                <Select labelId="year-label" value={announcedYear} onChange={(e) => setAnnouncedYear(e.target.value)} sx={{ height: '45px' }}>
-                                    {years.map((year) => (
-                                        <MenuItem key={year} value={year}>{year}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            {errors.announcedYear && <FormHelperText sx={{color:'red'}}>{errors.announcedYear}</FormHelperText>}
-                        </Grid>
-
-                        <Grid item xs={4}>
-                            <label><b>Closed on Date {RequiredAsterisk}</b><br />Month</label>
-                            <FormControl fullWidth variant="outlined" error={!!errors.closedMonth}>
-                                <Select labelId="month-label" value={closedMonth} onChange={(e) => setClosedMonth(e.target.value)} sx={{ height: '45px' }}>
-                                    {months.map((month, index) => (
-                                        <MenuItem key={index} value={index + 1}>{month}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            {errors.closedMonth && <FormHelperText sx={{color:'red'}}>{errors.closedMonth}</FormHelperText>}
-                        </Grid>
-
-                        <Grid item xs={4}>
-                            <label><br />Day</label>
-                            <FormControl fullWidth variant="outlined" error={!!errors.closedDay}>
-                                <Select labelId="day-label" value={closedDay} onChange={(e) => setClosedDay(e.target.value)} sx={{ height: '45px' }}>
-                                    {days.map((day) => (
-                                        <MenuItem key={day} value={day}>{day}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            {errors.closedDay && <FormHelperText sx={{color:'red'}}>{errors.closedDay}</FormHelperText>}
-                        </Grid>
-
-                        <Grid item xs={4}>
-                            <label><br />Year</label>
-                            <FormControl fullWidth variant="outlined" error={!!errors.closedYear}>
-                                <Select labelId="year-label" value={closedYear} onChange={(e) => setClosedYear(e.target.value)} sx={{ height: '45px' }}>
-                                    {years.map((year) => (
-                                        <MenuItem key={year} value={year}>{year}</MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                            {errors.closedYear && <FormHelperText sx={{color:'red'}}>{errors.closedYear}</FormHelperText>}
+                        <Grid item xs={6}>
+                            <label>Closed on Date {RequiredAsterisk} <br /></label>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker value={closedDate} onChange={handleDateChange} minDate={today} maxDate={twoYearsLater}
+                                    renderInput={(params) => (
+                                    <TextField {...params} error={!!errors.closedDate} helperText={errors.closedDate} />
+                                    )}
+                                    sx={{ width: '100%', height: '45px', '& .MuiInputBase-root': { height: '45px', padding: '0px 14px', } }} />
+                            </LocalizationProvider>
+                            {errors.closedDate && (<FormHelperText error>{errors.closedDate}</FormHelperText>)}
                         </Grid>
 
                         <Grid item xs={8}>

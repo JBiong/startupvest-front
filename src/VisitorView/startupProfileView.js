@@ -226,14 +226,21 @@ function StartUpView() {
                     <Grid item xs={12}>
                       <Grid container spacing={3}>
                         <Grid item xs={12} sx={{ textAlign: 'justify' }}>
-                          <Typography>
-                            <strong>Description</strong>
-                          </Typography>
-                          {loading ? (
-                            <Skeleton variant="text" width="100%" height={80} />
-                          ) : (
-                            <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{startup.companyDescription}</Typography>
-                          )}
+                          <Typography><strong>Description</strong></Typography>
+                            {loading ? (
+                              <Skeleton variant="text" width="100%" height={80} />
+                            ) : (
+                              <>
+                                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{startup.companyDescription}</Typography>
+
+                                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', mt: 3 }}>
+                                  Should you need additional information, please don’t hesitate to contact us via email at{' '}
+                                  <a href={`mailto:${startup.contactEmail}`} style={{ color: 'inherit', fontWeight: 'bold', textDecoration: 'none' }}>
+                                  {startup.contactEmail}
+                                  </a> or by phone at <span style={{ fontWeight: 'bold',  }}>{startup.phoneNumber}</span>.
+                                </Typography>
+                              </>
+                            )}
                         </Grid>
 
                         <Grid item xs={3}>
@@ -241,6 +248,13 @@ function StartUpView() {
                             <strong>Founded Date</strong>
                           </Typography>
                           {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.foundedDate}</Typography>}
+                        </Grid>
+
+                        <Grid item xs={3}>
+                          <Typography>
+                            <strong>Industry</strong>
+                          </Typography>
+                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.industry}</Typography>}
                         </Grid>
 
                         <Grid item xs={3}>
@@ -257,30 +271,11 @@ function StartUpView() {
                           {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.numberOfEmployees}</Typography>}
                         </Grid>
 
-                        <Grid item xs={3}>
+                        <Grid item xs={8}>
                           <Typography>
-                            <strong>Industry</strong>
+                            <strong>Location</strong>
                           </Typography>
-                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.industry}</Typography>}
-                        </Grid>
-
-                        <Grid item xs={3}>
-                          <Typography>
-                            <strong>location</strong>
-                          </Typography>
-                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.locationName}</Typography>}
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Typography>
-                            <strong>Telephone Number</strong>
-                          </Typography>
-                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.phoneNumber}</Typography>}
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Typography>
-                            <strong>Email</strong>
-                          </Typography>
-                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.contactEmail}</Typography>}
+                          {loading ? <Skeleton width={100} /> : <Typography variant="body1">{startup.locationName || "Location not available"}</Typography>}
                         </Grid>
 
                         {/* Icons */}

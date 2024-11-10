@@ -1,8 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import countries from '../static/countries';
 import industries from '../static/industries';
 import quantityOptions from '../static/quantityOptions';
 import { Box, Typography, TextField, Avatar, Select, MenuItem, Grid, FormControl, FormHelperText, Button, Autocomplete} from '@mui/material';
+
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+
 import axios from 'axios';
 
 function ViewStartupProfile({ profile }) {
@@ -12,15 +17,8 @@ function ViewStartupProfile({ profile }) {
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const RequiredAsterisk = <span style={{ color: 'red' }}>*</span>;
-
-    let month = '', day = '', year = '';
-    if (profile && profile.foundedDate) {
-        [month, day, year] = profile.foundedDate.split(/[\s,]+/);
-    }
     
-    const [foundedMonth, setFoundedMonth] = useState(month);
-    const [foundedDay, setFoundedDay] = useState(day);
-    const [foundedYear, setFoundedYear] = useState(year);
+    const [foundedDate, setFoundedDate] = useState(profile?.foundedDate ? dayjs(profile.foundedDate) : null);
     const [typeOfCompany, setTypeOfCompany] = useState(profile ? profile.typeOfCompany : '');
     const [numberOfEmployees, setNumberOfEmployees] = useState(profile ? profile.numberOfEmployees : '');
     const [phoneNumber, setPhoneNumber] = useState(profile ? profile.phoneNumber : '');
@@ -39,13 +37,7 @@ function ViewStartupProfile({ profile }) {
     const [twitter, setTwitter] = useState(profile ? profile.twitter : '');
     const [instagram, setInstagram] = useState(profile ? profile.instagram : '');
     const [linkedIn, setLinkedIn] = useState(profile ? profile.linkedIn : '');
-
-    const days = [...Array(31).keys()].map(i => i + 1);
-    const months = Array.from({ length: 12 }, (_, i) => {
-        return new Intl.DateTimeFormat('en', { month: 'long' }).format(new Date(2000, i, 1));
-    });
-    const years = [...Array(51).keys()].map(i => new Date().getFullYear() - i);
-
+    
     const contactEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneNumberRegex = /^[0-9]{10,15}$/;
 
@@ -68,6 +60,16 @@ function ViewStartupProfile({ profile }) {
         }
     };
 
+    const handleDateChange = (newDate) => {
+      setFoundedDate(newDate);
+      
+      if (!newDate) {
+        setErrors({ foundedDate: 'Please select a valid date' });
+      } else {
+        setErrors({ foundedDate: '' });
+      }
+    };    
+
     const validateFields = () => {
         const newErrors = {};
         const emptyFieldError = 'This field cannot be empty';
@@ -79,9 +81,8 @@ function ViewStartupProfile({ profile }) {
         } else if (companyDescription.length > maxDescriptionLength) {
             newErrors.companyDescription = `Company Description cannot exceed ${maxDescriptionLength} characters.`;
         }
-        if (!foundedMonth.trim()) newErrors.foundedMonth = emptyFieldError;
-        if (!foundedDay?.toString().trim()) newErrors.foundedDay = emptyFieldError;
-        if (!foundedYear?.toString().trim()) newErrors.foundedYear = emptyFieldError;
+        if (!foundedDate || !foundedDate.isValid()) {newErrors.foundedDate = emptyFieldError;
+        }       
         if (!typeOfCompany.trim()) newErrors.typeOfCompany = emptyFieldError;
         if (!numberOfEmployees.trim()) newErrors.numberOfEmployees = emptyFieldError;
         
@@ -102,6 +103,8 @@ function ViewStartupProfile({ profile }) {
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
       };
+
+      const formattedDateString = foundedDate ? dayjs(foundedDate).format('MMMM D, YYYY') : '';
             
     const handleUpdateProfile = async () => {
         if (isEditable) {
@@ -126,7 +129,7 @@ function ViewStartupProfile({ profile }) {
                     startupCode: startupCode,
                     companyName: companyName,
                     companyDescription: companyDescription,
-                    foundedDate: `${foundedMonth} ${foundedDay}, ${foundedYear}`,
+                    foundedDate: formattedDateString,
                     typeOfCompany: typeOfCompany,
                     numberOfEmployees: numberOfEmployees,
                     phoneNumber: phoneNumber,
@@ -276,89 +279,26 @@ function ViewStartupProfile({ profile }) {
                     )}
                   </Grid>
 
-                  <Grid item xs={4}>
-                    <label>
-                      <b>Founded Date {RequiredAsterisk}</b>
-                      <br />
-                      Month
-                    </label>
-                    <FormControl fullWidth variant="outlined">
-                      <Select
-                        labelId="month-label"
-                        value={foundedMonth}
-                        onChange={(e) => setFoundedMonth(e.target.value)}
-                        disabled={!isEditable}
-                        sx={{ height: "45px" }}
-                        error={!!errors.foundedMonth}>
-                        {months.map((month) => (
-                          <MenuItem key={month} value={month}>
-                            {month}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {errors.foundedMonth && (
-                        <FormHelperText error>
-                          {errors.foundedMonth}
-                        </FormHelperText>
-                      )}
-                    </FormControl>
+                  <Grid item xs={6}>
+                    <label>Founded Date {RequiredAsterisk} <br /></label>
+                      <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <DatePicker value={foundedDate} onChange={handleDateChange} disabled={!isEditable}
+                          maxDate={dayjs().endOf('day')}
+                          onAccept={(date) => {
+                            if (date.year() > dayjs().year()) {
+                              date = dayjs().year(dayjs().year()).month(date.month()).date(date.date());
+                            }
+                              handleDateChange(date);
+                            }}                         
+                            renderInput={(params) => (
+                            <TextField {...params} error={!!errors.foundedDate} helperText={errors.foundedDate} />
+                            )}
+                            sx={{ width: '100%', height: '45px', '& .MuiInputBase-root': { height: '45px', padding: '0px 14px', } }} />
+                      </LocalizationProvider>
+                      {errors.foundedDate && (<FormHelperText error>{errors.foundedDate}</FormHelperText>)}
                   </Grid>
 
-                  <Grid item xs={4}>
-                    <label>
-                      <br />
-                      Day
-                    </label>
-                    <FormControl fullWidth variant="outlined">
-                      <Select
-                        labelId="day-label"
-                        value={foundedDay}
-                        onChange={(e) => setFoundedDay(e.target.value)}
-                        disabled={!isEditable}
-                        sx={{ height: "45px" }}
-                        error={!!errors.foundedDay}>
-                        {days.map((day) => (
-                          <MenuItem key={day} value={day}>
-                            {day}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {errors.foundedDay && (
-                        <FormHelperText error>
-                          {errors.foundedDay}
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item xs={4}>
-                    <label>
-                      <br />
-                      Year
-                    </label>
-                    <FormControl fullWidth variant="outlined">
-                      <Select
-                        labelId="year-label"
-                        value={foundedYear}
-                        onChange={(e) => setFoundedYear(e.target.value)}
-                        disabled={!isEditable}
-                        sx={{ height: "45px" }}
-                        error={!!errors.foundedYear}>
-                        {years.map((year) => (
-                          <MenuItem key={year} value={year}>
-                            {year}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {errors.foundedYear && (
-                        <FormHelperText error>
-                          {errors.foundedYear}
-                        </FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item xs={4}>
+                  <Grid item xs={6}>
                     <label>Type of Company {RequiredAsterisk}</label>
                     <Grid container spacing={2}>
                       <Grid item xs={12}>
@@ -382,7 +322,7 @@ function ViewStartupProfile({ profile }) {
                     </Grid>
                   </Grid>
 
-                  <Grid item xs={4}>
+                  <Grid item xs={6}>
                     <label>No. of Employees {RequiredAsterisk}</label>
                     <Grid container spacing={2}>
                       <Grid item xs={12}>
@@ -409,7 +349,7 @@ function ViewStartupProfile({ profile }) {
                     </Grid>
                   </Grid>
 
-                  <Grid item xs={4}>
+                  <Grid item xs={6}>
                     <label>Phone Number {RequiredAsterisk}</label>
                     <TextField
                       fullWidth

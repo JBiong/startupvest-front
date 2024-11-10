@@ -12,6 +12,8 @@ const InvestNowDialog = ({
   fundingRound = '',
   fundingRoundId,
   investorId,
+  targetFunding,
+  moneyRaised,
 }) => {
   const [shareAmount, setShareAmount] = useState('');
   const [displayShareAmount, setDisplayShareAmount] = useState('');
@@ -25,6 +27,23 @@ const InvestNowDialog = ({
   const handleCheckboxChange = (e) => {
     setIsChecked(e.target.checked);
   };
+
+  // Function to calculate available shares considering NaN moneyRaised and rounding up
+  const calculateAvailableShares = () => {
+    // Ensure moneyRaised is a valid number, if not, set it to 0
+    const validMoneyRaised = isNaN(moneyRaised) ? 0 : moneyRaised;
+
+    // Available shares = (Target Funding - Money Raised) / Price per Share
+    const remainingMoney = targetFunding - validMoneyRaised;
+    const remainingShares = remainingMoney / pricePerShare;
+
+    // Round up to the next integer
+    return Math.ceil(remainingShares);
+  };
+
+      // Get available shares
+  const availableShares = calculateAvailableShares();
+
 
   useEffect(() => {
     const total = shareAmount ? shareAmount * pricePerShare : 0;
@@ -102,6 +121,9 @@ const InvestNowDialog = ({
     setTermsDialogOpen(false);
   };
 
+  console.log(targetFunding);
+  console.log(moneyRaised);
+
   return (
     <>
       {/* Main Investment Dialog */}
@@ -129,21 +151,22 @@ const InvestNowDialog = ({
 
             {/* Shares Input */}
             <Grid item xs={12}>
-              <Typography>Shares</Typography>
+              <Typography>Number of shares to buy:</Typography>
               <TextField margin="dense" id="share" type="text" fullWidth variant="outlined" placeholder="e.g., 5" value={displayShareAmount}
                 onChange={handleShareAmountChange} helperText={errors.shareAmount} error={!!errors.shareAmount} />
             </Grid>
+            <Typography variant="caption" sx={{ mb: 1, ml: 1, mt: 1}}>Shares Available: <strong>{availableShares}</strong></Typography>
 
             {/* Investment Summary */}
             <Grid item xs={12}>
               <Box p={3} sx={{ backgroundColor: '#f5f5f5', borderRadius: 2 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                  Investment Summary
-                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Investment Summary</Typography>
+
                 <Typography variant="body2" gutterBottom>
                   You are buying <strong>{shareAmount || 0} shares</strong> at a price of{' '}
                   <strong>P{pricePerShare ? Number(pricePerShare).toLocaleString() : '0'}</strong> per share.
                 </Typography>
+
                 <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
                   Total cost: P{totalCost ? totalCost.toLocaleString() : '0'}
                 </Typography>

@@ -402,6 +402,61 @@ const AdminDashboard = () => {
               </Paper>
             </Grid>
 
+            <Grid item xs={12} md={12}>
+              <Paper elevation={3} style={{ padding: '20px', height: '100%' }}>
+                <Typography variant="h6" color="#1E1E1E">Startup Profile Request</Typography>
+                <TableContainer component={Paper} sx={{ mt: 1 }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow sx={{ backgroundColor: '#336FB0'}}>
+                        <TableCell sx={{ color: 'white'}}>Startup Owner</TableCell>
+                        <TableCell sx={{ color: 'white'}}>Startup Name</TableCell>
+                        <TableCell sx={{ color: 'white'}}>Description</TableCell>
+                        <TableCell sx={{ color: 'white'}}>Type of Company</TableCell>
+                        <TableCell sx={{ color: 'white'}}>Contact Number</TableCell>
+                        <TableCell sx={{ color: 'white'}}>Contact Email</TableCell>
+                        <TableCell sx={{ color: 'white'}}>Industry</TableCell>
+                        <TableCell sx={{ color: 'white'}}>Action</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {loading ? (
+                        <TableRow>
+                          <TableCell colSpan={2}>Loading...</TableCell>
+                        </TableRow>
+                      ) : (
+                          <TableRow>
+                            <TableCell>    
+                              <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Avatar variant="square" sx={{ border: '1px solid #336FB0', width: 50, height: 50, mr: 1, 
+                                  transition: 'transform 0.3s ease', '&:hover': { transform: 'scale(1.5)' } }} />Bucheng
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Avatar variant="square" sx={{ border: '1px solid #336FB0', width: 50, height: 50, mr: 1,
+                                transition: 'transform 0.3s ease', '&:hover': { transform: 'scale(1.5)' } }} />Bucheng Corporation
+                              </div>
+                            </TableCell>
+                            <TableCell>I want to eat noodles</TableCell>
+                            <TableCell>Profit</TableCell>
+                            <TableCell>09231221341</TableCell>
+                            <TableCell>bucheng@gmail.com</TableCell>
+                            <TableCell>Technology</TableCell>
+                            <TableCell>
+                              <div style={{ display: 'flex', gap: '10px' }}>
+                                <Button variant="contained" color="success">Approve</Button>
+                                <Button variant="contained" color="error">Reject</Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </Paper>
+            </Grid>
+
             <Grid item xs={12}>
               <Paper elevation={3} style={{ padding: '20px', textAlign: 'center' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>

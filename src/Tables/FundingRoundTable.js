@@ -36,8 +36,13 @@ function FundingRoundTable({
     setSelectedStartupFunding(event.target.value);
   };
 
-  const getFundingRoundStatus = (closedDate) => {
+  const getFundingRoundStatus = (closedDate, moneyRaised, targetFunding) => {
     const today = new Date();
+
+    if (moneyRaised > targetFunding) {
+      return 'Completed';
+    }
+
     return new Date(closedDate) < today ? 'Completed' : 'Ongoing';
   };
 
@@ -174,7 +179,7 @@ function FundingRoundTable({
                 return (
                   <TableRow key={round.id}
                   sx={{ backgroundColor: 'white' }}>
-                    <TableCell sx={tableStyles.cell}>{getFundingRoundStatus(round.closedDate)}</TableCell>
+                    <TableCell sx={tableStyles.cell}>{getFundingRoundStatus(round.closedDate, round.moneyRaised, round.targetFunding)}</TableCell>
                     <TableCell sx={tableStyles.cell}>{formatDate(round.closedDate)}</TableCell>
                     <TableCell sx={tableStyles.cell}>{round.fundingName}</TableCell>
                     <TableCell sx={tableStyles.cell}>{round.fundingType}</TableCell>

@@ -70,8 +70,7 @@ const headCells = [
   { id: 'fundingName', numeric: false, disablePadding: false, label: 'Funding Name', width: '15%' },
   { id: 'fundingType', numeric: false, disablePadding: false, label: 'Funding Type', width: '15%' },
   { id: 'moneyRaised', numeric: true, disablePadding: false, label: 'Money Raised', width: '15%' },
-  { id: 'announcedDate', numeric: false, disablePadding: false, label: 'Announced Date', width: '15%' },
-  { id: 'closedDate', numeric: false, disablePadding: false, label: 'Closed Date', width: '15%' },
+  { id: 'closedDate', numeric: false, disablePadding: false, label: 'Closed on Date', width: '15%' },
   { id: 'Status', numeric: false, disablePadding: false, label: 'Status', width: '15%' },
 ];
 
@@ -279,7 +278,6 @@ export default function FundingRound() {
                     <StyledTableCell>
                       {row.moneyRaisedCurrency} {row.moneyRaised === '---' ? row.moneyRaised : Number(row.moneyRaised).toLocaleString()}
                     </StyledTableCell>
-                    <StyledTableCell>{formatDate(row.announcedDate)}</StyledTableCell>
                     <StyledTableCell>{formatDate(row.closedDate)}</StyledTableCell>
                     <StyledTableCell>{row.status}</StyledTableCell>
                   </StyledTableRow>
@@ -287,7 +285,7 @@ export default function FundingRound() {
               )}
               {visibleRows.length === 0 && !loading && (
                 <TableRow>
-                  <TableCell colSpan={7} align="center">
+                  <TableCell colSpan={6} align="center">
                     <Typography variant="body2" color="textSecondary">No funding rounds available.</Typography>
                   </TableCell>
                 </TableRow>
