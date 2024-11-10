@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, TextField, Button, Select, MenuItem, Grid, FormControl, FormHelperText, Autocomplete, Link } from '@mui/material';
+import { Box, Typography, TextField, Button, Select, MenuItem, Grid, FormControl, FormHelperText, Autocomplete } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import currencyOptions from '../static/currencyOptions';
@@ -7,7 +7,6 @@ import fundingOptions from '../static/fundingOptions';
 import axios from 'axios';
 import { NumericFormat } from 'react-number-format';
 import SuccessCreateFundingRoundDialog from '../Dialogs/SuccessCreateFundingRoundDialog';
-import CreateBusinessProfileDialog from "../Dialogs/CreateBusinessProfileDialog";
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -207,10 +206,6 @@ function CreateFundingRound({ onSuccess }) {
         return value.replace(/,/g, '');
     };
 
-    const handleOpenBusinessProfile = () => {
-        setCreateBusinessProfile(true); 
-    };
-
     const handleCloseBusinessProfile = async () => {
         setCreateBusinessProfile(false);
         window.location.reload();
@@ -218,9 +213,7 @@ function CreateFundingRound({ onSuccess }) {
 
     return (
         <Box component="main" sx={{ flexGrow: 1, width: '100%', overflowX: 'hidden', maxWidth: '1000px', background: '#F2F2F2' }}>
-            <Typography variant="h5" sx={{ color: '#414a4c', fontWeight: '500', pl: 5, pb: 3 }}>
-                Organization
-            </Typography>
+            <Typography variant="h5" sx={{ color: '#414a4c', fontWeight: '500', pl: 5, pb: 3 }}>Organization</Typography>
 
             <Grid container spacing={3} sx={{ ml: 2 }}>
                 <Grid item xs={12} sm={11}>
@@ -238,23 +231,6 @@ function CreateFundingRound({ onSuccess }) {
                                     ))}
                                 </Select>
                             </FormControl>
-
-                            {errors.selectedStartupId && (
-                                <FormHelperText sx={{ color: 'red' }}>
-                                    {errors.selectedStartupId}
-                                </FormHelperText>
-                            )}
-
-                            {startups.length === 0 && (
-                                <FormHelperText sx={{ color: 'red', marginTop: '8px' }}>
-                                You currently do not have any startups associated with your account. Would you like to &nbsp;
-                                <span 
-                                    style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }} 
-                                    onClick={handleOpenBusinessProfile}>
-                                     create one?
-                                </span>
-                            </FormHelperText>
-                            )}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -460,13 +436,10 @@ function CreateFundingRound({ onSuccess }) {
                 Create Round
             </Button>
 
-            <CreateBusinessProfileDialog open={openCreateBusinessProfile} onClose={handleCloseBusinessProfile} />
 
             {/* Success Dialog */}
             <SuccessCreateFundingRoundDialog open={successDialogOpen} onClose={() => setSuccessDialogOpen(false)}
-                selectedStartupId={selectedStartupId}
-                fundingType={fundingType}
-                companyName={selectedCompanyName} />
+                selectedStartupId={selectedStartupId} fundingType={fundingType} companyName={selectedCompanyName} />
         </Box>
     );
 }

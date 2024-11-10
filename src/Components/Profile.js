@@ -312,7 +312,7 @@ return (
             </Box>
 
             <Grid container spacing={2}>
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <label>First Name</label>
                 <TextField fullWidth variant="outlined" value={userData.firstName}
                   onChange={(e) => setUserData((prevData) => ({ ...prevData, firstName: e.target.value }))} 
@@ -320,7 +320,7 @@ return (
                   InputProps={{ disabled: !isEditable, style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }, }} />
               </Grid>
 
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <label>Last Name</label>
                 <TextField fullWidth variant="outlined" value={userData.lastName}
                   onChange={(e) => setUserData((prevData) => ({ ...prevData, lastName: e.target.value }))} 
@@ -328,7 +328,7 @@ return (
                   InputProps={{ disabled: !isEditable, style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }, }} />
               </Grid>
 
-              <Grid item xs={4}>
+              <Grid item xs={6}>
                 <label>Gender</label>
                 <Select fullWidth variant="outlined" value={userData.gender}
                   onChange={(e) => setUserData((prevData) => ({ ...prevData, gender: e.target.value }))} 
@@ -341,13 +341,6 @@ return (
                 </Select>
               </Grid>
 
-              <Grid item xs={6}>
-                <label>Email Address</label>
-                <TextField fullWidth variant="outlined" value={userData.email}
-                onChange={(e) => setUserData((prevData) => ({ ...prevData, email: e.target.value }))} 
-                error={!!formErrors.email} helperText={formErrors.email}
-                InputProps={{ disabled: !isEditable, style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' },}} />
-              </Grid>
 
               <Grid item xs={6}>
                 <label>Phone Number</label>
@@ -368,7 +361,7 @@ return (
               )}
 
               <Grid item xs={12}>
-                <label>Biography</label>
+                <label>Description</label>
                 <TextField fullWidth variant="outlined" multiline rows={2.2}
                   value={userData.biography}
                   onChange={(e) => setUserData((prevData) => ({ ...prevData, biography: e.target.value }))} 

@@ -230,16 +230,7 @@ function StartUpView() {
                             {loading ? (
                               <Skeleton variant="text" width="100%" height={80} />
                             ) : (
-                              <>
                                 <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{startup.companyDescription}</Typography>
-
-                                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', mt: 3 }}>
-                                  Should you need additional information, please don’t hesitate to contact us via email at{' '}
-                                  <a href={`mailto:${startup.contactEmail}`} style={{ color: 'inherit', fontWeight: 'bold', textDecoration: 'none' }}>
-                                  {startup.contactEmail}
-                                  </a> or by phone at <span style={{ fontWeight: 'bold',  }}>{startup.phoneNumber}</span>.
-                                </Typography>
-                              </>
                             )}
                         </Grid>
 
