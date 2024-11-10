@@ -73,7 +73,7 @@ function StartupDashboard() {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-
+    
             try {
                 await Promise.all([
                     fetchBusinessProfiles(),
@@ -87,28 +87,24 @@ function StartupDashboard() {
                 console.error('Error fetching data:', error);
             } finally {
                 setLoading(false);
+                handleCompanyCount();
             }
         };
-
+    
         const handleCompanyCount = () => {
-            if (companyCount > 0) {
-                setJoyrideFinished(true);
-                setJoyrideRun(false);
-            } else {
+            if (companyCount === 0) {
                 setCreateBusinessProfile(true);
                 setJoyrideRun(true);
+            } else {
+                setJoyrideFinished(true);
+                setCreateBusinessProfile(false);
             }
         };
-
+    
         fetchData();
-
-        const timer = setTimeout(() => {
-            handleCompanyCount();
-        }, 500);
-
-        return () => clearTimeout(timer);
-
+    
     }, [companyCount]);
+    
 
     const handleJoyrideCallback = (data) => {
         if (data.status === 'finished' || data.status === 'skipped') {
@@ -480,10 +476,6 @@ function StartupDashboard() {
 
     setSteps(tutorialSteps);
   }, []);
-
-  const handleJoyrideStart = () => {
-    setJoyrideRun(true);
-  };
 
 return (
     <>
