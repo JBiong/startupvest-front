@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Box, Typography, Toolbar, Grid, Menu, MenuItem, Tabs, Tab, ListItemText, ListItem, Button, Divider, Skeleton } from "@mui/material";
+import Joyride from 'react-joyride';
+import { Box, Typography, Toolbar, Grid, Menu, MenuItem, Tabs, Tab, ListItemText, ListItem, Button, Divider, Skeleton, Tooltip } from "@mui/material";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
-import { History, AddCircle, MonetizationOnRounded, Person2, Business} from '@mui/icons-material';
+import { History, AddCircle, MonetizationOnRounded, Person2, Business } from '@mui/icons-material';
 
 import Navbar from "../Navbar/Navbar";
 import CreateFundingRoundDialog from "../Dialogs/CreateFundingRoundDialog";
@@ -21,6 +22,9 @@ import { Container, HeaderBox, RecentActivityBox, RecentActivityList, TopInfoBox
 function StartupDashboard() {
     const [tabValue, setTabValue] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [joyrideRun, setJoyrideRun] = useState(false);
+    const [joyrideFinished, setJoyrideFinished] = useState(false);
+    const [steps, setSteps] = useState([]);
         
     // PROFILE
     const [businessProfiles, setBusinessProfiles] = useState([]);
@@ -68,39 +72,49 @@ function StartupDashboard() {
 
     useEffect(() => {
         const fetchData = async () => {
-          setLoading(true);
-    
-          try {
-            await Promise.all([
-              fetchBusinessProfiles(),
-              fetchFundingRounds(),
-              fetchAllInvestorsByEachUsersCompany(),
-              fetchRecentActivities(),
-              fetchCountInvestor(),
-              fetchTopInvestorContributor(),
-            ]);
-          } catch (error) {
-            console.error('Error fetching data:', error);
-          } finally {
-            setLoading(false);
-          }
+            setLoading(true);
+
+            try {
+                await Promise.all([
+                    fetchBusinessProfiles(),
+                    fetchFundingRounds(),
+                    fetchAllInvestorsByEachUsersCompany(),
+                    fetchRecentActivities(),
+                    fetchCountInvestor(),
+                    fetchTopInvestorContributor(),
+                ]);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
         };
-    
-        fetchData();
-    }, []);
-    
-    useEffect(() => {
-        const timer = setTimeout(() => {
+
+        const handleCompanyCount = () => {
             if (companyCount > 0) {
-                setCreateBusinessProfile(false);
+                setJoyrideFinished(true);
+                setJoyrideRun(false);
             } else {
                 setCreateBusinessProfile(true);
+                setJoyrideRun(true);
             }
-        }, 500); 
+        };
+
+        fetchData();
+
+        const timer = setTimeout(() => {
+            handleCompanyCount();
+        }, 500);
 
         return () => clearTimeout(timer);
 
-    }, [companyCount]); 
+    }, [companyCount]);
+
+    const handleJoyrideCallback = (data) => {
+        if (data.status === 'finished' || data.status === 'skipped') {
+            setJoyrideFinished(true); 
+        }
+    };
     
     const handleTabChange = (event, newValue) => {
         setTabValue(newValue);
@@ -416,6 +430,61 @@ function StartupDashboard() {
     fetchPendingRequestsCount();
   }, []);
 
+  useEffect(() => {
+    const tutorialSteps = [
+        {
+          target: '.create-button',
+          content: 'Click here to create a new Startup Profile or Funding Round. You can create multiple profiles and funding rounds as needed.',
+        },
+        {
+          target: '.highest-funded-company',
+          content: 'This box shows the highest-funded company in your portfolio.',
+        },
+        {
+          target: '.top-investment-contributor',
+          content: 'This box displays the top investor contributing to your startups.',
+        },
+        {
+          target: '.funded-companies',
+        content: 'Here you can see how many startups have raised money compared to the total number of companies.',
+        },
+        {
+          target: '.company-count',
+          content: 'This box shows the total number of startups you are tracking.',
+        },
+        {
+          target: '.investor-count',
+          content: 'This box shows the total number of investors involved across all your startups.'
+        },
+        {
+          target: '.funding-rounds', 
+          content: 'This box displays the number of funding rounds in your portfolio.',
+        },
+        {
+          target: '.total-funded-amount',
+          content: 'Here you can see the total amount funded across all the startups you have.'
+        },
+        {
+            target: '.monthly-funding-overview',
+            content: 'This chart shows a visual overview of the funding trends over the last few months.',
+        },
+        {
+            target: '.recent-activity',
+            content: 'This section shows your recent activities and updates related to your investments and companies.',
+        },
+        {
+          target: '.tabs-container', 
+          content: 'Edit profiles in My Startups and My Funding Rounds, view investors in My Cap Table, and manage requests in Investor Requests.'
+        },
+      ];
+
+    setSteps(tutorialSteps);
+  }, []);
+
+  const handleJoyrideStart = () => {
+    setJoyrideRun(true);
+  };
+
 return (
     <>
       <Navbar />
@@ -436,16 +505,22 @@ return (
                         {loading ? (
                             <Skeleton variant="rectangular" width="10%" height={40} />
                             ) : (
-                            <CreateButton {...bindTrigger(popupState)}><AddCircle sx={{ mr: 1}} />Create</CreateButton>
+                            <CreateButton className="create-button" {...bindTrigger(popupState)}><AddCircle sx={{ mr: 1}} />Create</CreateButton>
                         )}
                             <Menu {...bindMenu(popupState)}>
-                            <MenuItem onClick={() => { handleOpenBusinessProfile(); popupState.close(); }}> 
-                                <Business sx={{ mr: 1, color: "#336FB0" }} /> Startup Profile
-                            </MenuItem>
-                            
-                            <MenuItem onClick={() => { handleOpenFundingRound(); popupState.close(); }}> 
-                                <MonetizationOnRounded sx={{ mr: 1, color: "#336FB0" }} /> Funding Round
-                            </MenuItem>
+                                <MenuItem onClick={() => { handleOpenBusinessProfile(); popupState.close(); }}>
+                                    <Business sx={{ mr: 1, color: "#336FB0" }} /> Startup Profile
+                                </MenuItem>
+
+                                {companyCount === 0 ? (
+                                    <Tooltip title="You need to create a Startup Profile first to access this." arrow>
+                                        <div><MenuItem disabled><MonetizationOnRounded sx={{ mr: 1, color: "#336FB0" }} /> Funding Round</MenuItem></div>
+                                    </Tooltip>
+                                ) : (
+                                    <MenuItem onClick={() => { handleOpenFundingRound(); popupState.close(); }}>
+                                        <MonetizationOnRounded sx={{ mr: 1, color: "#336FB0" }} /> Funding Round
+                                    </MenuItem>
+                                )}
                             </Menu>
                         </>
                         )}
@@ -458,9 +533,9 @@ return (
                 {loading ? (
                     <Skeleton variant="rectangular" height={100} width="100%" />
                 ) : (
-                    <TopInfoBox>
-                        <TopInfoIcon><Business sx={{ color: '#f5f5f5' }} /></TopInfoIcon>
-                        <TopInfoText>Highest-Funded Company</TopInfoText>
+                    <TopInfoBox className="highest-funded-company">
+                        <TopInfoIcon><Business sx={{ color: '#f5f5f5' }}/></TopInfoIcon>
+                        <TopInfoText>Highest-Funded Startup</TopInfoText>
                         <TopInfoTitle>{highestMoneyRaisedCompany.companyName || 'None'}</TopInfoTitle>
                     </TopInfoBox>
                 )}
@@ -470,7 +545,7 @@ return (
                 {loading ? (
                     <Skeleton variant="rectangular" height={100} width="100%" />
                 ) : (
-                    <TopInfoBox>
+                    <TopInfoBox className="top-investment-contributor">
                         <TopInfoIcon><Person2 sx={{ color: '#f5f5f5' }} /></TopInfoIcon>
                         <TopInfoText>Top Investment Contributor</TopInfoText>
                         <TopInfoTitle>{topInvestor.topInvestorName || 'None'}</TopInfoTitle>
@@ -482,8 +557,8 @@ return (
                 {loading ? (
                     <Skeleton variant="rectangular" height={100} width="100%" />
                 ) : (
-                    <TopInfoBox>
-                        <TopInfoText>Funded Companies</TopInfoText>
+                    <TopInfoBox className="funded-companies">
+                        <TopInfoText>Funded Startups</TopInfoText>
                         <TopInfoTitle>{moneyRaisedCount} out of {companyCount}</TopInfoTitle>
                     </TopInfoBox>
                 )}
@@ -493,7 +568,7 @@ return (
                 {loading ? (
                     <Skeleton variant="rectangular" height={100} width="100%" />
                 ) : (
-                    <TopInfoBox>
+                    <TopInfoBox className="company-count">
                         <TopInfoText>Company Count</TopInfoText>
                         <TopInfoTitle>{companyCount}</TopInfoTitle>
                     </TopInfoBox>
@@ -504,7 +579,7 @@ return (
                 {loading ? (
                     <Skeleton variant="rectangular" height={100} width="100%" />
                 ) : (
-                    <TopInfoBox>
+                    <TopInfoBox className="investor-count">
                         <TopInfoText>Investor Count</TopInfoText>
                         <TopInfoTitle>{investorCount}</TopInfoTitle>
                     </TopInfoBox>
@@ -515,7 +590,7 @@ return (
                 {loading ? (
                     <Skeleton variant="rectangular" height={100} width="100%" />
                 ) : (
-                    <TopInfoBox>
+                    <TopInfoBox className="funding-rounds">
                         <TopInfoText>Funding Rounds</TopInfoText>
                         <TopInfoTitle>{fundingRoundsCount}</TopInfoTitle>
                     </TopInfoBox>
@@ -526,7 +601,7 @@ return (
                 {loading ? (
                     <Skeleton variant="rectangular" height={100} width="100%" />
                 ) : (
-                    <TopInfoBox>
+                    <TopInfoBox className="total-funded-amount">
                         <TopInfoText>Total Amount Funded</TopInfoText>
                         <TopInfoTitle>{totalAmountFunded.toLocaleString()}</TopInfoTitle>
                     </TopInfoBox>
@@ -538,7 +613,7 @@ return (
                 {loading ? (
                     <Skeleton variant="rectangular" height={500} width="100%" />
                 ) : (
-                    <RecentActivityBox>
+                    <RecentActivityBox className="monthly-funding-overview">
                         <GraphTitle>Monthly Funding Overview</GraphTitle>
                         <MonthlyFundingChart userId={userId} />
                     </RecentActivityBox>
@@ -549,7 +624,7 @@ return (
             {loading ? (
                 <Skeleton variant="rectangular" height={500} width="100%" />
             ) : (
-                <RecentActivityBox>
+                <RecentActivityBox className="recent-activity">
                     <RecentActivityTitle><History sx={{ mr: 1 }} />Recent Activity</RecentActivityTitle>
                     <Divider />
                     <RecentActivityList>
@@ -594,7 +669,7 @@ return (
                 )}
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={12} className="tabs-container">
                 {loading ? (
                     <Skeleton variant="rectangular" height={48} width="100%" />
                 ) : (
@@ -663,11 +738,16 @@ return (
                         <PendingRequestInvestor onPendingRequestsCountChange={setPendingRequestsCount} />
                         )}
                     </Box>
-                </Grid>  
+                </Grid> 
             </Grid>
 
-            {!loading && createBusinessProfile && (
-                <CreateBusinessProfileDialog open={createBusinessProfile} onClose={handleCloseBusinessProfile} companyCount={companyCount}/>
+            {joyrideRun && !joyrideFinished ? (
+                <Joyride steps={steps} callback={handleJoyrideCallback} run={joyrideRun} continuous showSkipButton showProgress 
+                disableCloseOnEsc disableOverlayClose scrollOffset={80} />
+            ) : (
+                !loading && createBusinessProfile && joyrideFinished && (
+                    <CreateBusinessProfileDialog open={createBusinessProfile} onClose={handleCloseBusinessProfile} companyCount={companyCount} />
+                )
             )}
 
             <CreateFundingRoundDialog open={openCreateFundingRound} onClose={handleCloseFundingRound} />

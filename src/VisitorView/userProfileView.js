@@ -86,7 +86,7 @@ function UserProfileView() {
                   <Grid item xs={12}>
                     <Grid container spacing={3}>
                       <Grid item xs={12}>
-                        <Typography><strong>Biography</strong></Typography>
+                        <Typography><strong>Description</strong></Typography>
                         {loading ? (
                           <Skeleton variant="text" width="100%" height={100} />
                         ) : (

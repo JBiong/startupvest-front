@@ -368,7 +368,7 @@ return (
               )}
 
               <Grid item xs={12}>
-                <label>Biography</label>
+                <label>Description</label>
                 <TextField fullWidth variant="outlined" multiline rows={2.2}
                   value={userData.biography}
                   onChange={(e) => setUserData((prevData) => ({ ...prevData, biography: e.target.value }))} 
