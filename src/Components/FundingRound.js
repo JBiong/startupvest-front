@@ -262,7 +262,6 @@ export default function FundingRound() {
                     <StyledTableCell><Skeleton variant="text" width="30%" /></StyledTableCell>
                     <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
                     <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
-                    <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>                    
                   </TableRow>
                 ))
               ) : (

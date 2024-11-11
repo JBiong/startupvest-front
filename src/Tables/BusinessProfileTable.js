@@ -84,24 +84,23 @@ function BusinessProfileTable({
                     </TableCell>
 
                     <TableCell>
-                      <span>
-                        {profile.locationName || (
+                      {profile.status === "approved" ? (
+                        profile.locationName ? (
+                          <span>{profile.locationName}</span>
+                        ) : (
                           <>
                             No location selected at the moment.{" "}
-                            <span
-                              style={{
-                                color: "#336FB0",
-                                textDecoration: "underline",
-                                cursor: "pointer",
-                              }}
+                            <span style={{ color: "#336FB0", textDecoration: "underline", cursor: "pointer", }}
                               onClick={() =>
                                 (window.location.href = `https://startupsphere.mugnavo.com/startup/${profile.id}`)
                               }>
                               Set Location
                             </span>
                           </>
-                        )}
-                      </span>
+                        )
+                      ) : (
+                        <span></span>
+                      )}
                     </TableCell>
 
                     <TableCell sx={tableStyles.cell}>

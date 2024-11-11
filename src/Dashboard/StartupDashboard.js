@@ -516,9 +516,21 @@ function StartupDashboard() {
             content: 'This section shows your recent activities and updates related to your investments and companies.',
         },
         {
-          target: '.tabs-container', 
-          content: 'Edit profiles in My Startups and My Funding Rounds, view investors in My Cap Table, and manage requests in Investor Requests.'
+            target: '.tabs-round', 
+            content: 'In the "My Funding Rounds" tab, you can view, edit, or delete funding round details as needed.'
         },
+        {
+            target: '.tabs-startups', 
+            content: 'In the "My Startups" tab, you can view, edit, and delete your startup profiles to keep them up to date.'
+        },
+        {
+            target: '.tabs-captable', 
+            content: 'The "Cap Table" tab displays investors from each funding round, including their titles, shares, and ownership percentages, helping you manage shareholder information.'
+        },
+        {
+            target: '.tabs-investorrequest', 
+            content: 'The "Investor Requests" tab displays requests from potential investors. You can review and respond to pending requests here.'
+        },        
       ];
 
     setSteps(tutorialSteps);
@@ -708,19 +720,19 @@ return (
                 )}
             </Grid>
 
-            <Grid item xs={12} className="tabs-container">
+            <Grid item xs={12}>
                 {loading ? (
                     <Skeleton variant="rectangular" height={48} width="100%" />
                 ) : (
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="tabs"
                     sx={{ mt: 2, "& .MuiTabs-indicator": { backgroundColor: "#004A98" }, }}>
-                <Tab label="My Funding Rounds"
+                <Tab label="My Funding Rounds" className="tabs-round"
                     sx={{ color: tabValue === 0 ? "#1E1E1E" : "text.secondary", "&.Mui-selected": { color: "#1E1E1E" },}}/>
-                <Tab label="My Startups" 
+                <Tab label="My Startups" className="tabs-startups"
                     sx={{ color: tabValue === 1 ? "#1E1E1E" : "text.secondary", "&.Mui-selected": { color: "#1E1E1E",},}}/>
-                <Tab label="My Cap Table"
+                <Tab label="My Cap Table" className="tabs-captable"
                     sx={{color: tabValue === 2 ? "#1E1E1E" : "text.secondary", "&.Mui-selected": {color: "#1E1E1E",},}}/>
-                <Tab label={`Investor Requests (${pendingRequestsCount})`} 
+                <Tab label={`Investor Requests (${pendingRequestsCount})`} className="tabs-investorrequest"
                     sx={{ color: tabValue === 3 ? "#1E1E1E" : "text.secondary", "&.Mui-selected": { color: "#1E1E1E", },}}/>
                 </Tabs>
                 )}
@@ -784,7 +796,8 @@ return (
 
             {joyrideRun && !joyrideFinished ? (
                 <Joyride steps={steps} callback={handleJoyrideCallback} run={joyrideRun} continuous showSkipButton showProgress 
-                disableCloseOnEsc disableOverlayClose scrollOffset={80} />
+                disableCloseOnEsc disableOverlayClose scrollOffset={80}     
+                styles={{ options: { zIndex: 10000, }, overlay: { zIndex: 10000, }, spotlight: { zIndex: 10001, }, tooltip: { zIndex: 10002, }, }}/>
             ) : (
                 !loading && createBusinessProfile && joyrideFinished && (
                     <CreateBusinessProfileDialog open={createBusinessProfile} onClose={handleCloseBusinessProfile} companyCount={companyCount} />
