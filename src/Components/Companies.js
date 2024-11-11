@@ -111,9 +111,12 @@ export default function Companies() {
   useEffect(() => {
     axios.get(`${process.env.REACT_APP_API_URL}/startups/all`)
       .then((response) => {
-        setRows(response.data);
-        setFilteredRows(response.data);
-        fetchAllProfilePictures(response.data);
+        const approvedStartups = response.data.filter(
+          (startup) => startup.status === "approved" && !startup.isDeleted
+        );
+        setRows(approvedStartups);
+        setFilteredRows(approvedStartups);
+        fetchAllProfilePictures(approvedStartups);
         setLoading(false);
       })
       .catch((error) => {

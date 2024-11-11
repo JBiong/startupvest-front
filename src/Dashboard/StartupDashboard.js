@@ -8,6 +8,7 @@ import { History, AddCircle, MonetizationOnRounded, Person2, Business } from '@m
 import Navbar from "../Navbar/Navbar";
 import CreateFundingRoundDialog from "../Dialogs/CreateFundingRoundDialog";
 import CreateBusinessProfileDialog from "../Dialogs/CreateBusinessProfileDialog";
+import ConfirmCancelDialog from '../Dialogs/ConfirmCancelDialog';
 import BusinessProfileTable from "../Tables/BusinessProfileTable";
 import FundingRoundTable from "../Tables/FundingRoundTable";
 import PendingRequestInvestor from "../Tables/PendingRequestInvestorTable";
@@ -34,6 +35,8 @@ function StartupDashboard() {
     const [openViewInvestor, setOpenViewInvestor] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [profileToDelete, setProfileToDelete] = useState(null);
+    const [openCancelDialog, setOpenCancelDialog] = useState(false);
+    const [profileToCancel, setProfileToCancel] = useState(null); 
 
     // FUNDING ROUND
     const [openCreateFundingRound, setOpenCreateFundingRound] = useState(false);
@@ -155,6 +158,16 @@ function StartupDashboard() {
         setOpenDeleteDialog(false);
     };
 
+    const handleOpenCancelDialog = (profile) => {
+        setProfileToCancel(profile);
+        setOpenCancelDialog(true);
+      };
+      
+      const handleCloseCancelDialog = () => {
+        setOpenCancelDialog(false);
+        setProfileToCancel(null);
+      };
+
     const fetchRecentActivities = async () => {
         try {
             const response = await axios.get(`${process.env.REACT_APP_API_URL}/activities`, {
@@ -208,6 +221,9 @@ function StartupDashboard() {
                     type: "Startup",
                     photo: await fetchProfilePicture(profile.id, 'startup')
                 })));
+
+            const approvedStartups = startups.filter(profile => profile.status === 'approved');
+            setCompanyCount(approvedStartups.length);
     
             const investors = await Promise.all(responseInvestors.data
                 .filter((profile) => !profile.isDeleted)
@@ -216,11 +232,18 @@ function StartupDashboard() {
                     type: "Investor",
                     photo: await fetchProfilePicture(profile.id, 'investor')
                 })));
+
+                
     
             const allProfiles = [...investors, ...startups];
-            setBusinessProfiles(allProfiles);
-            setCompanyCount(startups.length);
-            return allProfiles;
+            const sortedProfiles = allProfiles.sort((a, b) => {
+                if (a.status === 'approved' && b.status !== 'approved') return -1;
+                if (b.status === 'approved' && a.status !== 'approved') return 1;
+                return 0;
+            });
+
+            setBusinessProfiles(sortedProfiles);
+            return sortedProfiles;
         } catch (error) {
             console.error('Failed to fetch business profiles:', error);
         }
@@ -255,6 +278,30 @@ function StartupDashboard() {
             console.error('Failed to delete profile:', error);
         }
     };
+
+    const handleCancelStartup = async (startupId) => {
+        try {
+          await axios.put(
+            `${process.env.REACT_APP_API_URL}/startups/${startupId}/cancel`,
+            {},
+            {
+              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+            }
+          );
+    
+          await fetchBusinessProfiles();
+
+        } catch (error) {
+          console.error("Error cancelling startup:", error);
+        }
+      };
+      
+      const handleConfirmCancel = async () => {
+        if (profileToCancel) {
+          await handleCancelStartup(profileToCancel.id);
+          handleCloseCancelDialog();
+        }
+      };
     
     // FUNDING ROUND
     const handleOpenFundingRound = () => {
@@ -469,9 +516,21 @@ function StartupDashboard() {
             content: 'This section shows your recent activities and updates related to your investments and companies.',
         },
         {
-          target: '.tabs-container', 
-          content: 'Edit profiles in My Startups and My Funding Rounds, view investors in My Cap Table, and manage requests in Investor Requests.'
+            target: '.tabs-round', 
+            content: 'In the "My Funding Rounds" tab, you can view, edit, or delete funding round details as needed.'
         },
+        {
+            target: '.tabs-startups', 
+            content: 'In the "My Startups" tab, you can view, edit, and delete your startup profiles to keep them up to date.'
+        },
+        {
+            target: '.tabs-captable', 
+            content: 'The "Cap Table" tab displays investors from each funding round, including their titles, shares, and ownership percentages, helping you manage shareholder information.'
+        },
+        {
+            target: '.tabs-investorrequest', 
+            content: 'The "Investor Requests" tab displays requests from potential investors. You can review and respond to pending requests here.'
+        },        
       ];
 
     setSteps(tutorialSteps);
@@ -661,19 +720,19 @@ return (
                 )}
             </Grid>
 
-            <Grid item xs={12} className="tabs-container">
+            <Grid item xs={12}>
                 {loading ? (
                     <Skeleton variant="rectangular" height={48} width="100%" />
                 ) : (
                 <Tabs value={tabValue} onChange={handleTabChange} aria-label="tabs"
                     sx={{ mt: 2, "& .MuiTabs-indicator": { backgroundColor: "#004A98" }, }}>
-                <Tab label="My Funding Rounds"
+                <Tab label="My Funding Rounds" className="tabs-round"
                     sx={{ color: tabValue === 0 ? "#1E1E1E" : "text.secondary", "&.Mui-selected": { color: "#1E1E1E" },}}/>
-                <Tab label="My Startups" 
+                <Tab label="My Startups" className="tabs-startups"
                     sx={{ color: tabValue === 1 ? "#1E1E1E" : "text.secondary", "&.Mui-selected": { color: "#1E1E1E",},}}/>
-                <Tab label="My Cap Table"
+                <Tab label="My Cap Table" className="tabs-captable"
                     sx={{color: tabValue === 2 ? "#1E1E1E" : "text.secondary", "&.Mui-selected": {color: "#1E1E1E",},}}/>
-                <Tab label={`Investor Requests (${pendingRequestsCount})`} 
+                <Tab label={`Investor Requests (${pendingRequestsCount})`} className="tabs-investorrequest"
                     sx={{ color: tabValue === 3 ? "#1E1E1E" : "text.secondary", "&.Mui-selected": { color: "#1E1E1E", },}}/>
                 </Tabs>
                 )}
@@ -706,6 +765,7 @@ return (
                             handleOpenStartUp={handleOpenStartUp}
                             handleOpenInvestor={handleOpenInvestor}
                             handleOpenDeleteDialog={handleOpenDeleteDialog}
+                            handleOpenCancelDialog={handleOpenCancelDialog}
                             selectedBusinessProfile={selectedBusinessProfile}
                             openViewStartup={openViewStartup}
                             openViewInvestor={openViewInvestor}
@@ -713,6 +773,7 @@ return (
                             handleCloseStartUp={handleCloseStartUp}
                             handleCloseInvestor={handleCloseInvestor}
                             handleCloseDeleteDialog={handleCloseDeleteDialog}
+                            handleCloseCancelDialog={handleCloseCancelDialog}
                             handleSoftDelete={handleSoftDelete}
                             profileToDelete={profileToDelete}/>                            
                         )}
@@ -735,7 +796,8 @@ return (
 
             {joyrideRun && !joyrideFinished ? (
                 <Joyride steps={steps} callback={handleJoyrideCallback} run={joyrideRun} continuous showSkipButton showProgress 
-                disableCloseOnEsc disableOverlayClose scrollOffset={80} />
+                disableCloseOnEsc disableOverlayClose scrollOffset={80}     
+                styles={{ options: { zIndex: 10000, }, overlay: { zIndex: 10000, }, spotlight: { zIndex: 10001, }, tooltip: { zIndex: 10002, }, }}/>
             ) : (
                 !loading && createBusinessProfile && joyrideFinished && (
                     <CreateBusinessProfileDialog open={createBusinessProfile} onClose={handleCloseBusinessProfile} companyCount={companyCount} />
@@ -744,6 +806,8 @@ return (
 
             <CreateFundingRoundDialog open={openCreateFundingRound} onClose={handleCloseFundingRound} />
             <ActivitiesDialog open={dialogOpen} onClose={handleCloseDialog} activities={recentActivities}/>
+            <ConfirmCancelDialog open={openCancelDialog} onClose={handleCloseCancelDialog} 
+                onConfirm={handleConfirmCancel} companyName={profileToCancel ? profileToCancel.companyName : ""} />
         </Container>
     </>
   );

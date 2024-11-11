@@ -116,7 +116,7 @@ export default function Companies() {
     const fetchInvestors = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/users/all`);
-        const filteredInvestors = response.data.filter(investor => investor.role !== 'Admin');
+        const filteredInvestors = response.data.filter(investor => investor.role !== 'Admin' && investor.isVerified);
         setInvestors(filteredInvestors);
       } catch (error) {
         console.error('Error fetching investors:', error);

@@ -229,13 +229,13 @@ const AdminDashboard = () => {
   const getFilteredData = () => {
     switch (filter) {
       case "all":
-        return users;
+        return users.filter(user => user.isVerified);
       case "startup":
-        return startups;
+        return startups.filter(startup => startup.status === "approved" && !startup.isDeleted);
       case "investor":
         return investors;
       case "funding":
-        return fundingRounds;
+        return fundingRounds.filter(fundingRound => !fundingRound.isDeleted);
       default:
         return [];
     }
@@ -533,7 +533,7 @@ const AdminDashboard = () => {
               <TopInfoBox>
                 <TopInfoText>Total Users</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : users.length}
+                  {loading ? "Loading..." : users.filter(user => user.isVerified).length}
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -542,7 +542,7 @@ const AdminDashboard = () => {
               <TopInfoBox>
                 <TopInfoText>Total Startups</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : startups.length}
+                  {loading ? "Loading..." : startups.filter(startup => startup.status === "approved" && !startup.isDeleted).length}
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -560,7 +560,8 @@ const AdminDashboard = () => {
               <TopInfoBox>
                 <TopInfoText>Total Funding Rounds</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : fundingRounds.length}
+                  {loading ? "Loading..." : fundingRounds.filter(fundingRound => !fundingRound.isDeleted)
+                .length}
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -598,6 +599,7 @@ const AdminDashboard = () => {
                         </TableRow>
                       ) : (
                         users
+                          .filter((user) => user.isVerified)
                           .sort((a, b) => b.id - a.id)
                           .slice(0, 6)
                           .map((user) => (

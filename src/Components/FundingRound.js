@@ -144,6 +144,7 @@ export default function FundingRound() {
       try {
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/funding-rounds/all`);
         const fetchedRows = response.data
+          .filter(fundingRound => !fundingRound.isDeleted)
           .map(fundingRound => createData(
             fundingRound.id,
             fundingRound.transactionName || '---',
@@ -261,7 +262,6 @@ export default function FundingRound() {
                     <StyledTableCell><Skeleton variant="text" width="30%" /></StyledTableCell>
                     <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
                     <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>
-                    <StyledTableCell><Skeleton variant="text" width="50%" /></StyledTableCell>                    
                   </TableRow>
                 ))
               ) : (
