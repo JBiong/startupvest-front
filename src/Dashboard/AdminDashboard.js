@@ -125,23 +125,24 @@ const AdminDashboard = () => {
           setFundingRounds(fundingRoundsResponse.data);
     
           // Calculate top performing startup
-          const validFundingRounds = fundingRoundsResponse.data.filter(round => !round.isDeleted && round.startup);
+          const validFundingRounds = fundingRoundsResponse.data.filter(round => !round.isDeleted && round.startup && round.capTableInvestors && round.capTableInvestors.length > 0);
           const startupTotalFunding = validFundingRounds.reduce((acc, round) => {
             const startupId = round.startup.id;
             acc[startupId] = (acc[startupId] || 0) + round.moneyRaised;
             return acc;
           }, {});
 
-          // Filter out startups with no funding rounds
+          // Filter out startups with no funding rounds or no investors
           const startupsWithFunding = Object.keys(startupTotalFunding).map(key => parseInt(key));
 
           const topStartupEntry = Object.entries(startupTotalFunding)
+            .filter(([id]) => startupsWithFunding.includes(parseInt(id)))
             .sort(([, a], [, b]) => b - a)[0];
 
           if (topStartupEntry) {
             const topStartupId = parseInt(topStartupEntry[0]);
-            if (startupsWithFunding.includes(topStartupId)) {
-              const topStartup = startupsResponse.data.find(s => s.id === topStartupId);
+            const topStartup = startupsResponse.data.find(s => s.id === topStartupId);
+            if (topStartup && topStartupEntry[1] > 0) {
               setTopPerformingStartup(topStartup);
             } else {
               setTopPerformingStartup(null);
@@ -195,17 +196,17 @@ const AdminDashboard = () => {
             });
           }
             
-        } catch (error) {
-          console.error("Error fetching dashboard data:", error);
-          // You might want to add error state handling here
-          setLoading(false);
-        } finally {
-          setLoading(false);
-        }
-      };
-    
-      fetchData();
-    }, []);
+                } catch (error) {
+                  console.error("Error fetching dashboard data:", error);
+                  // You might want to add error state handling here
+                  setLoading(false);
+                } finally {
+                  setLoading(false);
+                }
+              };
+            
+              fetchData();
+            }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -666,13 +667,17 @@ const AdminDashboard = () => {
                         paginatedRows.map((row) => (
                           <TableRow key={row.id}>
                             <TableCell>
-                              <div style={{ display: "flex", alignItems: "center" }}>
-                                <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" } }} src={row.avatarUrl} />{row.ceoName}
+                              <div style={{ display: "flex",alignItems: "center", }}>
+                                <Avatar variant="square"sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease",
+                                    "&:hover": { transform: "scale(1.5)" }, }}
+                                  src={row.avatarUrl}/>{row.ceoName}
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div style={{ display: "flex", alignItems: "center" }}>
-                                <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" } }} src={row.companyLogoUrl} />{row.companyName}
+                              <div style={{ display: "flex", alignItems: "center", }}>
+                                <Avatar variant="square"
+                                  sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" },}}
+                                  src={row.companyLogoUrl}/>{row.companyName}
                               </div>
                             </TableCell>
                             <TableCell sx={{ width: '25%' }}>
@@ -769,33 +774,34 @@ const AdminDashboard = () => {
                       {loading ? (
                         <TableRow>
                           <TableCell colSpan={8}>
-                            <Skeleton variant="rectangular" width="100%" height={60} />
+                            <Skeleton variant="rectangular" width="100%" height={60}/>
                           </TableCell>
                         </TableRow>
                       ) : (
                         startups
-                          .filter((row) => row.status === 'pending')
-                          .map((row) => (
-                            <TableRow key={row.id}>
-                              <TableCell>
-                                <div style={{ display: "flex", alignItems: "center" }}>
-                                  <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" } }} src={row.avatarUrl} />{row.ceoName}
-                                </div>
-                              </TableCell>
-                              <TableCell>
-                                <div style={{ display: "flex", alignItems: "center" }}>
-                                  <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" } }} src={row.companyLogoUrl} />{row.companyName}
-                                </div>
-                              </TableCell>
-                              <TableCell>{row.contactEmail}</TableCell>
-                              <TableCell sx={{ textAlign: 'center' }}>
-                                <div style={{ display: "flex", gap: "10px" }}>
-                                  <Button variant="contained" color="success" onClick={() => handleApproveStartup(row.id)}>Approve</Button>
-                                  <Button variant="contained" color="error" onClick={() => handleRejectStartup(row.id)}>Reject</Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))
+                        .filter((row) => row.status === 'pending')
+                        .map((row) => (
+                          <TableRow key={row.id}>
+                            <TableCell>
+                              <div style={{ display: "flex", alignItems: "center", }}>
+                                <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease",
+                                    "&:hover": { transform: "scale(1.5)" }, }}src={row.avatarUrl}/>{row.ceoName}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div style={{ display: "flex", alignItems: "center", }}>
+                                <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" }, }} src={row.companyLogoUrl}/>{row.companyName}
+                              </div>
+                            </TableCell>
+                            <TableCell>{row.contactEmail}</TableCell>
+                            <TableCell sx= {{ textAlign: 'center' }}>
+                              <div style={{ display: "flex", gap: "10px" }}>
+                                <Button variant="contained" color="success" onClick={() => handleApproveStartup(row.id)}>Approve</Button>
+                                <Button variant="contained" color="error" onClick={() => handleRejectStartup(row.id)}>Reject</Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
                       )}
                     </TableBody>
                   </Table>

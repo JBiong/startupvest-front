@@ -256,7 +256,7 @@ function StartupDashboard() {
         }
 
         try {
-            const endpoint = `${process.env.REACT_APP_API_URL}/startups/${profileToDelete.id}/delete`;
+            const endpoint = `${process.env.REACT_APP_API_URL}/startups/${profileToDelete.id}/request-delete`;
 
             await axios.put(endpoint, {}, {
                 headers: {
