@@ -3,7 +3,7 @@ import industries from '../static/industries';
 import quantityOptions from '../static/quantityOptions';
 import SuccessCreateBusinessProfileDialog from '../Dialogs/SuccessCreateBusinessProfileDialog';
 import { Box, Typography, TextField, Select, MenuItem, Grid, FormControl, CardContent, Button, Autocomplete, FormHelperText } from '@mui/material';
-import { Business, MonetizationOn } from '@mui/icons-material'; 
+import { Business, Info } from '@mui/icons-material'; 
 import { StyledCard } from '../styles/CardStyles';
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -176,9 +176,7 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
         <>
         <Box component="main" sx={{ flexGrow: 1, width: '100%', overflowX: 'hidden', maxWidth: '1000px',  background: '#F2F2F2'}}>
             <Box component="main" sx={{mr: 5, borderRadius: 2 }}>
-            <Typography variant="h6" sx={{ color: '#414a4c', fontWeight: '500', pl: 5, pb: 3, display: 'none' }}>
-                    Profile Type 
-                </Typography>
+            <Typography variant="h6" sx={{ color: '#414a4c', fontWeight: '500', pl: 5, pb: 3, display: 'none' }}>Profile Type </Typography>
 
                 <Box sx={{ display: 'flex', gap: 2, pl: 5, pb: 2, textAlign: 'center', flexDirection: { xs: 'column', sm: 'row' }, backgroundColor: '#f5f5f5', borderRadius: 2, display: 'none'}}>
                     <StyledCard color="#004A98"
@@ -196,12 +194,20 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
                 {selectedProfileType === 'Startup Company' && (
                 <>
                     {companyCount === 0 && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#FFEB3B', padding: 2, borderRadius: 2, ml: 5, mb: 3 }}>
-                        <Typography variant="body1" sx={{ color: '#1E1E1E', fontWeight: 'bold' }}>
-                            <Business sx={{ mr: 1, color: "#1E1E1E" }} />
-                            Welcome to the platform! To get started, please create your startup profile. This is essential for setting up funding rounds and unlocking other key features tailored to your business.
+                    <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#FFEB3B', padding: 2, borderRadius: 2, ml: 5, mb: 2 }}>
+                        <Typography variant="caption" sx={{ color: '#1E1E1E', fontWeight: 'bold' }}>
+                            🏠︎ Welcome to the platform! To get started, please create your startup profile. This is essential for setting up funding rounds and unlocking other key features tailored to your business.
                         </Typography>
                     </Box>
+                )}
+
+                {companyCount > 0 && (
+                <Box sx={{ backgroundColor: '#FFEB3B', display: 'flex', alignItems: 'center', padding: 2, borderRadius: 2, ml: 5, mb: 2 }}>
+                    <Typography variant="caption" sx={{ color: '#1E1E1E', fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+                    <Info sx={{ mr: 1, color: "#1E1E1E", fontSize: 24 }} />
+                    You can create as many startup profiles as you'd like. Add more profiles to track different businesses and funding rounds at any time.
+                    </Typography>
+                </Box>
                 )}
           
                 <Typography variant="h6" sx={{ color: '#414a4c', fontWeight: '500', pl: 5, pb: 3}}>Overview</Typography>

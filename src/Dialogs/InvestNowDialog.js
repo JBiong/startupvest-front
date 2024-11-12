@@ -65,17 +65,25 @@ const InvestNowDialog = ({
 
   const handleShareAmountChange = (e) => {
     const inputValue = e.target.value.replace(/,/g, '');
-    const shares = parseInt(inputValue, 10);
-
+    let shares = parseInt(inputValue, 10);
+  
+    // Check if the input is a valid number and within bounds
     if (isNaN(shares) || shares < 1) {
       setErrors((prev) => ({ ...prev, shareAmount: 'Please enter a valid number.' }));
+      setShareAmount('');
+      setDisplayShareAmount('');
     } else {
-      setErrors((prev) => ({ ...prev, shareAmount: '' }));
+      if (shares > availableShares) {
+        setErrors((prev) => ({ ...prev, shareAmount: 'You cannot purchase more shares than the available quantity.' }));
+        setShareAmount(''); 
+        setDisplayShareAmount(''); 
+      } else {
+        setErrors((prev) => ({ ...prev, shareAmount: '' })); 
+        setShareAmount(shares.toString()); 
+        setDisplayShareAmount(formatNumber(shares)); 
+      }
     }
-
-    setShareAmount(inputValue);
-    setDisplayShareAmount(formatNumber(inputValue));
-  };
+  };  
 
   const handleConfirm = async () => {
     if (shareAmount <= 0) {
@@ -121,9 +129,6 @@ const InvestNowDialog = ({
     setTermsDialogOpen(false);
   };
 
-  console.log(targetFunding);
-  console.log(moneyRaised);
-
   return (
     <>
       {/* Main Investment Dialog */}
@@ -145,15 +150,16 @@ const InvestNowDialog = ({
               <Typography variant="body1" gutterBottom align="justify">
                 You are about to invest in the <strong>{fundingRound}</strong> funding round conducted by{' '}
                 <strong>{companyName}</strong>. The price per share is{' '}
-                <strong>P{Number(pricePerShare).toLocaleString() || '0'}</strong>.
+                <strong>₱ {Number(pricePerShare).toLocaleString() || '0'}</strong>.
               </Typography>
             </Grid>
 
             {/* Shares Input */}
             <Grid item xs={12}>
               <Typography>Number of shares to buy:</Typography>
-              <TextField margin="dense" id="share" type="text" fullWidth variant="outlined" placeholder="e.g., 5" value={displayShareAmount}
-                onChange={handleShareAmountChange} helperText={errors.shareAmount} error={!!errors.shareAmount} />
+              <TextField margin="dense" id="share" type="number" fullWidth variant="outlined" placeholder="e.g., 5" value={displayShareAmount}
+                onChange={handleShareAmountChange} helperText={errors.shareAmount} error={!!errors.shareAmount}
+                inputProps={{ max: availableShares, min: 1 }} />
             </Grid>
             <Typography variant="caption" sx={{ mb: 1, ml: 1, mt: 1}}>Shares Available: <strong>{availableShares}</strong></Typography>
 
@@ -163,12 +169,15 @@ const InvestNowDialog = ({
                 <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Investment Summary</Typography>
 
                 <Typography variant="body2" gutterBottom>
-                  You are buying <strong>{shareAmount || 0} shares</strong> at a price of{' '}
-                  <strong>P{pricePerShare ? Number(pricePerShare).toLocaleString() : '0'}</strong> per share.
+                  You are buying <strong>{(shareAmount <= availableShares && shareAmount > 0) ? shareAmount : 0} shares</strong> at a price of{' '}
+                  <strong>₱ {pricePerShare ? Number(pricePerShare).toLocaleString() : '0'}</strong> per share.
                 </Typography>
 
                 <Typography variant="h6" color="primary" sx={{ mt: 1 }}>
-                  Total cost: P{totalCost ? totalCost.toLocaleString() : '0'}
+                  Total cost: ₱
+                  {shareAmount <= availableShares && shareAmount > 0
+                    ? (pricePerShare * shareAmount).toLocaleString()
+                    : '0'}
                 </Typography>
               </Box>
             </Grid>
@@ -200,7 +209,7 @@ const InvestNowDialog = ({
         {/* Dialog Actions */}
         <DialogActions sx={{ p: 3, justifyContent: 'center' }}>
           <Button onClick={handleConfirm} variant="contained" color="primary" sx={{ px: 8 }}
-            disabled={!shareAmount || shareAmount <= 0 || !isChecked}>
+            disabled={!shareAmount || shareAmount <= 0 || !isChecked || displayShareAmount > availableShares }>
             Confirm Investment
           </Button>
         </DialogActions>

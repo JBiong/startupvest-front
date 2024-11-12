@@ -477,7 +477,7 @@ function StartupDashboard() {
     const tutorialSteps = [
         {
           target: '.create-button',
-          content: 'Click here to create a new Startup Profile or Funding Round. You can create multiple profiles and funding rounds as needed.',
+          content: 'Click here to create a new Startup Profile or Funding Round.',
         },
         {
           target: '.highest-funded-company',
