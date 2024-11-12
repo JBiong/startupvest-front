@@ -1,26 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Grid,
-  Paper,
-  Typography,
-  Toolbar,
-  CssBaseline,
-  AppBar,
-  Box,
-  IconButton,
-  Avatar,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Select,
-  MenuItem,
-  Pagination,
-  Tooltip,
-  Button,
-} from "@mui/material";
+import { Grid, Paper, Typography, Toolbar, CssBaseline, AppBar, Box, IconButton, Avatar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, Pagination, Tooltip, Button, Stack } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import axios from "axios";
 import UserRegistrationsChart from "../Components/ChartAdmin";
@@ -28,11 +7,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import { Skeleton } from "@mui/material";
 
 import Papa from "papaparse";
-import {
-  TopInfoBox,
-  TopInfoText,
-  TopInfoTitle,
-} from "../styles/StartupDashboard";
+import { TopInfoBox, TopInfoText,TopInfoTitle, } from "../styles/StartupDashboard";
 
 const AdminDashboard = () => {
   const [filter, setFilter] = useState("all");
@@ -42,9 +17,29 @@ const AdminDashboard = () => {
   const [fundingRounds, setFundingRounds] = useState([]);
   const [profilePictures, setProfilePictures] = useState({});
   const [loading, setLoading] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const [page, setPage] = useState(1);
   const itemsPerPage = 7;
+  const [pageForVerificationStartups, setPageForVerificationStartups] = useState(1);
+  const rowsPerPage = 5;
+
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  // Calculate number of pages
+  const totalPages = Math.ceil(startups.filter((row) => row.status === 'pending').length / rowsPerPage);
+
+  // Function to handle page change
+  const handlePageVSChange = (event, newPage) => {
+    setPageForVerificationStartups(newPage);
+  };
+    
+  // Get current page rows
+  const paginatedRows = startups
+    .filter((row) => row.status === 'pending')
+    .slice((pageForVerificationStartups - 1) * rowsPerPage, pageForVerificationStartups * rowsPerPage);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -210,11 +205,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const getStartupName = (startupId) => {
-    const startup = startups.find((s) => s.id === startupId);
-    return startup ? startup.companyName : "Unknown Startup";
-  };
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { year: "numeric", month: "long", day: "numeric" };
@@ -289,6 +279,8 @@ const AdminDashboard = () => {
               ))}
             </TableRow>
           </TableHead>
+
+          {/* COLUMN DATA */}
           <TableBody>
             {loading ? (
               <TableRow>
@@ -301,30 +293,16 @@ const AdminDashboard = () => {
                 <TableRow key={item.id}>
                   {filter === "startup" ? (
                     <>
+                      <TableCell>{item.status}</TableCell>
                       <TableCell>{item.companyName}</TableCell>
                       <TableCell>{item.foundedDate}</TableCell>
                       <TableCell>{item.industry}</TableCell>
                       <TableCell>{item.contactEmail}</TableCell>
                       <TableCell>
                         {profilePictures[`startup_${item.id}`] ? (
-                          <Avatar
-                            src={profilePictures[`startup_${item.id}`]}
-                            sx={{
-                              width: 50,
-                              height: 50,
-                              border: "1px solid #336FB0",
-                            }}
-                          />
+                          <Avatar src={profilePictures[`startup_${item.id}`]} sx={{ width: 50, height: 50, border: "1px solid #336FB0", }} />
                         ) : (
-                          <Avatar
-                            sx={{
-                              width: 50,
-                              height: 50,
-                              border: "1px solid #336FB0",
-                            }}
-                          >
-                            {item.companyName[0]}
-                          </Avatar>
+                          <Avatar sx={{ width: 50, height: 50, border: "1px solid #336FB0", }}>{item.companyName[0]}</Avatar>
                         )}
                       </TableCell>
                     </>
@@ -333,28 +311,12 @@ const AdminDashboard = () => {
                       <TableCell>{`${item.firstName} ${item.lastName}`}</TableCell>
                       <TableCell>{item.emailAddress}</TableCell>
                       <TableCell>{item.contactInformation}</TableCell>
-                      <TableCell>
-                        {item.locationLng}, {item.locationLat},{" "}
-                        {item.locationName}
-                      </TableCell>
+                      <TableCell>{item.locationLng}, {item.locationLat},{" "} {item.locationName}</TableCell>
                       <TableCell>
                         {profilePictures[`investor_${item.id}`] ? (
-                          <Avatar
-                            src={profilePictures[`investor_${item.id}`]}
-                            sx={{
-                              width: 50,
-                              height: 50,
-                              border: "1px solid #336FB0",
-                            }}
-                          />
+                          <Avatar src={profilePictures[`investor_${item.id}`]} sx={{ width: 50, height: 50, border: "1px solid #336FB0", }} />
                         ) : (
-                          <Avatar
-                            sx={{
-                              width: 50,
-                              height: 50,
-                              border: "1px solid #336FB0",
-                            }}
-                          >
+                          <Avatar sx={{ width: 50, height: 50, border: "1px solid #336FB0", }}>
                             {item.firstName[0]}
                             {item.lastName[0]}
                           </Avatar>
@@ -366,42 +328,20 @@ const AdminDashboard = () => {
                       <TableCell>{item.startup.companyName}</TableCell>
                       <TableCell>{item.fundingType}</TableCell>
                       <TableCell>{formatDate(item.announcedDate)}</TableCell>
-                      <TableCell>{`${item.moneyRaisedCurrency}${formatCurrency(
-                        item.targetFunding
-                      )}`}</TableCell>
-                      <TableCell>{`${item.moneyRaisedCurrency}${formatCurrency(
-                        item.moneyRaised
-                      )}`}</TableCell>
+                      <TableCell>{`${item.moneyRaisedCurrency}${formatCurrency(item.targetFunding)}`}</TableCell>
+                      <TableCell>{`${item.moneyRaisedCurrency}${formatCurrency(item.moneyRaised)}`}</TableCell>
                     </>
                   ) : (
                     <>
-                      <TableCell>
-                        {item.firstName} {item.lastName}
-                      </TableCell>
+                      <TableCell>{item.firstName} {item.lastName}</TableCell>
                       <TableCell>{item.gender}</TableCell>
                       <TableCell>{item.email}</TableCell>
                       <TableCell>{item.contactNumber}</TableCell>
                       <TableCell>
                         {item.photo ? (
-                          <Avatar
-                            src={item.photo}
-                            sx={{
-                              width: 50,
-                              height: 50,
-                              border: "1px solid #336FB0",
-                            }}
-                          />
+                          <Avatar src={item.photo} sx={{ width: 50, height: 50, border: "1px solid #336FB0", }} />
                         ) : (
-                          <Avatar
-                            sx={{
-                              width: 50,
-                              height: 50,
-                              border: "1px solid #336FB0",
-                            }}
-                          >
-                            {item.firstName[0]}
-                            {item.lastName[0]}
-                          </Avatar>
+                          <Avatar sx={{ width: 50, height: 50, border: "1px solid #336FB0", }}>{item.firstName[0]} {item.lastName[0]}</Avatar>
                         )}
                       </TableCell>
                     </>
@@ -413,13 +353,7 @@ const AdminDashboard = () => {
         </Table>
 
         <Box display="flex" justifyContent="center">
-          <Pagination
-            count={Math.ceil(getFilteredData().length / itemsPerPage)}
-            page={page}
-            onChange={handlePageChange}
-            color="primary"
-            sx={{ m: 2 }}
-          />
+          <Pagination count={Math.ceil(getFilteredData().length / itemsPerPage)} page={page} onChange={handlePageChange} sx={{ m: 2 }} />
         </Box>
       </TableContainer>
     );
@@ -428,29 +362,12 @@ const AdminDashboard = () => {
   return (
     <div style={{ marginTop: "78px", background: "#f5f5f5" }}>
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          background: "#004A98",
-        }}
-      >
+      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, background: "#004A98", }}>
         <Toolbar>
-          <Avatar
-            sx={{ width: 40, height: 40, mr: 2 }}
-            src="images/logoV1.png"
-          ></Avatar>
-          <Typography variant="h6" noWrap component="div" sx={{ ml: -1 }}>
-            Startup Vest
-          </Typography>
+          <Avatar sx={{ width: 40, height: 40, mr: 2 }} src="images/logoV1.png"></Avatar>
+          <Typography variant="h6" noWrap component="div" sx={{ ml: -1 }}>Startup Vest</Typography>
           <Box sx={{ flexGrow: 1 }} />
-          <IconButton
-            size="medium"
-            aria-label="show 17 new notifications"
-            color="inherit"
-            sx={{ marginRight: 5 }}
-            onClick={handleLogout}
-          >
+          <IconButton size="medium" aria-label="show 17 new notifications" color="inherit" sx={{ marginRight: 5 }} onClick={handleLogout}>
             <LogoutIcon />
           </IconButton>
         </Toolbar>
@@ -460,25 +377,23 @@ const AdminDashboard = () => {
         <Grid item xs={12}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={12}>
-              <Typography variant="h5" color="#232023">
-                Admin Dashboard
-              </Typography>
+              <Typography variant="h5" color="#232023">Admin Dashboard</Typography>
             </Grid>
 
             <Grid item xs={12} sm={3}>
               <TopInfoBox>
                 <TopInfoText>Total Users</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : users.length}
+                  {loading ? "Loading..." : users.filter(user => user.isVerified).length}
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
 
             <Grid item xs={12} sm={3}>
               <TopInfoBox>
-                <TopInfoText>Total Startups</TopInfoText>
+                <TopInfoText>Total CEOs</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : startups.length}
+                  Paki Call
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -494,9 +409,46 @@ const AdminDashboard = () => {
 
             <Grid item xs={12} sm={3}>
               <TopInfoBox>
+                <TopInfoText>Total CFOs</TopInfoText>
+                <TopInfoTitle>
+                  Paki Call
+                </TopInfoTitle>
+              </TopInfoBox>
+            </Grid>
+
+            <Grid item xs={12} sm={3}>
+              <TopInfoBox>
+                <TopInfoText>Total Startups</TopInfoText>
+                <TopInfoTitle>
+                  {loading ? "Loading..." : startups.filter(startup => startup.status === "approved" && !startup.isDeleted).length}
+                </TopInfoTitle>
+              </TopInfoBox>
+            </Grid>
+
+            <Grid item xs={12} sm={3}>
+              <TopInfoBox>
+                <TopInfoText>Top Performing Startup</TopInfoText>
+                <TopInfoTitle>
+                  Paki Call
+                </TopInfoTitle>
+              </TopInfoBox>
+            </Grid>
+
+            <Grid item xs={12} sm={3}>
+              <TopInfoBox>
+                <TopInfoText>Top Investor</TopInfoText>
+                <TopInfoTitle>
+                  Paki Call
+                </TopInfoTitle>
+              </TopInfoBox>
+            </Grid>
+
+            <Grid item xs={12} sm={3}>
+              <TopInfoBox>
                 <TopInfoText>Total Funding Rounds</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : fundingRounds.length}
+                  {loading ? "Loading..." : fundingRounds.filter(fundingRound => !fundingRound.isDeleted)
+                .length}
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -505,7 +457,7 @@ const AdminDashboard = () => {
 
         <Grid item xs={12}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={9}>
               <Paper elevation={3} style={{ padding: "20px", height: "100%" }}>
                 <Typography variant="h6" color="#1E1E1E">
                   User Growth Graph
@@ -514,15 +466,14 @@ const AdminDashboard = () => {
               </Paper>
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            <Grid item xs={12} md={3}>
               <Paper elevation={3} style={{ padding: "20px", height: "100%" }}>
-                <Typography variant="h6" color="#1E1E1E">
-                  Latest User
-                </Typography>
+                <Typography variant="h6" color="#1E1E1E">Latest User</Typography>
                 <TableContainer component={Paper} sx={{ mt: 1 }}>
                   <Table>
                     <TableHead>
                       <TableRow sx={{ backgroundColor: "#336FB0" }}>
+                      <TableCell sx={{ color: "white" }}>Role</TableCell>
                         <TableCell sx={{ color: "white" }}>Name</TableCell>
                         <TableCell sx={{ color: "white" }}>Photo</TableCell>
                       </TableRow>
@@ -534,34 +485,18 @@ const AdminDashboard = () => {
                         </TableRow>
                       ) : (
                         users
+                          .filter((user) => user.isVerified)
                           .sort((a, b) => b.id - a.id)
                           .slice(0, 6)
                           .map((user) => (
                             <TableRow key={user.id}>
-                              <TableCell>
-                                {user.firstName} {user.lastName}
-                              </TableCell>
+                              <TableCell>{user.role}</TableCell>
+                              <TableCell>{user.firstName} {user.lastName}</TableCell>
                               <TableCell>
                                 {user.photo ? (
-                                  <Avatar
-                                    src={user.photo}
-                                    sx={{
-                                      border: "1px solid #336FB0",
-                                      width: 50,
-                                      height: 50,
-                                    }}
-                                  />
+                                  <Avatar src={user.photo} sx={{ border: "1px solid #336FB0", width: 50, height: 50, }}/>
                                 ) : (
-                                  <Avatar
-                                    sx={{
-                                      border: "1px solid #336FB0",
-                                      width: 50,
-                                      height: 50,
-                                    }}
-                                  >
-                                    {user.firstName[0]}
-                                    {user.lastName[0]}
-                                  </Avatar>
+                                  <Avatar sx={{ border: "1px solid #336FB0", width: 50, height: 50, }}>{user.firstName[0]} {user.lastName[0]}</Avatar>
                                 )}
                               </TableCell>
                             </TableRow>
@@ -575,116 +510,67 @@ const AdminDashboard = () => {
 
             <Grid item xs={12} md={12}>
               <Paper elevation={3} style={{ padding: "20px", height: "100%" }}>
-                <Typography variant="h6" color="#1E1E1E">
-                  Startup Profile Request
-                </Typography>
+                <Typography variant="h6" color="#1E1E1E">Request for Startup Profile Verification</Typography>
                 <TableContainer component={Paper} sx={{ mt: 1 }}>
                   <Table>
                     <TableHead>
                       <TableRow sx={{ backgroundColor: "#336FB0" }}>
-                        <TableCell sx={{ color: "white" }}>
-                          Startup Owner
-                        </TableCell>
-                        <TableCell sx={{ color: "white" }}>
-                          Startup Name
-                        </TableCell>
-                        <TableCell sx={{ color: "white" }}>
-                          Description
-                        </TableCell>
-                        <TableCell sx={{ color: "white" }}>
-                          Type of Company
-                        </TableCell>
-                        <TableCell sx={{ color: "white" }}>
-                          Contact Number
-                        </TableCell>
-                        <TableCell sx={{ color: "white" }}>
-                          Contact Email
-                        </TableCell>
+                        <TableCell sx={{ color: "white" }}>Startup Owner</TableCell>
+                        <TableCell sx={{ color: "white" }}>Startup Name</TableCell>
+                        <TableCell sx={{ color: "white" }}>Description</TableCell>
+                        <TableCell sx={{ color: "white" }}>Type of Company</TableCell>
+                        <TableCell sx={{ color: "white" }}>Contact Number</TableCell>
+                        <TableCell sx={{ color: "white" }}>Contact Email</TableCell>
                         <TableCell sx={{ color: "white" }}>Industry</TableCell>
-                        <TableCell sx={{ color: "white" }}>Action</TableCell>
+                        <TableCell sx={{ color: "white", textAlign: 'center' }}>Action</TableCell>
                       </TableRow>
                     </TableHead>
+
                     <TableBody>
                       {loading ? (
                         <TableRow>
                           <TableCell colSpan={8}>
-                            <Skeleton
-                              variant="rectangular"
-                              width="100%"
-                              height={60}
-                            />
+                            <Skeleton variant="rectangular" width="100%" height={60} />
                           </TableCell>
                         </TableRow>
                       ) : (
-                        startups
-                        .filter((row) => row.status === 'pending')
-                        .map((row) => (
+                        paginatedRows.map((row) => (
                           <TableRow key={row.id}>
                             <TableCell>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Avatar
-                                  variant="square"
-                                  sx={{
-                                    border: "1px solid #336FB0",
-                                    width: 50,
-                                    height: 50,
-                                    mr: 1,
-                                    transition: "transform 0.3s ease",
-                                    "&:hover": { transform: "scale(1.5)" },
-                                  }}
-                                  src={row.avatarUrl}
-                                />
-                                {row.name}
+                              <div style={{ display: "flex",alignItems: "center", }}>
+                                <Avatar variant="square"sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease",
+                                    "&:hover": { transform: "scale(1.5)" }, }}
+                                  src={row.avatarUrl}/>{row.name}
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Avatar
-                                  variant="square"
-                                  sx={{
-                                    border: "1px solid #336FB0",
-                                    width: 50,
-                                    height: 50,
-                                    mr: 1,
-                                    transition: "transform 0.3s ease",
-                                    "&:hover": { transform: "scale(1.5)" },
-                                  }}
-                                  src={row.companyLogoUrl}
-                                />
-                                {row.companyName}
+                              <div style={{ display: "flex", alignItems: "center", }}>
+                                <Avatar variant="square"
+                                  sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" },}}
+                                  src={row.companyLogoUrl}/>{row.companyName}
                               </div>
                             </TableCell>
-                            <TableCell>{row.companyDescription}</TableCell>
+                            <TableCell sx={{ width: '25%' }}>
+                              {isExpanded ? row.companyDescription : row.companyDescription.slice(0, 50)}
+                              {row.companyDescription.length > 50 && (
+                                <>
+                                  {isExpanded ? row.companyDescription : row.companyDescription.slice(0, 50) + "..."}
+                                  <span
+                                    style={{ color: 'blue', cursor: 'pointer', marginLeft: 5 }}
+                                    onClick={toggleExpanded}>
+                                    {isExpanded ? "Show less" : "Show more"}
+                                  </span>
+                                </>
+                              )}
+                            </TableCell>
                             <TableCell>{row.typeOfCompany}</TableCell>
                             <TableCell>{row.phoneNumber}</TableCell>
                             <TableCell>{row.contactEmail}</TableCell>
                             <TableCell>{row.industry}</TableCell>
                             <TableCell>
                               <div style={{ display: "flex", gap: "10px" }}>
-                                <Button
-                                  variant="contained"
-                                  color="success"
-                                  onClick={() => handleApproveStartup(row.id)}
-                                >
-                                  Approve
-                                </Button>
-                                <Button
-                                  variant="contained"
-                                  color="error"
-                                  onClick={() => handleRejectStartup(row.id)}
-                                >
-                                  Reject
-                                </Button>
+                                <Button variant="contained" color="success" onClick={() => handleApproveStartup(row.id)}>Approve</Button>
+                                <Button variant="contained" color="error" onClick={() => handleRejectStartup(row.id)}>Reject</Button>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -693,146 +579,17 @@ const AdminDashboard = () => {
                     </TableBody>
                   </Table>
                 </TableContainer>
+
+                {/* Pagination Component */}
+                <Stack spacing={2} sx={{ mt: 2, alignItems: "center" }}>
+                  <Pagination count={totalPages} page={pageForVerificationStartups} onChange={handlePageVSChange} size="medium" />
+                </Stack>
               </Paper>
             </Grid>
 
-
-            <Grid item xs={12} md={12}>
-              <Paper elevation={3} style={{ padding: "20px", height: "100%" }}>
-                <Typography variant="h6" color="#1E1E1E">
-                 DELETION OF Startup Profile Request
-                </Typography>
-                <TableContainer component={Paper} sx={{ mt: 1 }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow sx={{ backgroundColor: "#336FB0" }}>
-                        <TableCell sx={{ color: "white" }}>
-                          Startup Owner
-                        </TableCell>
-                        <TableCell sx={{ color: "white" }}>
-                          Startup Name
-                        </TableCell>
-                        <TableCell sx={{ color: "white" }}>
-                          Description
-                        </TableCell>
-                        <TableCell sx={{ color: "white" }}>
-                          Type of Company
-                        </TableCell>
-                        <TableCell sx={{ color: "white" }}>
-                          Contact Number
-                        </TableCell>
-                        <TableCell sx={{ color: "white" }}>
-                          Contact Email
-                        </TableCell>
-                        <TableCell sx={{ color: "white" }}>Industry</TableCell>
-                        <TableCell sx={{ color: "white" }}>Action</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {loading ? (
-                        <TableRow>
-                          <TableCell colSpan={8}>
-                            <Skeleton
-                              variant="rectangular"
-                              width="100%"
-                              height={60}
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        startups
-                        .filter((row) => row.status === 'pending')
-                        .map((row) => (
-                          <TableRow key={row.id}>
-                            <TableCell>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Avatar
-                                  variant="square"
-                                  sx={{
-                                    border: "1px solid #336FB0",
-                                    width: 50,
-                                    height: 50,
-                                    mr: 1,
-                                    transition: "transform 0.3s ease",
-                                    "&:hover": { transform: "scale(1.5)" },
-                                  }}
-                                  src={row.avatarUrl}
-                                />
-                                {row.name}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                }}
-                              >
-                                <Avatar
-                                  variant="square"
-                                  sx={{
-                                    border: "1px solid #336FB0",
-                                    width: 50,
-                                    height: 50,
-                                    mr: 1,
-                                    transition: "transform 0.3s ease",
-                                    "&:hover": { transform: "scale(1.5)" },
-                                  }}
-                                  src={row.companyLogoUrl}
-                                />
-                                {row.companyName}
-                              </div>
-                            </TableCell>
-                            <TableCell>{row.companyDescription}</TableCell>
-                            <TableCell>{row.typeOfCompany}</TableCell>
-                            <TableCell>{row.phoneNumber}</TableCell>
-                            <TableCell>{row.contactEmail}</TableCell>
-                            <TableCell>{row.industry}</TableCell>
-                            <TableCell>
-                              <div style={{ display: "flex", gap: "10px" }}>
-                                <Button
-                                  variant="contained"
-                                  color="success"
-                                  onClick={() => handleApproveStartup(row.id)}
-                                >
-                                  Approve
-                                </Button>
-                                <Button
-                                  variant="contained"
-                                  color="error"
-                                  onClick={() => handleRejectStartup(row.id)}
-                                >
-                                  Reject
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Paper>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Paper
-                elevation={3}
-                style={{ padding: "20px", textAlign: "center" }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 2,
-                  }}
-                >
+            <Grid item xs={7}>
+              <Paper elevation={3} style={{ padding: "20px", textAlign: "center" }}>
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2, }}>
                   <Typography variant="h6">
                     {filter === "all"
                       ? "User"
@@ -843,29 +600,13 @@ const AdminDashboard = () => {
                       : "Funding Round"}{" "}
                     Information
                   </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      gap: 1,
-                    }}
-                  >
-                    <Select
-                      value={filter}
+                  <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, }}>
+                    <Select value={filter}
                       onChange={(e) => {
                         setFilter(e.target.value);
                         setPage(1);
                       }}
-                      sx={{
-                        minWidth: 200,
-                        height: 45,
-                        ".MuiSelect-select": {
-                          padding: "8px 14px",
-                          display: "flex",
-                          alignItems: "center",
-                        },
-                      }}
-                    >
+                      sx={{ minWidth: 200, height: 45, ".MuiSelect-select": { padding: "8px 14px", display: "flex", alignItems: "center", },}}>
                       <MenuItem value="all">Users</MenuItem>
                       <MenuItem value="startup">Startups</MenuItem>
                       <MenuItem value="investor">Investors</MenuItem>
@@ -882,6 +623,59 @@ const AdminDashboard = () => {
 
                 {/* Render your table based on paginated data */}
                 {renderTable(paginatedData)}
+              </Paper>
+            </Grid>
+            
+            <Grid item xs={12} md={5}>
+              <Paper elevation={3} style={{ padding: "20px", height: "100%" }}>
+                <Typography variant="h6" color="#1E1E1E">Request for Deletion of Startup Profile</Typography>
+                <TableContainer component={Paper} sx={{ mt: 1 }}>
+                  <Table>
+                    <TableHead>
+                      <TableRow sx={{ backgroundColor: "#336FB0" }}>
+                        <TableCell sx={{ color: "white" }}>Startup Owner</TableCell>
+                        <TableCell sx={{ color: "white" }}>Startup Name</TableCell>
+                        <TableCell sx={{ color: "white" }}>Contact Email</TableCell>
+                        <TableCell sx={{ color: "white", textAlign: 'center' }}>Action</TableCell>
+                      </TableRow>
+                    </TableHead>
+
+                    <TableBody>
+                      {loading ? (
+                        <TableRow>
+                          <TableCell colSpan={8}>
+                            <Skeleton variant="rectangular" width="100%" height={60}/>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        startups
+                        .filter((row) => row.status === 'pending')
+                        .map((row) => (
+                          <TableRow key={row.id}>
+                            <TableCell>
+                              <div style={{ display: "flex", alignItems: "center", }}>
+                                <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease",
+                                    "&:hover": { transform: "scale(1.5)" }, }}src={row.avatarUrl}/>{row.name}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div style={{ display: "flex", alignItems: "center", }}>
+                                <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" }, }} src={row.companyLogoUrl}/>{row.companyName}
+                              </div>
+                            </TableCell>
+                            <TableCell>{row.contactEmail}</TableCell>
+                            <TableCell sx= {{ textAlign: 'center' }}>
+                              <div style={{ display: "flex", gap: "10px" }}>
+                                <Button variant="contained" color="success" onClick={() => handleApproveStartup(row.id)}>Approve</Button>
+                                <Button variant="contained" color="error" onClick={() => handleRejectStartup(row.id)}>Reject</Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </Paper>
             </Grid>
           </Grid>
