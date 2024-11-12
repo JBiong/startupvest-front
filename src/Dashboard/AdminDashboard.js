@@ -1,5 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Grid, Paper, Typography, Toolbar, CssBaseline, AppBar, Box, IconButton, Avatar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, Pagination, Tooltip, Button, } from "@mui/material";
+import {
+  Grid,
+  Paper,
+  Typography,
+  Toolbar,
+  CssBaseline,
+  AppBar,
+  Box,
+  IconButton,
+  Avatar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Select,
+  MenuItem,
+  Pagination,
+  Tooltip,
+  Button,
+} from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import axios from "axios";
 import UserRegistrationsChart from "../Components/ChartAdmin";
@@ -7,7 +28,11 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import { Skeleton } from "@mui/material";
 
 import Papa from "papaparse";
-import { TopInfoBox, TopInfoText, TopInfoTitle, } from "../styles/StartupDashboard";
+import {
+  TopInfoBox,
+  TopInfoText,
+  TopInfoTitle,
+} from "../styles/StartupDashboard";
 
 const AdminDashboard = () => {
   const [filter, setFilter] = useState("all");
@@ -29,7 +54,7 @@ const AdminDashboard = () => {
           startupsResponse,
           investorsResponse,
           fundingRoundsResponse,
-        ] = await Promise.all([
+        ] = await  Promise.allSettled([
           axios.get(`${process.env.REACT_APP_API_URL}/users/all`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -147,10 +172,9 @@ const AdminDashboard = () => {
     window.location = "/";
   };
 
-  // DOWNLOAD TO CSV FILE
   const downloadData = () => {
     const filteredData = getFilteredData();
-    const headers = getTableHeaders(filter); 
+    const headers = getTableHeaders(filter); // Pass the filter to getHeaders
 
     // Filter the data based on selected filter for download
     const formattedData = filteredData.map((item) => {
@@ -202,30 +226,27 @@ const AdminDashboard = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  // FILTER DATA INFORMATION
   const getFilteredData = () => {
     switch (filter) {
       case "all":
-        return users.filter(user => user.isVerified);
+        return users;
       case "startup":
-        return startups.filter(startup => startup.status === "approved" || startup.status === "rejected");
+        return startups;
       case "investor":
         return investors;
       case "funding":
-        return fundingRounds.filter(fundingRound => !fundingRound.isDeleted);
+        return fundingRounds;
       default:
         return [];
     }
   };
 
-  // HEADERS FOR DATA INFORMATION
   const getTableHeaders = () => {
     switch (filter) {
       case "all":
         return ["Name", "Gender", "Email", "Contact Number", "User Photo"];
       case "startup":
         return [
-          "Status",
           "Company Name",
           "Founded Date",
           "Industry",
@@ -251,6 +272,11 @@ const AdminDashboard = () => {
       default:
         return [];
     }
+  };
+
+  const getStartupName = (startupId) => {
+    const startup = startups.find((s) => s.id === startupId);
+    return startup ? startup.companyName : "Unknown Startup";
   };
 
   const formatDate = (dateString) => {
@@ -327,8 +353,6 @@ const AdminDashboard = () => {
               ))}
             </TableRow>
           </TableHead>
-
-          {/* COLUMN DATA */}
           <TableBody>
             {loading ? (
               <TableRow>
@@ -341,16 +365,30 @@ const AdminDashboard = () => {
                 <TableRow key={item.id}>
                   {filter === "startup" ? (
                     <>
-                      <TableCell>{item.status}</TableCell>
                       <TableCell>{item.companyName}</TableCell>
                       <TableCell>{item.foundedDate}</TableCell>
                       <TableCell>{item.industry}</TableCell>
                       <TableCell>{item.contactEmail}</TableCell>
                       <TableCell>
                         {profilePictures[`startup_${item.id}`] ? (
-                          <Avatar src={profilePictures[`startup_${item.id}`]} sx={{ width: 50, height: 50, border: "1px solid #336FB0", }} />
+                          <Avatar
+                            src={profilePictures[`startup_${item.id}`]}
+                            sx={{
+                              width: 50,
+                              height: 50,
+                              border: "1px solid #336FB0",
+                            }}
+                          />
                         ) : (
-                          <Avatar sx={{ width: 50, height: 50, border: "1px solid #336FB0", }}>{item.companyName[0]}</Avatar>
+                          <Avatar
+                            sx={{
+                              width: 50,
+                              height: 50,
+                              border: "1px solid #336FB0",
+                            }}
+                          >
+                            {item.companyName[0]}
+                          </Avatar>
                         )}
                       </TableCell>
                     </>
@@ -359,12 +397,28 @@ const AdminDashboard = () => {
                       <TableCell>{`${item.firstName} ${item.lastName}`}</TableCell>
                       <TableCell>{item.emailAddress}</TableCell>
                       <TableCell>{item.contactInformation}</TableCell>
-                      <TableCell>{item.locationLng}, {item.locationLat},{" "} {item.locationName}</TableCell>
+                      <TableCell>
+                        {item.locationLng}, {item.locationLat},{" "}
+                        {item.locationName}
+                      </TableCell>
                       <TableCell>
                         {profilePictures[`investor_${item.id}`] ? (
-                          <Avatar src={profilePictures[`investor_${item.id}`]} sx={{ width: 50, height: 50, border: "1px solid #336FB0", }} />
+                          <Avatar
+                            src={profilePictures[`investor_${item.id}`]}
+                            sx={{
+                              width: 50,
+                              height: 50,
+                              border: "1px solid #336FB0",
+                            }}
+                          />
                         ) : (
-                          <Avatar sx={{ width: 50, height: 50, border: "1px solid #336FB0", }}>
+                          <Avatar
+                            sx={{
+                              width: 50,
+                              height: 50,
+                              border: "1px solid #336FB0",
+                            }}
+                          >
                             {item.firstName[0]}
                             {item.lastName[0]}
                           </Avatar>
@@ -376,20 +430,42 @@ const AdminDashboard = () => {
                       <TableCell>{item.startup.companyName}</TableCell>
                       <TableCell>{item.fundingType}</TableCell>
                       <TableCell>{formatDate(item.announcedDate)}</TableCell>
-                      <TableCell>{`${item.moneyRaisedCurrency}${formatCurrency(item.targetFunding)}`}</TableCell>
-                      <TableCell>{`${item.moneyRaisedCurrency}${formatCurrency(item.moneyRaised)}`}</TableCell>
+                      <TableCell>{`${item.moneyRaisedCurrency}${formatCurrency(
+                        item.targetFunding
+                      )}`}</TableCell>
+                      <TableCell>{`${item.moneyRaisedCurrency}${formatCurrency(
+                        item.moneyRaised
+                      )}`}</TableCell>
                     </>
                   ) : (
                     <>
-                      <TableCell>{item.firstName} {item.lastName}</TableCell>
+                      <TableCell>
+                        {item.firstName} {item.lastName}
+                      </TableCell>
                       <TableCell>{item.gender}</TableCell>
                       <TableCell>{item.email}</TableCell>
                       <TableCell>{item.contactNumber}</TableCell>
                       <TableCell>
                         {item.photo ? (
-                          <Avatar src={item.photo} sx={{ width: 50, height: 50, border: "1px solid #336FB0", }} />
+                          <Avatar
+                            src={item.photo}
+                            sx={{
+                              width: 50,
+                              height: 50,
+                              border: "1px solid #336FB0",
+                            }}
+                          />
                         ) : (
-                          <Avatar sx={{ width: 50, height: 50, border: "1px solid #336FB0", }}>{item.firstName[0]} {item.lastName[0]}</Avatar>
+                          <Avatar
+                            sx={{
+                              width: 50,
+                              height: 50,
+                              border: "1px solid #336FB0",
+                            }}
+                          >
+                            {item.firstName[0]}
+                            {item.lastName[0]}
+                          </Avatar>
                         )}
                       </TableCell>
                     </>
@@ -401,7 +477,13 @@ const AdminDashboard = () => {
         </Table>
 
         <Box display="flex" justifyContent="center">
-          <Pagination count={Math.ceil(getFilteredData().length / itemsPerPage)} page={page} onChange={handlePageChange} color="primary" sx={{ m: 2 }} />
+          <Pagination
+            count={Math.ceil(getFilteredData().length / itemsPerPage)}
+            page={page}
+            onChange={handlePageChange}
+            color="primary"
+            sx={{ m: 2 }}
+          />
         </Box>
       </TableContainer>
     );
@@ -410,12 +492,29 @@ const AdminDashboard = () => {
   return (
     <div style={{ marginTop: "78px", background: "#f5f5f5" }}>
       <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, background: "#004A98", }}>
+      <AppBar
+        position="fixed"
+        sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          background: "#004A98",
+        }}
+      >
         <Toolbar>
-          <Avatar sx={{ width: 40, height: 40, mr: 2 }} src="images/logoV1.png"></Avatar>
-          <Typography variant="h6" noWrap component="div" sx={{ ml: -1 }}>Startup Vest</Typography>
+          <Avatar
+            sx={{ width: 40, height: 40, mr: 2 }}
+            src="images/logoV1.png"
+          ></Avatar>
+          <Typography variant="h6" noWrap component="div" sx={{ ml: -1 }}>
+            Startup Vest
+          </Typography>
           <Box sx={{ flexGrow: 1 }} />
-          <IconButton size="medium" aria-label="show 17 new notifications" color="inherit" sx={{ marginRight: 5 }} onClick={handleLogout}>
+          <IconButton
+            size="medium"
+            aria-label="show 17 new notifications"
+            color="inherit"
+            sx={{ marginRight: 5 }}
+            onClick={handleLogout}
+          >
             <LogoutIcon />
           </IconButton>
         </Toolbar>
@@ -425,14 +524,16 @@ const AdminDashboard = () => {
         <Grid item xs={12}>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={12}>
-              <Typography variant="h5" color="#232023">Admin Dashboard</Typography>
+              <Typography variant="h5" color="#232023">
+                Admin Dashboard
+              </Typography>
             </Grid>
 
             <Grid item xs={12} sm={3}>
               <TopInfoBox>
                 <TopInfoText>Total Users</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : users.filter(user => user.isVerified).length}
+                  {loading ? "Loading..." : users.length}
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -441,7 +542,7 @@ const AdminDashboard = () => {
               <TopInfoBox>
                 <TopInfoText>Total Startups</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : startups.filter(startup => startup.status === "approved" && !startup.isDeleted).length}
+                  {loading ? "Loading..." : startups.length}
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -459,8 +560,7 @@ const AdminDashboard = () => {
               <TopInfoBox>
                 <TopInfoText>Total Funding Rounds</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : fundingRounds.filter(fundingRound => !fundingRound.isDeleted)
-                .length}
+                  {loading ? "Loading..." : fundingRounds.length}
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -480,7 +580,9 @@ const AdminDashboard = () => {
 
             <Grid item xs={12} md={4}>
               <Paper elevation={3} style={{ padding: "20px", height: "100%" }}>
-                <Typography variant="h6" color="#1E1E1E">Latest User</Typography>
+                <Typography variant="h6" color="#1E1E1E">
+                  Latest User
+                </Typography>
                 <TableContainer component={Paper} sx={{ mt: 1 }}>
                   <Table>
                     <TableHead>
@@ -496,7 +598,6 @@ const AdminDashboard = () => {
                         </TableRow>
                       ) : (
                         users
-                          .filter((user) => user.isVerified)
                           .sort((a, b) => b.id - a.id)
                           .slice(0, 6)
                           .map((user) => (
@@ -506,9 +607,25 @@ const AdminDashboard = () => {
                               </TableCell>
                               <TableCell>
                                 {user.photo ? (
-                                  <Avatar src={user.photo} sx={{ border: "1px solid #336FB0", width: 50, height: 50, }}/>
+                                  <Avatar
+                                    src={user.photo}
+                                    sx={{
+                                      border: "1px solid #336FB0",
+                                      width: 50,
+                                      height: 50,
+                                    }}
+                                  />
                                 ) : (
-                                  <Avatar sx={{ border: "1px solid #336FB0", width: 50, height: 50, }}>{user.firstName[0]} {user.lastName[0]}</Avatar>
+                                  <Avatar
+                                    sx={{
+                                      border: "1px solid #336FB0",
+                                      width: 50,
+                                      height: 50,
+                                    }}
+                                  >
+                                    {user.firstName[0]}
+                                    {user.lastName[0]}
+                                  </Avatar>
                                 )}
                               </TableCell>
                             </TableRow>
@@ -522,27 +639,44 @@ const AdminDashboard = () => {
 
             <Grid item xs={12} md={12}>
               <Paper elevation={3} style={{ padding: "20px", height: "100%" }}>
-                <Typography variant="h6" color="#1E1E1E">Startup Profile Request</Typography>
+                <Typography variant="h6" color="#1E1E1E">
+                  Startup Profile Request
+                </Typography>
                 <TableContainer component={Paper} sx={{ mt: 1 }}>
                   <Table>
                     <TableHead>
                       <TableRow sx={{ backgroundColor: "#336FB0" }}>
-                        <TableCell sx={{ color: "white" }}>Startup Owner</TableCell>
-                        <TableCell sx={{ color: "white" }}>Startup Name</TableCell>
-                        <TableCell sx={{ color: "white" }}>Description</TableCell>
-                        <TableCell sx={{ color: "white" }}>Type of Company</TableCell>
-                        <TableCell sx={{ color: "white" }}>Contact Number</TableCell>
-                        <TableCell sx={{ color: "white" }}>Contact Email</TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Startup Owner
+                        </TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Startup Name
+                        </TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Description
+                        </TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Type of Company
+                        </TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Contact Number
+                        </TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Contact Email
+                        </TableCell>
                         <TableCell sx={{ color: "white" }}>Industry</TableCell>
                         <TableCell sx={{ color: "white" }}>Action</TableCell>
                       </TableRow>
                     </TableHead>
-
                     <TableBody>
                       {loading ? (
                         <TableRow>
                           <TableCell colSpan={8}>
-                            <Skeleton variant="rectangular" width="100%" height={60} />
+                            <Skeleton
+                              variant="rectangular"
+                              width="100%"
+                              height={60}
+                            />
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -551,17 +685,47 @@ const AdminDashboard = () => {
                         .map((row) => (
                           <TableRow key={row.id}>
                             <TableCell>
-                              <div style={{ display: "flex",alignItems: "center", }}>
-                                <Avatar variant="square"sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease",
-                                    "&:hover": { transform: "scale(1.5)" }, }}
-                                  src={row.avatarUrl}/>{row.name}
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Avatar
+                                  variant="square"
+                                  sx={{
+                                    border: "1px solid #336FB0",
+                                    width: 50,
+                                    height: 50,
+                                    mr: 1,
+                                    transition: "transform 0.3s ease",
+                                    "&:hover": { transform: "scale(1.5)" },
+                                  }}
+                                  src={row.avatarUrl}
+                                />
+                                {row.name}
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div style={{ display: "flex", alignItems: "center", }}>
-                                <Avatar variant="square"
-                                  sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" },}}
-                                  src={row.companyLogoUrl}/>{row.companyName}
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Avatar
+                                  variant="square"
+                                  sx={{
+                                    border: "1px solid #336FB0",
+                                    width: 50,
+                                    height: 50,
+                                    mr: 1,
+                                    transition: "transform 0.3s ease",
+                                    "&:hover": { transform: "scale(1.5)" },
+                                  }}
+                                  src={row.companyLogoUrl}
+                                />
+                                {row.companyName}
                               </div>
                             </TableCell>
                             <TableCell>{row.companyDescription}</TableCell>
@@ -571,8 +735,20 @@ const AdminDashboard = () => {
                             <TableCell>{row.industry}</TableCell>
                             <TableCell>
                               <div style={{ display: "flex", gap: "10px" }}>
-                                <Button variant="contained" color="success" onClick={() => handleApproveStartup(row.id)}>Approve</Button>
-                                <Button variant="contained" color="error" onClick={() => handleRejectStartup(row.id)}>Reject</Button>
+                                <Button
+                                  variant="contained"
+                                  color="success"
+                                  onClick={() => handleApproveStartup(row.id)}
+                                >
+                                  Approve
+                                </Button>
+                                <Button
+                                  variant="contained"
+                                  color="error"
+                                  onClick={() => handleRejectStartup(row.id)}
+                                >
+                                  Reject
+                                </Button>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -584,30 +760,47 @@ const AdminDashboard = () => {
               </Paper>
             </Grid>
 
+
             <Grid item xs={12} md={12}>
               <Paper elevation={3} style={{ padding: "20px", height: "100%" }}>
-                <Typography variant="h6" color="#1E1E1E">DELETION OF Startup Profile Request
+                <Typography variant="h6" color="#1E1E1E">
+                 DELETION OF Startup Profile Request
                 </Typography>
                 <TableContainer component={Paper} sx={{ mt: 1 }}>
                   <Table>
                     <TableHead>
                       <TableRow sx={{ backgroundColor: "#336FB0" }}>
-                        <TableCell sx={{ color: "white" }}>Startup Owner</TableCell>
-                        <TableCell sx={{ color: "white" }}>Startup Name</TableCell>
-                        <TableCell sx={{ color: "white" }}>Description</TableCell>
-                        <TableCell sx={{ color: "white" }}>Type of Company</TableCell>
-                        <TableCell sx={{ color: "white" }}>Contact Number</TableCell>
-                        <TableCell sx={{ color: "white" }}>Contact Email</TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Startup Owner
+                        </TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Startup Name
+                        </TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Description
+                        </TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Type of Company
+                        </TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Contact Number
+                        </TableCell>
+                        <TableCell sx={{ color: "white" }}>
+                          Contact Email
+                        </TableCell>
                         <TableCell sx={{ color: "white" }}>Industry</TableCell>
                         <TableCell sx={{ color: "white" }}>Action</TableCell>
                       </TableRow>
                     </TableHead>
-
                     <TableBody>
                       {loading ? (
                         <TableRow>
                           <TableCell colSpan={8}>
-                            <Skeleton variant="rectangular" width="100%" height={60}/>
+                            <Skeleton
+                              variant="rectangular"
+                              width="100%"
+                              height={60}
+                            />
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -616,14 +809,47 @@ const AdminDashboard = () => {
                         .map((row) => (
                           <TableRow key={row.id}>
                             <TableCell>
-                              <div style={{ display: "flex", alignItems: "center", }}>
-                                <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease",
-                                    "&:hover": { transform: "scale(1.5)" }, }}src={row.avatarUrl}/>{row.name}
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Avatar
+                                  variant="square"
+                                  sx={{
+                                    border: "1px solid #336FB0",
+                                    width: 50,
+                                    height: 50,
+                                    mr: 1,
+                                    transition: "transform 0.3s ease",
+                                    "&:hover": { transform: "scale(1.5)" },
+                                  }}
+                                  src={row.avatarUrl}
+                                />
+                                {row.name}
                               </div>
                             </TableCell>
                             <TableCell>
-                              <div style={{ display: "flex", alignItems: "center", }}>
-                                <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" }, }} src={row.companyLogoUrl}/>{row.companyName}
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Avatar
+                                  variant="square"
+                                  sx={{
+                                    border: "1px solid #336FB0",
+                                    width: 50,
+                                    height: 50,
+                                    mr: 1,
+                                    transition: "transform 0.3s ease",
+                                    "&:hover": { transform: "scale(1.5)" },
+                                  }}
+                                  src={row.companyLogoUrl}
+                                />
+                                {row.companyName}
                               </div>
                             </TableCell>
                             <TableCell>{row.companyDescription}</TableCell>
@@ -633,8 +859,20 @@ const AdminDashboard = () => {
                             <TableCell>{row.industry}</TableCell>
                             <TableCell>
                               <div style={{ display: "flex", gap: "10px" }}>
-                                <Button variant="contained" color="success" onClick={() => handleApproveStartup(row.id)}>Approve</Button>
-                                <Button variant="contained" color="error" onClick={() => handleRejectStartup(row.id)}>Reject</Button>
+                                <Button
+                                  variant="contained"
+                                  color="success"
+                                  onClick={() => handleApproveStartup(row.id)}
+                                >
+                                  Approve
+                                </Button>
+                                <Button
+                                  variant="contained"
+                                  color="error"
+                                  onClick={() => handleRejectStartup(row.id)}
+                                >
+                                  Reject
+                                </Button>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -647,8 +885,18 @@ const AdminDashboard = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <Paper elevation={3} style={{ padding: "20px", textAlign: "center" }}>
-                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 2, }}>
+              <Paper
+                elevation={3}
+                style={{ padding: "20px", textAlign: "center" }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 2,
+                  }}
+                >
                   <Typography variant="h6">
                     {filter === "all"
                       ? "User"
@@ -659,13 +907,29 @@ const AdminDashboard = () => {
                       : "Funding Round"}{" "}
                     Information
                   </Typography>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1, }}>
-                    <Select value={filter}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 1,
+                    }}
+                  >
+                    <Select
+                      value={filter}
                       onChange={(e) => {
                         setFilter(e.target.value);
                         setPage(1);
                       }}
-                      sx={{ minWidth: 200, height: 45, ".MuiSelect-select": { padding: "8px 14px", display: "flex", alignItems: "center", },}}>
+                      sx={{
+                        minWidth: 200,
+                        height: 45,
+                        ".MuiSelect-select": {
+                          padding: "8px 14px",
+                          display: "flex",
+                          alignItems: "center",
+                        },
+                      }}
+                    >
                       <MenuItem value="all">Users</MenuItem>
                       <MenuItem value="startup">Startups</MenuItem>
                       <MenuItem value="investor">Investors</MenuItem>
