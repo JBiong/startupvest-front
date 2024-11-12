@@ -18,13 +18,13 @@ const ConfirmDeleteDialog = ({ open, onClose, onConfirm, companyName }) => {
   const handleConfirmDelete = async () => {
     setIsDeleting(true);
     try {
-      await onConfirm();
-      setDeleteSuccessDialogOpen(true);
+      await onConfirm(); // Call the onConfirm function passed by the parent
+      setDeleteSuccessDialogOpen(true); // Open success dialog on success
     } catch (error) {
-      console.error('Failed to delete:', error);
+      console.error('Failed to request deletion:', error);
     } finally {
       setIsDeleting(false);
-      onClose(); 
+      onClose();
     }
   };
 

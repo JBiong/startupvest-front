@@ -19,11 +19,6 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const [topPerformingStartup, setTopPerformingStartup] = useState(null);
-  const [topInvestor, setTopInvestor] = useState(null);
-  const [ceoCount, setCeoCount] = useState(0);
-  const [cfoCount, setCfoCount] = useState(0);
-
   const [page, setPage] = useState(1);
   const itemsPerPage = 7;
   const [pageForVerificationStartups, setPageForVerificationStartups] = useState(1);
@@ -46,156 +41,61 @@ const AdminDashboard = () => {
     .filter((row) => row.status === 'pending')
     .slice((pageForVerificationStartups - 1) * rowsPerPage, pageForVerificationStartups * rowsPerPage);
 
-    const fetchProfilePicture = async (id, type = 'user') => {
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true); // Set loading to true at the start
       try {
-        let url;
-        if (type === 'startup') {
-          url = `${process.env.REACT_APP_API_URL}/profile-picture/startup/${id}`;
-        } else {
-          url = `${process.env.REACT_APP_API_URL}/profile-picture/${id}`;
-        }
-    
-        const response = await axios.get(url, {
+        const usersResponse = await axios.get(`${process.env.REACT_APP_API_URL}/users/all`, {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          responseType: 'blob',
         });
-    
-        const imageUrl = URL.createObjectURL(response.data);
-    
-        setProfilePictures((prevState) => ({
-          ...prevState,
-          [`${type}_${id}`]: imageUrl,
-        }));
+        // Filter out admin users and set state
+        const nonAdminUsers = usersResponse.data.filter(user => user.role !== "Admin");
+        setUsers(nonAdminUsers);
       } catch (error) {
-        console.error('Failed to fetch profile picture:', error);
-        setProfilePictures((prevState) => ({
-          ...prevState,
-          [`${type}_${id}`]: null,
-        }));
+        console.error("Error fetching users data:", error);
       }
+  
+      try {
+        const startupsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/startups/all`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setStartups(startupsResponse.data);
+      } catch (error) {
+        console.error("Error fetching startups data:", error);
+      }
+  
+      try {
+        const investorsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/investors/all`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setInvestors(investorsResponse.data);
+      } catch (error) {
+        console.error("Error fetching investors data:", error);
+      }
+  
+      try {
+        const fundingRoundsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/funding-rounds/all`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setFundingRounds(fundingRoundsResponse.data);
+      } catch (error) {
+        console.error("Error fetching funding rounds data:", error);
+      }
+  
+      setLoading(false); // Set loading to false after all requests
     };
-
-    useEffect(() => {
-      const fetchData = async () => {
-        setLoading(true);
-        try {
-          // Fetch all data in parallel
-          const [usersResponse, startupsResponse, investorsResponse, fundingRoundsResponse] = await Promise.all([
-            axios.get(`${process.env.REACT_APP_API_URL}/users/all`, {
-              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            }),
-            axios.get(`${process.env.REACT_APP_API_URL}/startups/all`, {
-              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            }),
-            axios.get(`${process.env.REACT_APP_API_URL}/investors/all`, {
-              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            }),
-            axios.get(`${process.env.REACT_APP_API_URL}/funding-rounds/all`, {
-              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            }),
-          ]);
-    
-          // Process users data
-          const nonAdminUsers = usersResponse.data.filter(user => user.role !== "Admin");
-          setUsers(nonAdminUsers);
-
-          // Fetch profile pictures for users
-          nonAdminUsers.forEach(user => {
-            fetchProfilePicture(user.id, 'user');
-          });
-
-          // Fetch profile pictures for investors
-          investorsResponse.data.forEach(investor => {
-            fetchProfilePicture(investor.id, 'investor');
-          });
-
-          // Fetch profile pictures for startups
-          startupsResponse.data.forEach(startup => {
-            fetchProfilePicture(startup.id, 'startup');
-          });
-
-          setCeoCount(nonAdminUsers.filter(user => user.role === "CEO").length);
-          setCfoCount(nonAdminUsers.filter(user => user.role === "CFO").length);
-    
-          // Set basic data
-          setStartups(startupsResponse.data);
-          setInvestors(investorsResponse.data);
-          setFundingRounds(fundingRoundsResponse.data);
-    
-          // Calculate top performing startup
-          const validFundingRounds = fundingRoundsResponse.data.filter(round => !round.isDeleted && round.startup);
-          const startupTotalFunding = validFundingRounds.reduce((acc, round) => {
-            const startupId = round.startup.id;
-            acc[startupId] = (acc[startupId] || 0) + round.moneyRaised;
-            return acc;
-          }, {});
-    
-          const topStartupEntry = Object.entries(startupTotalFunding)
-            .sort(([, a], [, b]) => b - a)[0];
-          
-          if (topStartupEntry) {
-            const topStartup = startupsResponse.data.find(s => s.id === parseInt(topStartupEntry[0]));
-            setTopPerformingStartup(topStartup);
-          }
-    
-          // Calculate top investor using the new method
-          const investorTotalInvestments = validFundingRounds.reduce((acc, round) => {
-            if (round.capTableInvestors && round.capTableInvestors.length > 0) {
-              round.capTableInvestors.forEach(capTableInvestor => {
-                if (
-                  capTableInvestor.investor && 
-                  capTableInvestor.status === 'accepted' && 
-                  !capTableInvestor.isDeleted && 
-                  !capTableInvestor.investorRemoved
-                ) {
-                  const investorId = capTableInvestor.investor.id;
-                  const investment = parseFloat(capTableInvestor.totalInvestment) || 0;
-                  
-                  // Add this investment to the investor's running total
-                  acc[investorId] = {
-                    totalAmount: (acc[investorId]?.totalAmount || 0) + investment,
-                    investor: capTableInvestor.investor,
-                    investments: [
-                      ...(acc[investorId]?.investments || []),
-                      {
-                        roundId: round.id,
-                        fundingName: round.fundingName,
-                        amount: investment
-                      }
-                    ]
-                  };
-                }
-              });
-            }
-            return acc;
-          }, {});
-
-          // Sort investors by their total investment amount across all rounds
-          const sortedInvestors = Object.entries(investorTotalInvestments)
-            .sort(([, a], [, b]) => b.totalAmount - a.totalAmount);
-
-          // Get and set the top investor
-          const topInvestorData = sortedInvestors[0];
-          if (topInvestorData) {
-            setTopInvestor({
-              ...topInvestorData[1].investor,
-              totalInvestmentAmount: topInvestorData[1].totalAmount
-            });
-          }
-            
-                } catch (error) {
-                  console.error("Error fetching dashboard data:", error);
-                  // You might want to add error state handling here
-                  setLoading(false);
-                } finally {
-                  setLoading(false);
-                }
-              };
-            
-              fetchData();
-            }, []);
+  
+    fetchData();
+  }, []);
+  
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -212,7 +112,6 @@ const AdminDashboard = () => {
       switch (filter) {
         case "startup":
           return {
-            "Status": item.status,
             "Company Name": item.companyName,
             "Founded Date": item.foundedDate,
             Industry: item.industry,
@@ -279,7 +178,6 @@ const AdminDashboard = () => {
         return ["Name", "Gender", "Email", "Contact Number", "User Photo"];
       case "startup":
         return [
-          "Status",
           "Company Name",
           "Founded Date",
           "Industry",
@@ -368,6 +266,48 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleApproveDeleteStartup = async (startupId) => {
+    try {
+      await axios.put(
+        `${process.env.REACT_APP_API_URL}/startups/${startupId}/approve-delete`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      setStartups((prevStartups) =>
+        prevStartups.map((startup) =>
+          startup.id === startupId
+            ? { ...startup, deleteRequested: true, isDeleted: true }
+            : startup
+        )
+      );
+    } catch (error) {
+      console.error("Error approving startup:", error);
+    }
+  };
+
+  const handleRejectDeleteStartup = async (startupId) => {
+    try {
+      await axios.put(
+        `${process.env.REACT_APP_API_URL}/startups/${startupId}/reject-delete`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+      setStartups((prevStartups) =>
+        prevStartups.map((startup) =>
+          startup.id === startupId
+            ? { ...startup,deleteRequested: false, isDeleted: false }
+            : startup
+        )
+      );
+    } catch (error) {
+      console.error("Error approving startup:", error);
+    }
+  };
+
   const renderTable = () => {
     return (
       <TableContainer component={Paper} sx={{ mt: 3 }}>
@@ -401,16 +341,11 @@ const AdminDashboard = () => {
                       <TableCell>{item.industry}</TableCell>
                       <TableCell>{item.contactEmail}</TableCell>
                       <TableCell>
-                      <Avatar 
-                        src={profilePictures[`startup_${item.id}`]}
-                        sx={{ 
-                          width: 50, 
-                          height: 50, 
-                          border: "1px solid #336FB0",
-                        }}
-                      >
-                        {!profilePictures[`startup_${item.id}`] && item.companyName[0]}
-                      </Avatar>
+                        {profilePictures[`startup_${item.id}`] ? (
+                          <Avatar src={profilePictures[`startup_${item.id}`]} sx={{ width: 50, height: 50, border: "1px solid #336FB0", }} />
+                        ) : (
+                          <Avatar sx={{ width: 50, height: 50, border: "1px solid #336FB0", }}>{item.companyName[0]}</Avatar>
+                        )}
                       </TableCell>
                     </>
                   ) : filter === "investor" ? (
@@ -420,16 +355,14 @@ const AdminDashboard = () => {
                       <TableCell>{item.contactInformation}</TableCell>
                       <TableCell>{item.locationLng}, {item.locationLat},{" "} {item.locationName}</TableCell>
                       <TableCell>
-                        <Avatar 
-                            src={profilePictures[`investor_${item.id}`]} 
-                            sx={{ 
-                              width: 50, 
-                              height: 50, 
-                              border: "1px solid #336FB0",
-                            }}
-                          >
-                            {!profilePictures[`investor_${item.id}`] && `${item.firstName[0]}${item.lastName[0]}`}
+                        {profilePictures[`investor_${item.id}`] ? (
+                          <Avatar src={profilePictures[`investor_${item.id}`]} sx={{ width: 50, height: 50, border: "1px solid #336FB0", }} />
+                        ) : (
+                          <Avatar sx={{ width: 50, height: 50, border: "1px solid #336FB0", }}>
+                            {item.firstName[0]}
+                            {item.lastName[0]}
                           </Avatar>
+                        )}
                       </TableCell>
                     </>
                   ) : filter === "funding" ? (
@@ -447,16 +380,11 @@ const AdminDashboard = () => {
                       <TableCell>{item.email}</TableCell>
                       <TableCell>{item.contactNumber}</TableCell>
                       <TableCell>
-                      <Avatar 
-                        src={profilePictures[`user_${item.id}`]} 
-                        sx={{ 
-                          border: "1px solid #336FB0", 
-                          width: 50, 
-                          height: 50,
-                        }}
-                      >
-                        {!profilePictures[`user_${item.id}`] && `${item.firstName[0]}${item.lastName[0]}`}
-                      </Avatar>
+                        {item.photo ? (
+                          <Avatar src={item.photo} sx={{ width: 50, height: 50, border: "1px solid #336FB0", }} />
+                        ) : (
+                          <Avatar sx={{ width: 50, height: 50, border: "1px solid #336FB0", }}>{item.firstName[0]} {item.lastName[0]}</Avatar>
+                        )}
                       </TableCell>
                     </>
                   )}
@@ -507,7 +435,7 @@ const AdminDashboard = () => {
               <TopInfoBox>
                 <TopInfoText>Total CEOs</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : ceoCount}
+                  Paki Call
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -525,7 +453,7 @@ const AdminDashboard = () => {
               <TopInfoBox>
                 <TopInfoText>Total CFOs</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : cfoCount}
+                  Paki Call
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -543,7 +471,7 @@ const AdminDashboard = () => {
               <TopInfoBox>
                 <TopInfoText>Top Performing Startup</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : topPerformingStartup ? topPerformingStartup.companyName : "No data"}
+                  Paki Call
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -552,7 +480,7 @@ const AdminDashboard = () => {
               <TopInfoBox>
                 <TopInfoText>Top Investor</TopInfoText>
                 <TopInfoTitle>
-                  {loading ? "Loading..." : topInvestor ? `${topInvestor.firstName} ${topInvestor.lastName}` : "No data"}
+                  Paki Call
                 </TopInfoTitle>
               </TopInfoBox>
             </Grid>
@@ -607,16 +535,11 @@ const AdminDashboard = () => {
                               <TableCell>{user.role}</TableCell>
                               <TableCell>{user.firstName} {user.lastName}</TableCell>
                               <TableCell>
-                              <Avatar 
-                                src={profilePictures[`user_${user.id}`]} 
-                                sx={{ 
-                                  border: "1px solid #336FB0", 
-                                  width: 50, 
-                                  height: 50,
-                                }}
-                              >
-                                {!profilePictures[`user_${user.id}`] && `${user.firstName[0]}${user.lastName[0]}`}
-                              </Avatar>
+                                {user.photo ? (
+                                  <Avatar src={user.photo} sx={{ border: "1px solid #336FB0", width: 50, height: 50, }}/>
+                                ) : (
+                                  <Avatar sx={{ border: "1px solid #336FB0", width: 50, height: 50, }}>{user.firstName[0]} {user.lastName[0]}</Avatar>
+                                )}
                               </TableCell>
                             </TableRow>
                           ))
@@ -768,7 +691,7 @@ const AdminDashboard = () => {
                         </TableRow>
                       ) : (
                         startups
-                        .filter((row) => row.status === 'pending')
+                        .filter((row) => row.deleteRequested == true && row.isDeleted === false )
                         .map((row) => (
                           <TableRow key={row.id}>
                             <TableCell>
@@ -785,8 +708,8 @@ const AdminDashboard = () => {
                             <TableCell>{row.contactEmail}</TableCell>
                             <TableCell sx= {{ textAlign: 'center' }}>
                               <div style={{ display: "flex", gap: "10px" }}>
-                                <Button variant="contained" color="success" onClick={() => handleApproveStartup(row.id)}>Approve</Button>
-                                <Button variant="contained" color="error" onClick={() => handleRejectStartup(row.id)}>Reject</Button>
+                                <Button variant="contained" color="success" onClick={() => handleApproveDeleteStartup(row.id)}>Approve</Button>
+                                <Button variant="contained" color="error" onClick={() => handleRejectDeleteStartup(row.id)}>Reject</Button>
                               </div>
                             </TableCell>
                           </TableRow>
