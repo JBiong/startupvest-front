@@ -104,7 +104,7 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
           let logMessage;
           if (selectedProfileType === 'Startup Company') {
             endpoint = `${process.env.REACT_APP_API_URL}/startups/create`;
-            logMessage = `${companyName} profile created successfully.`;
+            logMessage = `${companyName} Profile created successfully.`;
           } else if (selectedProfileType === 'Investor') {  
             endpoint = `${process.env.REACT_APP_API_URL}/investors/create`;
             logMessage = `${firstName} ${lastName} profile created successfully.`;
@@ -122,7 +122,7 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
     
             setSuccessDialogOpen(true);
     
-            await logActivity(logMessage, `${selectedProfileType} profile`);
+            await logActivity(logMessage, `Awaiting admin approval to verify your startup.`);
     
             setTimeout(() => {
               setSuccessDialogOpen(false);
