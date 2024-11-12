@@ -196,17 +196,17 @@ const AdminDashboard = () => {
             });
           }
             
-                } catch (error) {
-                  console.error("Error fetching dashboard data:", error);
-                  // You might want to add error state handling here
-                  setLoading(false);
-                } finally {
-                  setLoading(false);
-                }
-              };
-            
-              fetchData();
-            }, []);
+        } catch (error) {
+          console.error("Error fetching dashboard data:", error);
+          // You might want to add error state handling here
+          setLoading(false);
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+      fetchData();
+    }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
