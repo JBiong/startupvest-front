@@ -302,7 +302,7 @@ function FundingRoundView() {
                 <StyledTable>
                   <StyledTableHead>
                     <TableRow>
-                      <StyledTableCell>Investor Name</StyledTableCell>
+                      <StyledTableCell>No</StyledTableCell>
                       <StyledTableCell>Title</StyledTableCell>
                       <StyledTableCell>Share</StyledTableCell>
                       <StyledTableCell>Total Share</StyledTableCell>
@@ -320,17 +320,10 @@ function FundingRoundView() {
                         .slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage)
                         .map((investor, index) => (
                           <TableRow key={index}>
-                            <TableCell sx={{ textAlign: 'center' }}>
-                              {investor.name}
-                            </TableCell>
-                            <TableCell sx={{ textAlign: 'center' }}>
-                              {investor.title}
-                            </TableCell>
-                            <TableCell sx={{ textAlign: 'center' }}>
-                              {Number(investor.shares).toLocaleString()}
-                            </TableCell>
-                            <TableCell sx={{ textAlign: 'center' }}>
-                              {fundinground.moneyRaisedCurrency}{' '}
+                            <TableCell sx={{ textAlign: 'center' }}>{index + 1 + (currentPage - 1) * rowsPerPage}</TableCell>
+                            <TableCell sx={{ textAlign: 'center' }}>{investor.title}</TableCell>
+                            <TableCell sx={{ textAlign: 'center' }}>{Number(investor.shares).toLocaleString()}</TableCell>
+                            <TableCell sx={{ textAlign: 'center' }}>{fundinground.moneyRaisedCurrency}{' '}
                               {Number(investor.totalInvestment).toLocaleString()}
                             </TableCell>
                           </TableRow>

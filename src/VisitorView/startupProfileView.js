@@ -328,7 +328,7 @@ function StartUpView() {
         )}
 
         {selectedPage === 'financial' && (
-          <Box component="main" sx={{ display: 'flex', flexGrow: 1, width: '100%', overflowX: 'hidden', pl: 3, pr: 5, pt: 3, pb: 3 }}>
+          <Box component="main" sx={{ display: 'flex', flexGrow: 1, width: '100%', overflowX: 'hidden', pl: 3, pr: 5, pt: 3, pb: 3, }}>
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
                 <FundingBox>
@@ -346,28 +346,16 @@ function StartUpView() {
                   <CardStyled>
                     <FundingTitle>Funding Rounds</FundingTitle>
                     <Divider sx={{ mb: 2 }} />
-                    <FundingDescription>
-                      Total Number of Rounds: <strong>{startup.fundingRounds.filter(round => !round.isDeleted).length}</strong>
-                    </FundingDescription>
-                    <FundingNote>*Includes all rounds since inception.</FundingNote>
+                    <FundingDescription>Total Number of Rounds: <strong>{startup.fundingRounds.filter(round => !round.isDeleted).length}</strong></FundingDescription>
+                    <FundingNote>*Includes all funding rounds since inception.</FundingNote>
                   </CardStyled>
 
                   {/* Investors Card */}
                   <CardStyled>
                     <FundingTitle>Investors</FundingTitle>
-                    <Divider sx={{ mb: 2 }} />
-                    
-                    <FundingDescription>
-                      Total Number of Investors: <strong>{uniqueAcceptedInvestorsCount}</strong>
-                    </FundingDescription>
-                    
-                    <FundingNote>
-                      Lead Investor: <strong>{getLeadInvestor()}</strong>
-                    </FundingNote>
-                    
-                    <FundingNote>
-                      Repeat Investor: <strong>{getRepeatInvestor()}</strong>
-                    </FundingNote>
+                    <Divider sx={{ mb: 2, }} />
+                    <FundingDescription>Total Number of Investors: <strong>{uniqueAcceptedInvestorsCount}</strong></FundingDescription>
+                    <FundingNote>*Includes all investors from every funding round since inception.</FundingNote>
                   </CardStyled>
                 </FundingBox>
               </Grid>

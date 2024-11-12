@@ -79,7 +79,7 @@ export const PaginationBox = styled(Box)(({ theme }) => ({
 
 // STARTUP PROFILE FINANCIAL VIEW
 export const CardStyled = styled(Card)(({ theme }) => ({
-    padding: theme.spacing(3),
+    padding: theme.spacing(3.2),
     boxShadow: 3,
     borderRadius: 10,
     transition: '0.3s',

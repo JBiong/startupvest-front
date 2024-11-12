@@ -69,7 +69,7 @@ const headCells = [
   { id: 'startupName', numeric: false, disablePadding: false, label: 'StartUp Name', width: '15%' },
   { id: 'fundingName', numeric: false, disablePadding: false, label: 'Funding Name', width: '15%' },
   { id: 'fundingType', numeric: false, disablePadding: false, label: 'Funding Type', width: '15%' },
-  { id: 'moneyRaised', numeric: true, disablePadding: false, label: 'Money Raised', width: '15%' },
+  { id: 'targetFunding', numeric: true, disablePadding: false, label: 'Target Funding', width: '15%' },
   { id: 'closedDate', numeric: false, disablePadding: false, label: 'Closed on Date', width: '15%' },
   { id: 'Status', numeric: false, disablePadding: false, label: 'Status', width: '15%' },
 ];
@@ -276,7 +276,7 @@ export default function FundingRound() {
                     <StyledTableCell>{row.fundingName}</StyledTableCell>
                     <StyledTableCell>{row.fundingType}</StyledTableCell>
                     <StyledTableCell>
-                      {row.moneyRaisedCurrency} {row.moneyRaised === '---' ? row.moneyRaised : Number(row.moneyRaised).toLocaleString()}
+                      {row.moneyRaisedCurrency} {row.targetFunding === '---' ? row.targetFunding : Number(row.targetFunding).toLocaleString()}
                     </StyledTableCell>
                     <StyledTableCell>{formatDate(row.closedDate)}</StyledTableCell>
                     <StyledTableCell>{row.status}</StyledTableCell>
