@@ -48,123 +48,59 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true); // Set loading to true at the start
       try {
-        const [
-          usersResponse,
-          startupsResponse,
-          investorsResponse,
-          fundingRoundsResponse,
-        ] = await  Promise.allSettled([
-          axios.get(`${process.env.REACT_APP_API_URL}/users/all`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }),
-          axios.get(`${process.env.REACT_APP_API_URL}/startups/all`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }),
-          axios.get(`${process.env.REACT_APP_API_URL}/investors/all`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }),
-          axios.get(`${process.env.REACT_APP_API_URL}/funding-rounds/all`, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }),
-        ]);
-
-        // Filter out admin users
-        const nonAdminUsers = usersResponse.data.filter(
-          (user) => user.role !== "Admin"
-        );
-
-        const usersWithPhotos = await Promise.all(
-          nonAdminUsers.map(async (user) => {
-            try {
-              const profilePicResponse = await axios.get(
-                `${process.env.REACT_APP_API_URL}/profile-picture/${user.id}`,
-                {
-                  responseType: "blob",
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                }
-              );
-              const profilePicUrl = URL.createObjectURL(
-                profilePicResponse.data
-              );
-              return { ...user, photo: profilePicUrl };
-            } catch (picError) {
-              console.error("Error fetching profile picture:", picError);
-              return { ...user, photo: null };
-            }
-          })
-        );
-
-        setUsers(usersWithPhotos);
-        setStartups(startupsResponse.data);
-        setInvestors(investorsResponse.data);
-        setFundingRounds(fundingRoundsResponse.data);
-
-        const pictures = {};
-        await Promise.all([
-          ...startupsResponse.data.map(async (startup) => {
-            try {
-              const response = await axios.get(
-                `${process.env.REACT_APP_API_URL}/profile-picture/startup/${startup.id}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                  responseType: "blob",
-                }
-              );
-              pictures[`startup_${startup.id}`] = URL.createObjectURL(
-                response.data
-              );
-            } catch (error) {
-              console.error(
-                `Failed to fetch profile picture for startup ID ${startup.id}:`,
-                error
-              );
-            }
-          }),
-          ...investorsResponse.data.map(async (investor) => {
-            try {
-              const response = await axios.get(
-                `${process.env.REACT_APP_API_URL}/profile-picture/${investor.id}`,
-                {
-                  headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                  },
-                  responseType: "blob",
-                }
-              );
-              pictures[`investor_${investor.id}`] = URL.createObjectURL(
-                response.data
-              );
-            } catch (error) {
-              console.error(
-                `Failed to fetch profile picture for investor ID ${investor.id}:`,
-                error
-              );
-            }
-          }),
-        ]);
-        setProfilePictures(pictures);
+        const usersResponse = await axios.get(`${process.env.REACT_APP_API_URL}/users/all`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        // Filter out admin users and set state
+        const nonAdminUsers = usersResponse.data.filter(user => user.role !== "Admin");
+        setUsers(nonAdminUsers);
       } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching users data:", error);
       }
+  
+      try {
+        const startupsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/startups/all`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setStartups(startupsResponse.data);
+      } catch (error) {
+        console.error("Error fetching startups data:", error);
+      }
+  
+      try {
+        const investorsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/investors/all`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setInvestors(investorsResponse.data);
+      } catch (error) {
+        console.error("Error fetching investors data:", error);
+      }
+  
+      try {
+        const fundingRoundsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/funding-rounds/all`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setFundingRounds(fundingRoundsResponse.data);
+      } catch (error) {
+        console.error("Error fetching funding rounds data:", error);
+      }
+  
+      setLoading(false); // Set loading to false after all requests
     };
-
+  
     fetchData();
   }, []);
+  
 
   const handleLogout = () => {
     localStorage.removeItem("token");
