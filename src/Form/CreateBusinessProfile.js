@@ -2,7 +2,7 @@ import { useState } from 'react';
 import industries from '../static/industries';
 import quantityOptions from '../static/quantityOptions';
 import SuccessCreateBusinessProfileDialog from '../Dialogs/SuccessCreateBusinessProfileDialog';
-import { Box, Typography, TextField, Select, MenuItem, Grid, FormControl, CardContent, Button, Autocomplete, FormHelperText } from '@mui/material';
+import { Box, Typography, TextField, Select, MenuItem, Grid, FormControl, CardContent, Button, Autocomplete, FormHelperText, Menu, IconButton, InputAdornment } from '@mui/material';
 import { Business, Info } from '@mui/icons-material'; 
 import { StyledCard } from '../styles/CardStyles';
 
@@ -10,6 +10,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
+
+import countries from '../static/countries';
+import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
 
 import axios from 'axios';
 
@@ -45,10 +48,16 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
     const [contactEmail, setContactEmail] = useState('');
     const [industry, setIndustry] = useState('');
     const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+
+    const [selectedCountryCode, setSelectedCountryCode] = useState(countries[0]);
+    const [phoneNumberError, setPhoneNumberError] = useState('');
+    const [anchorEl, setAnchorEl] = useState(null);
+
     const RequiredAsterisk = <span style={{ color: 'red' }}>*</span>;
     
     // Error State Variables
     const [errors, setErrors] = useState({});
+    const [phoneNumberErrorVisible, setPhoneNumberErrorVisible] = useState(false);
 
     const handleDateChange = (newDate) => {
         setFoundedDate(newDate);
@@ -76,8 +85,10 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
         if (!foundedDate) newErrors.foundedDate = emptyFieldError;
         if (!typeOfCompany) newErrors.typeOfCompany = emptyFieldError;
         if (!numberOfEmployees) newErrors.numberOfEmployees = emptyFieldError;
-        if (!phoneNumber.trim()) newErrors.phoneNumber = emptyFieldError;
-            else if (!contactInfoRegex.test(phoneNumber)) newErrors.phoneNumber = 'Enter a valid phone number (10-15 digits).';
+        if (phoneNumberError) {
+            newErrors.phoneNumber = phoneNumberError;
+        }            
+        else if (!contactInfoRegex.test(phoneNumber)) newErrors.phoneNumber = 'Enter a valid phone number (10-15 digits).';
         if (!contactEmail.trim()) newErrors.contactEmail = emptyFieldError;
             else if (!emailRegex.test(contactEmail)) newErrors.contactEmail = 'Invalid email address format';
         if (!industry) newErrors.industry = emptyFieldError;
@@ -88,16 +99,17 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
 
     const handleCreateProfile = async () => {
         if (!validateFields()) {
-            console.log('Validation failed');
             return;
         }
   
+        const formattedContactNumber = formatContactNumberForCountry(phoneNumber);
+
         const profileData = {
             firstName, lastName, emailAddress, contactInformation, gender, biography,
             streetAddress, country, city, state, postalCode, website, facebook, twitter, 
             foundedDate: formattedDateString,
             instagram, linkedIn, companyName, companyDescription, 
-            typeOfCompany, numberOfEmployees, phoneNumber, contactEmail, industry,startupCode: generateStartupCode(),
+            typeOfCompany, numberOfEmployees, phoneNumber: formattedContactNumber, contactEmail, industry,startupCode: generateStartupCode(),
           };
     
           let endpoint;
@@ -133,45 +145,45 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
           }
       };
 
-      const handleInputChange = (e, type) => {
-        const value = e.target.value;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const contactInfoRegex = /^[0-9]{0,15}$/;
-      
-        switch (type) {
-          case 'phoneNumber':
-          case 'contactInformation':
-            if (contactInfoRegex.test(value)) {
-              type === 'phoneNumber' ? setPhoneNumber(value) : setContactInformation(value);
-              setErrors(prev => ({ ...prev, [type]: '' }));
-            } else {
-              setErrors(prev => ({ ...prev, [type]: 'Enter numbers only (max 15 digits).' }));
+      const validateContactNumber = (number) => {
+        try {
+            // Parsing the phone number using libphonenumber
+            const phoneNumberInstance = parsePhoneNumber(number, selectedCountryCode.code);
+            
+            if (!phoneNumberInstance.isValid()) {
+                setPhoneNumberError(`Invalid ${selectedCountryCode.label} phone number.`);
+                return false;
             }
-            break;
-          case 'emailAddress':
-          case 'contactEmail':
-            if (emailRegex.test(value) || value === '') {
-              type === 'emailAddress' ? setEmailAddress(value) : setContactEmail(value);
-              setErrors(prev => ({ ...prev, [type]: '' }));
-            } else {
-              setErrors(prev => ({ ...prev, [type]: 'Invalid email address format' }));
-            }
-            break;
-          case 'postalCode':
-            if (/^[A-Za-z0-9 ]*$/.test(value) || value === '') {
-              setPostalCode(value);
-              setErrors(prev => ({ ...prev, postalCode: '' }));
-            } else {
-              setErrors(prev => ({ ...prev, postalCode: 'Please enter a valid postal code.' }));
-            }
-            break;
-          default:
-            // Handle other input types if needed
-            break;
+            
+            // If valid, clear the error
+            setPhoneNumberError('');
+            return true;
+        } catch (error) {
+            setPhoneNumberError('Invalid phone number format.');
+            return false;
         }
     };
+
+    const formatContactNumberForCountry = (number) => {
+        try {
+            const phoneNumberInstance = parsePhoneNumber(number, selectedCountryCode.code);
+            return phoneNumberInstance.formatInternational(); // Formats number in international format
+        } catch (error) {
+            console.error('Phone number formatting error:', error);
+            return number; // Return as is if formatting fails
+        }
+    };
+
+    const handleCountryClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCountrySelect = (country) => {
+        setSelectedCountryCode(country);
+        setPhoneNumber('');
+        setAnchorEl(null);
+    };
     
-    console.log(companyCount);
     return (
         <>
         <Box component="main" sx={{ flexGrow: 1, width: '100%', overflowX: 'hidden', maxWidth: '1000px',  background: '#F2F2F2'}}>
@@ -288,12 +300,49 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
                         </Grid>
 
                         <Grid item xs={6}>
-                            <label>Contact Number {RequiredAsterisk}</label>
-                            <TextField fullWidth variant="outlined" value={phoneNumber}
-                                onChange={(e) => handleInputChange(e, 'phoneNumber')}
-                                error={!!errors.phoneNumber}
-                                sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' }}} />
-                                {errors.phoneNumber && (<FormHelperText error>{errors.phoneNumber}</FormHelperText>)}
+                            <label>Phone Number {RequiredAsterisk}</label>
+                            <TextField
+                                fullWidth
+                                name="phoneNumber"
+                                placeholder="Enter phone number"
+                                type="tel"
+                                value={phoneNumber}
+                                sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <IconButton
+                                                onClick={handleCountryClick}
+                                                sx={{
+                                                    width: 30, height: 30, padding: 2, borderRadius: 1,
+                                                    fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                }}>
+                                                {selectedCountryCode.label} {selectedCountryCode.dialCode}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                onChange={(e) => {
+                                    const numberInput = e.target.value;
+                                    const cleanedInput = numberInput.replace(/\D/g, ''); 
+                                    setPhoneNumber(cleanedInput);
+                                    validateContactNumber(cleanedInput);
+                                }}
+                                error={!!phoneNumberError}
+                                onFocus={() => setPhoneNumberErrorVisible(true)}
+                                onBlur={() => setPhoneNumberErrorVisible(false)} />
+                            {phoneNumberError && (
+                                <FormHelperText error>{phoneNumberError}</FormHelperText>
+                            )}
+
+                            {/* Country selection menu */}
+                            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+                                {countries.map((country) => (
+                                    <MenuItem key={country.code} onClick={() => handleCountrySelect(country)}>
+                                        {country.label} {country.dialCode}
+                                    </MenuItem>
+                                ))}
+                            </Menu>
                         </Grid>
 
                         <Grid item xs={12}>

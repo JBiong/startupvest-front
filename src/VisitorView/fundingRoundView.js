@@ -115,6 +115,12 @@ function FundingRoundView() {
     return isClosed;
   };
 
+  const getActiveInvestorCount = (investors) => {
+    return investors.filter(
+      (investorDetail) => !(investorDetail.investor?.isDeleted || investorDetail.investorRemoved)
+    ).length;
+  };
+
   return (
     <>
       <Navbar />
@@ -275,7 +281,7 @@ function FundingRoundView() {
                         )}
                       </Grid>
 
-                      <Grid item xs={4}>
+                      <Grid item xs={3}>
                         {loading ? (
                           <Skeleton variant="text" />
                         ) : (
@@ -298,7 +304,14 @@ function FundingRoundView() {
 
                 <Divider sx={{ mt: 5 }} />
 
-                <InvestorTitle variant="h5" sx={{ mt: 5, mb: 3 }}>{loading? <Skeleton width={100} /> : 'Investors' }</InvestorTitle>
+                <InvestorTitle variant="h5" sx={{ mt: 5, mb: 3 }}>
+                  {loading ? (
+                    <Skeleton width={100} />
+                  ) : (
+                    `Investors (${getActiveInvestorCount(fundinground.capTableInvestors)})`
+                  )}
+                </InvestorTitle>
+                
                 <StyledTable>
                   <StyledTableHead>
                     <TableRow>

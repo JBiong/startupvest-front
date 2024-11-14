@@ -27,7 +27,7 @@ const AdminDashboard = () => {
   const [page, setPage] = useState(1);
   const itemsPerPage = 7;
   const [pageForVerificationStartups, setPageForVerificationStartups] = useState(1);
-  const rowsPerPage = 5;
+  const rowsPerPage = 8;
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);

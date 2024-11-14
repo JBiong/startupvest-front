@@ -73,7 +73,17 @@ function BusinessProfileTable({
                       </Box>
                     </TableCell>
 
-                    <TableCell sx={{ ...tableStyles.cell }}>{profile.startupCode}</TableCell>
+                    <TableCell sx={{ ...tableStyles.cell }}>
+                      {profile.status === 'approved' ? (
+                        profile.startupCode ? (
+                          <span>{profile.startupCode}</span>
+                        ) : (
+                          <span>No startup code available</span>
+                        )
+                      ) : (
+                        <span></span>
+                      )}
+                    </TableCell>
 
                     <TableCell sx={{ ...tableStyles.cell, display: "flex", alignItems: "center", pl: 8, }}>
                       <Avatar src={profile.photo} alt={profile.companyName}
