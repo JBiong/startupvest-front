@@ -34,8 +34,8 @@ function stableSort(array, comparator) {
 
 const headCells = [
   { id: 'startup', numeric: false, disablePadding: false, label: 'Startup Name', width: '18%' },
-  { id: 'location', numeric: false, disablePadding: false, label: 'Location', width: '25%' },
-  { id: 'founded', numeric: false, disablePadding: false, label: 'Founded Date', width: '12%' },
+  { id: 'location', numeric: false, disablePadding: false, label: 'Location', width: '20%' },
+  { id: 'founded', numeric: false, disablePadding: false, label: 'Founded Date', width: '15%' },
   { id: 'description', numeric: false, disablePadding: false, label: 'Description', width: '35%' },
 ];
 
