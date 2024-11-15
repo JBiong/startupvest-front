@@ -58,7 +58,7 @@ function CapTable({
           onChange={handleFilterChange}
           variant="outlined"
           sx={{ minWidth: 150, height: '45px', background: 'white' }}>
-          {businessProfiles.filter(profile => profile.type === 'Startup').map((startup) => (
+          {businessProfiles.filter(profile => profile.type === 'Startup' && profile.status === 'approved').map((startup) => (
             <MenuItem key={startup.id} value={startup.id}>{startup.companyName}</MenuItem>
           ))}
         </Select>

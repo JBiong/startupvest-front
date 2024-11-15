@@ -87,7 +87,8 @@ function ViewFundingRound({ fundingRoundDetails }) {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 });
-                setAllInvestors(response.data);
+                const verifiedInvestors = response.data.filter(investor => investor.user.isVerified);
+                setAllInvestors(verifiedInvestors);
             } catch (error) {
                 console.error('Error fetching investors:', error);
             }

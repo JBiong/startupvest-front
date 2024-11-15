@@ -116,13 +116,17 @@ const AdminDashboard = () => {
             fetchProfilePicture(startup.id, 'startup');
           });
 
-          setCeoCount(nonAdminUsers.filter(user => user.role === "CEO").length);
-          setCfoCount(nonAdminUsers.filter(user => user.role === "CFO").length);
-    
+          // Filter out non-verified users and count CEOs and CFOs
+          const verifiedUsers = usersResponse.data.filter((user) => user.isVerified);
+          setCeoCount(verifiedUsers.filter((user) => user.role === "CEO").length);
+          setCfoCount(verifiedUsers.filter((user) => user.role === "CFO").length);
+
+          const verifiedInvestors = investorsResponse.data.filter(investor => investor.user.isVerified);
+
           // Set basic data
           setStartups(startupsResponse.data);
-          setInvestors(investorsResponse.data);
           setFundingRounds(fundingRoundsResponse.data);
+          setInvestors(verifiedInvestors);
     
           // Calculate top performing startup
           const validFundingRounds = fundingRoundsResponse.data.filter(round => !round.isDeleted && round.startup && round.capTableInvestors && round.capTableInvestors.length > 0);
@@ -498,11 +502,16 @@ const AdminDashboard = () => {
                       <TableCell>{item.email}</TableCell>
                       <TableCell>{item.contactNumber}</TableCell>
                       <TableCell>
-                        {item.photo ? (
-                          <Avatar src={item.photo} sx={{ width: 50, height: 50, border: "1px solid #336FB0", }} />
-                        ) : (
-                          <Avatar sx={{ width: 50, height: 50, border: "1px solid #336FB0", }}>{item.firstName[0]} {item.lastName[0]}</Avatar>
-                        )}
+                      <Avatar 
+                        src={profilePictures[`user_${item.id}`]} 
+                        sx={{ 
+                          border: "1px solid #336FB0", 
+                          width: 50, 
+                          height: 50,
+                        }}
+                      >
+                        {!profilePictures[`user_${item.id}`] && `${item.firstName[0]}${item.lastName[0]}`}
+                      </Avatar>
                       </TableCell>
                     </>
                   )}
@@ -653,11 +662,16 @@ const AdminDashboard = () => {
                               <TableCell>{user.role}</TableCell>
                               <TableCell>{user.firstName} {user.lastName}</TableCell>
                               <TableCell>
-                                {user.photo ? (
-                                  <Avatar src={user.photo} sx={{ border: "1px solid #336FB0", width: 50, height: 50, }}/>
-                                ) : (
-                                  <Avatar sx={{ border: "1px solid #336FB0", width: 50, height: 50, }}>{user.firstName[0]} {user.lastName[0]}</Avatar>
-                                )}
+                              <Avatar 
+                                src={profilePictures[`user_${user.id}`]} 
+                                sx={{ 
+                                  border: "1px solid #336FB0", 
+                                  width: 50, 
+                                  height: 50,
+                                }}
+                              >
+                                {!profilePictures[`user_${user.id}`] && `${user.firstName[0]}${user.lastName[0]}`}
+                              </Avatar>
                               </TableCell>
                             </TableRow>
                           ))
