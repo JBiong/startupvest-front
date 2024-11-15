@@ -116,13 +116,26 @@ const AdminDashboard = () => {
             fetchProfilePicture(startup.id, 'startup');
           });
 
-          setCeoCount(nonAdminUsers.filter(user => user.role === "CEO").length);
-          setCfoCount(nonAdminUsers.filter(user => user.role === "CFO").length);
+          // setCeoCount(nonAdminUsers.filter(user => user.role === "CEO").length);
+          // setCfoCount(nonAdminUsers.filter(user => user.role === "CFO").length);
+
+          // // Set basic data
+          // setStartups(startupsResponse.data);
+          // setFundingRounds(fundingRoundsResponse.data);
+          // setInvestors(investorsResponse.data);
+
+          // Filter out non-verified users and count CEOs and CFOs
+          const verifiedUsers = usersResponse.data.filter((user) => user.isVerified);
+          setCeoCount(verifiedUsers.filter((user) => user.role === "CEO").length);
+          setCfoCount(verifiedUsers.filter((user) => user.role === "CFO").length);
+
+          // const verifiedInvestors = investorsResponse.data.filter(investor => investor.user.isVerified);
 
           // Set basic data
           setStartups(startupsResponse.data);
           setFundingRounds(fundingRoundsResponse.data);
           setInvestors(investorsResponse.data);
+          // setInvestors(verifiedInvestors);
     
           // Calculate top performing startup
           const validFundingRounds = fundingRoundsResponse.data.filter(round => !round.isDeleted && round.startup && round.capTableInvestors && round.capTableInvestors.length > 0);
