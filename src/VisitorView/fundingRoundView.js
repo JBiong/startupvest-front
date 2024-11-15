@@ -110,7 +110,7 @@ function FundingRoundView() {
   const isFundingRoundClosed = () => {
     const currentDate = new Date();
     const closedDate = new Date(fundinground.closedDate);
-    const isClosed = closedDate < currentDate || fundinground.moneyRaised > fundinground.targetFunding;
+    const isClosed = closedDate < currentDate || fundinground.moneyRaised >= fundinground.targetFunding;
 
     return isClosed;
   };
