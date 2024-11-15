@@ -27,7 +27,7 @@ const AdminDashboard = () => {
   const [page, setPage] = useState(1);
   const itemsPerPage = 7;
   const [pageForVerificationStartups, setPageForVerificationStartups] = useState(1);
-  const rowsPerPage = 8;
+  const rowsPerPage = 5;
 
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded);
@@ -116,17 +116,13 @@ const AdminDashboard = () => {
             fetchProfilePicture(startup.id, 'startup');
           });
 
-          // Filter out non-verified users and count CEOs and CFOs
-          const verifiedUsers = usersResponse.data.filter((user) => user.isVerified);
-          setCeoCount(verifiedUsers.filter((user) => user.role === "CEO").length);
-          setCfoCount(verifiedUsers.filter((user) => user.role === "CFO").length);
-
-          const verifiedInvestors = investorsResponse.data.filter(investor => investor.user.isVerified);
-
+          setCeoCount(nonAdminUsers.filter(user => user.role === "CEO").length);
+          setCfoCount(nonAdminUsers.filter(user => user.role === "CFO").length);
+    
           // Set basic data
           setStartups(startupsResponse.data);
+          setInvestors(investorsResponse.data);
           setFundingRounds(fundingRoundsResponse.data);
-          setInvestors(verifiedInvestors);
     
           // Calculate top performing startup
           const validFundingRounds = fundingRoundsResponse.data.filter(round => !round.isDeleted && round.startup && round.capTableInvestors && round.capTableInvestors.length > 0);
@@ -502,16 +498,11 @@ const AdminDashboard = () => {
                       <TableCell>{item.email}</TableCell>
                       <TableCell>{item.contactNumber}</TableCell>
                       <TableCell>
-                      <Avatar 
-                        src={profilePictures[`user_${item.id}`]} 
-                        sx={{ 
-                          border: "1px solid #336FB0", 
-                          width: 50, 
-                          height: 50,
-                        }}
-                      >
-                        {!profilePictures[`user_${item.id}`] && `${item.firstName[0]}${item.lastName[0]}`}
-                      </Avatar>
+                        {item.photo ? (
+                          <Avatar src={item.photo} sx={{ width: 50, height: 50, border: "1px solid #336FB0", }} />
+                        ) : (
+                          <Avatar sx={{ width: 50, height: 50, border: "1px solid #336FB0", }}>{item.firstName[0]} {item.lastName[0]}</Avatar>
+                        )}
                       </TableCell>
                     </>
                   )}
@@ -662,16 +653,11 @@ const AdminDashboard = () => {
                               <TableCell>{user.role}</TableCell>
                               <TableCell>{user.firstName} {user.lastName}</TableCell>
                               <TableCell>
-                              <Avatar 
-                                src={profilePictures[`user_${user.id}`]} 
-                                sx={{ 
-                                  border: "1px solid #336FB0", 
-                                  width: 50, 
-                                  height: 50,
-                                }}
-                              >
-                                {!profilePictures[`user_${user.id}`] && `${user.firstName[0]}${user.lastName[0]}`}
-                              </Avatar>
+                                {user.photo ? (
+                                  <Avatar src={user.photo} sx={{ border: "1px solid #336FB0", width: 50, height: 50, }}/>
+                                ) : (
+                                  <Avatar sx={{ border: "1px solid #336FB0", width: 50, height: 50, }}>{user.firstName[0]} {user.lastName[0]}</Avatar>
+                                )}
                               </TableCell>
                             </TableRow>
                           ))
@@ -717,7 +703,13 @@ const AdminDashboard = () => {
                                   src={row.avatarUrl}/>{row.ceoName}
                               </div>
                             </TableCell>
-                            <TableCell>{row.companyName}</TableCell>
+                            <TableCell>
+                              <div style={{ display: "flex", alignItems: "center", }}>
+                                <Avatar variant="square"
+                                  sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" },}}
+                                  src={row.companyLogoUrl}/>{row.companyName}
+                              </div>
+                            </TableCell>
                             <TableCell sx={{ width: '25%' }}>
                               {isExpanded ? row.companyDescription : row.companyDescription.slice(0, 50)}
                               {row.companyDescription.length > 50 && (
