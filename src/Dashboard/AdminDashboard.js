@@ -703,13 +703,7 @@ const AdminDashboard = () => {
                                   src={row.avatarUrl}/>{row.ceoName}
                               </div>
                             </TableCell>
-                            <TableCell>
-                              <div style={{ display: "flex", alignItems: "center", }}>
-                                <Avatar variant="square"
-                                  sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" },}}
-                                  src={row.companyLogoUrl}/>{row.companyName}
-                              </div>
-                            </TableCell>
+                            <TableCell>{row.companyName}</TableCell>
                             <TableCell sx={{ width: '25%' }}>
                               {isExpanded ? row.companyDescription : row.companyDescription.slice(0, 50)}
                               {row.companyDescription.length > 50 && (

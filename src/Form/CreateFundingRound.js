@@ -231,6 +231,7 @@ function CreateFundingRound({ onSuccess }) {
                                     ))}
                                 </Select>
                             </FormControl>
+                            {errors.selectedStartupId && <FormHelperText sx={{color:'red'}}>{errors.selectedStartupId}</FormHelperText>}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -248,7 +249,8 @@ function CreateFundingRound({ onSuccess }) {
                             <FormControl fullWidth variant="outlined" error={!!errors.fundingName}>
                             <TextField fullWidth variant="outlined"
                                 value={fundingName} onChange={(e) => setFundingName(e.target.value)}
-                                sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }} />
+                                sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
+                                error={!!errors.fundingName} />
                             </FormControl>
                             {errors.fundingName && <FormHelperText sx={{color:'red'}}>{errors.fundingName}</FormHelperText>}
                         </Grid>
