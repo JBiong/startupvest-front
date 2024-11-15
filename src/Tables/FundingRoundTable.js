@@ -39,7 +39,7 @@ function FundingRoundTable({
   const getFundingRoundStatus = (closedDate, moneyRaised, targetFunding) => {
     const today = new Date();
 
-    if (moneyRaised > targetFunding) {
+    if (moneyRaised >= targetFunding) {
       return 'Completed';
     }
 

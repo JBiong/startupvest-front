@@ -206,11 +206,6 @@ function CreateFundingRound({ onSuccess }) {
         return value.replace(/,/g, '');
     };
 
-    const handleCloseBusinessProfile = async () => {
-        setCreateBusinessProfile(false);
-        window.location.reload();
-    };
-
     return (
         <Box component="main" sx={{ flexGrow: 1, width: '100%', overflowX: 'hidden', maxWidth: '1000px', background: '#F2F2F2' }}>
             <Typography variant="h5" sx={{ color: '#414a4c', fontWeight: '500', pl: 5, pb: 3 }}>Organization</Typography>
