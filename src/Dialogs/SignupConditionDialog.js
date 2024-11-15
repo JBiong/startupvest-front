@@ -1,137 +1,122 @@
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material';
 
-const TermsAndConditionsDialog = ({ open, handleClose }) => {
+const TermsAndConditionsDialog = ({ open, handleClose, handleAgree }) => {
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>InvestTrack Terms and Conditions</DialogTitle>
-        <DialogContent dividers>
-        <Typography variant="body2" gutterBottom>Last Updated: November 13, 2024</Typography>
-            <Typography variant="body2" gutterBottom>
-              Welcome to InvestTrack! By signing up and creating an account, you agree to the following Terms and Conditions. 
-              Please read these terms carefully to understand our practices regarding your information, data privacy, and how our services work.
-            </Typography>
+      <DialogContent dividers>
+        <Typography variant="body2" gutterBottom>
+          <strong>Last Updated:</strong> November 13, 2024
+        </Typography>
+        <Typography variant="body2" paragraph>
+          Welcome to InvestTrack! By using our services, you agree to abide by these Terms and Conditions. 
+          Please review them carefully, as they outline the legal obligations between you and InvestTrack.
+        </Typography>
 
-            <Typography variant="h6" gutterBottom>
-              1. Acceptance of Terms
-            </Typography>
-            <Typography variant="body2" paragraph>
-              By creating an account on InvestTrack, you confirm that you have read, understood, and agreed to these Terms and Conditions. 
-              If you do not agree to these terms, you should not use our platform.
-            </Typography>
+        <Section title="1. Acceptance of Terms">
+          By creating an account, you confirm that you have read, understood, and agreed to abide by these Terms and Conditions. 
+          If you disagree with any part of the terms, please discontinue use of our platform immediately.
+        </Section>
 
-            <Typography variant="h6" gutterBottom>
-              2. Overview of Services
-            </Typography>
-            <Typography variant="body2" paragraph>
-              InvestTrack is an online platform designed to connect startup owners seeking funding with investors looking for promising ventures. 
-              Our platform allows users to share and discover funding opportunities, connect with potential partners, and facilitate the process of startup funding rounds.
-            </Typography>
+        <Section title="2. Overview of Services">
+          InvestTrack connects startup owners with investors seeking new ventures. Our platform facilitates:
+          <ul>
+            <li>Discovery of funding opportunities across various industries.</li>
+            <li>Networking between startup owners and investors, enabling direct communication and information sharing.</li>
+            <li>Coordination of investment rounds through dedicated features.</li>
+          </ul>
+          Note: InvestTrack does not offer financial advice or directly engage in transactions between users.
+        </Section>
 
-            <Typography variant="h6" gutterBottom>
-              3. Data Privacy and Collection
-            </Typography>
-            <Typography variant="body2" paragraph>
-              We prioritize your privacy. When you register with InvestTrack, you agree that we may collect and process personal information, including but not limited to:
-              <ul>
-                <li>Personal Identifiable Information (PII): Such as your name, contact details, and business-related information.</li>
-                <li>Financial and Funding Information: Details related to investment opportunities, funding rounds, and other related activities.</li>
-                <li>Usage Data: Information about your interactions with our platform, including pages visited, features used, and engagement statistics.</li>
-              </ul>
-            </Typography>
+        <Section title="3. Data Privacy and Collection">
+          We prioritize your privacy and collect data only as necessary to deliver our services effectively, including:
+          <ul>
+            <li><strong>Personally Identifiable Information (PII):</strong> Such as your name, contact information, and business-related details.</li>
+            <li><strong>Financial Information:</strong> Related to investment opportunities, funding interests, and your role in funding rounds.</li>
+            <li><strong>Usage Data:</strong> Which includes your interactions on the platform, pages visited, and frequency of use.</li>
+          </ul>
+        </Section>
 
-            <Typography variant="h6" gutterBottom>
-              4. Use of Collected Information
-            </Typography>
-            <Typography variant="body2" paragraph>
-              Your information is collected for the purpose of providing and enhancing our services, including:
-              <ul>
-                <li>Displaying relevant information on the platform to facilitate connections between startup owners and investors.</li>
-                <li>Personalizing your experience on InvestTrack, such as showing recommended connections based on your interests and activities.</li>
-                <li>Communicating with you about updates, new features, and relevant events.</li>
-                <li>Conducting analytics to improve our platform and tailor it to the needs of our users.</li>
-              </ul>
-              We may use anonymized or aggregated data for research, analytics, and business purposes.
-            </Typography>
+        <Section title="4. Use of Collected Information">
+          The data we collect allows us to enhance your experience, including:
+          <ul>
+            <li>Enabling connections between users based on your profile and preferences.</li>
+            <li>Delivering personalized content based on activity, past engagement, and interests.</li>
+            <li>Sending notifications, event invitations, and platform updates.</li>
+            <li>Conducting analytics to improve features and optimize the platform’s usability.</li>
+          </ul>
+          Aggregated data, without identifiable information, may be used for market research or business development.
+        </Section>
 
-            <Typography variant="h6" gutterBottom>
-              5. Data Sharing and Disclosure
-            </Typography>
-            <Typography variant="body2" paragraph>
-              InvestTrack may share your information in the following circumstances:
-              <ul>
-                <li>With Other Users: As part of our core service, your profile and relevant information (e.g., name, startup details, and public funding information) will be visible to other registered users to facilitate investment and networking. Additionally, your contact information may be displayed so that you can be reached in case someone has a question, concern, or other communication regarding your startup or activities on the platform.</li>
-                <li>With Third-Party Service Providers: We may use third-party providers to help operate our platform, and they may have access to your information as needed to provide these services.</li>
-                <li>As Required by Law: We may disclose your information if required to comply with legal obligations, regulations, or governmental requests.</li>
-              </ul>
-              We do not sell or rent your personal information to third parties.
-            </Typography>
+        <Section title="5. Data Sharing and Disclosure">
+          We share your data only under specific conditions:
+          <ul>
+            <li><strong>With Other Users:</strong> Profile data, like name and startup info, will be visible to registered users for networking.</li>
+            <li><strong>With Service Providers:</strong> Third-party services that support platform functionality may access certain information.</li>
+            <li><strong>Legal Compliance:</strong> Information may be disclosed to comply with legal obligations or governmental requests.</li>
+          </ul>
+          <strong>Note:</strong> InvestTrack does not sell or rent personal information to third parties.
+        </Section>
 
-            <Typography variant="h6" gutterBottom>
-              6. User Responsibilities and Conduct
-            </Typography>
-            <Typography variant="body2" paragraph>
-              As a user of InvestTrack, you agree to:
-              <ul>
-                <li>Provide accurate and up-to-date information when registering and using the platform.</li>
-                <li>Use the platform in compliance with all applicable laws and regulations.</li>
-                <li>Avoid sharing misleading, false, or harmful information about yourself or others.</li>
-                <li>Refrain from any misuse of the platform, including spamming, harassing, or sharing sensitive information about other users without their consent.</li>
-              </ul>
-            </Typography>
+        <Section title="6. User Responsibilities and Conduct">
+          Users are expected to:
+          <ul>
+            <li>Provide accurate and up-to-date information, including profile details and funding data.</li>
+            <li>Adhere to all applicable laws and refrain from illegal activities on the platform.</li>
+            <li>Avoid sharing false, misleading, or harmful information with others.</li>
+            <li>Use respectful communication, avoiding spam, harassment, and the sharing of sensitive data without authorization.</li>
+          </ul>
+          Violations may lead to account suspension or termination.
+        </Section>
 
-            <Typography variant="h6" gutterBottom>
-              7. Data Security
-            </Typography>
-            <Typography variant="body2" paragraph>
-              We implement security measures to protect your personal information. However, we cannot guarantee complete security due to the inherent risks associated with online data transmission. We encourage you to use strong passwords and to keep your login credentials confidential.
-            </Typography>
+        <Section title="7. Data Security">
+          We take precautions to protect your data, including encryption and access controls. However, we advise users to:
+          <ul>
+            <li>Use strong, unique passwords and update them regularly.</li>
+            <li>Be cautious with shared devices and avoid sharing login credentials with others.</li>
+          </ul>
+          Despite our efforts, online data transmission cannot be guaranteed as fully secure.
+        </Section>
 
-            <Typography variant="h6" gutterBottom>
-              8. User Rights
-            </Typography>
-            <Typography variant="body2" paragraph>
-              Depending on your location, you may have certain rights regarding your personal information, including the right to:
-              <ul>
-                <li>Access, update, or delete your personal information on our platform.</li>
-                <li>Restrict or object to certain processing of your data.</li>
-                <li>Withdraw consent for data collection where applicable.</li>
-                <li>Request a copy of your data or transfer it to another service provider.</li>
-              </ul>
-              To exercise any of these rights, please contact us at [investtrackhq@gmail.com].
-            </Typography>
+        <Section title="8. User Rights">
+          Based on your location, you may have rights related to your personal information:
+          <ul>
+            <li>Access: You may request access to or copies of your data.</li>
+            <li>Update/Delete: You may request changes or deletion of certain data.</li>
+            <li>Restrictions: You may limit certain processing activities.</li>
+            <li>Portability: You may request data transfer to another service.</li>
+          </ul>
+          To exercise these rights, please contact us at <a href="mailto:investtrackhq@gmail.com" style={{ color: '#1E1E1E' }}>investtrackhq@gmail.com</a>.
+        </Section>
 
-            <Typography variant="h6" gutterBottom>
-              9. Termination of Account
-            </Typography>
-            <Typography variant="body2" paragraph>
-              We reserve the right to suspend or terminate your account at our discretion if you violate these Terms and Conditions or engage in any harmful or unlawful activities on the platform.
-            </Typography>
+        <Section title="9. Account Termination">
+          InvestTrack reserves the right to suspend or terminate accounts for violations of these Terms or other unlawful activities.
+          Users may also request account deletion through support channels. Deletion will permanently remove data associated with the account.
+        </Section>
 
-            <Typography variant="h6" gutterBottom>
-              10. Updates to Terms and Conditions
-            </Typography>
-            <Typography variant="body2" paragraph>
-              InvestTrack may update these Terms and Conditions from time to time. We will notify you of any significant changes, and your continued use of the platform constitutes acceptance of the updated terms.
-            </Typography>
+        <Section title="10. Updates to Terms and Conditions">
+          These Terms and Conditions may be periodically updated. Substantial changes will be communicated to users, and continued use of the platform constitutes acceptance of the updated terms.
+        </Section>
 
-            <Typography variant="h6" gutterBottom>
-              11. Contact Us
-            </Typography>
-            <Typography variant="body2" paragraph>
-              If you have questions, concerns, or feedback regarding these Terms and Conditions, please contact us at [investtrackhq@gmail.com].
-            </Typography>
+        <Section title="11. Contact Us">
+          For questions or concerns, contact us at 
+          <a href="mailto:investtrackhq@gmail.com" style={{ color: '#1E1E1E' }}>investtrackhq@gmail.com</a>.
+        </Section>
 
-            <Typography variant="body2" paragraph>
-              By creating an account, you acknowledge that you have read and understood these Terms and Conditions and agree to abide by them.
-            </Typography>
-        </DialogContent>
-      <DialogActions>
-
-        <Button onClick={handleClose} color="primary">Close</Button>
-      </DialogActions>
+        <Typography variant="body2" paragraph sx={{ mt: 3 }}>
+          By creating an account, you acknowledge and agree to comply with these Terms and Conditions.
+        </Typography>
+      </DialogContent>
     </Dialog>
   );
 };
+
+const Section = ({ title, children }) => (
+  <div style={{ marginTop: 16 }}>
+    <Typography variant="h6" gutterBottom>{title}</Typography>
+    <Typography variant="body2" paragraph>{children}</Typography>
+  </div>
+);
 
 export default TermsAndConditionsDialog;
