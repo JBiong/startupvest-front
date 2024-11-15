@@ -215,6 +215,15 @@ function Profile() {
         .join(' ');
   };
 
+  useEffect(() => {
+    if (contactNumber) {
+        const matchingCountry = countries.find((country) => contactNumber.startsWith(country.dialCode));
+        if (matchingCountry) {
+            setSelectedCountryCode(matchingCountry);
+        }
+    }
+}, [contactNumber]);
+
   const validateContactNumber = (phoneNumber) => {
     try {
       if (!phoneNumber || phoneNumber.trim() === '') {
@@ -245,17 +254,17 @@ function Profile() {
   const formatContactNumberForCountry = (number) => {
     try {
         const phoneNumberInstance = parsePhoneNumber(number, selectedCountryCode.code);
-        return phoneNumberInstance.formatInternational(); // Formats number in international format
+        return phoneNumberInstance.formatInternational(); 
     } catch (error) {
         console.error('Phone number formatting error:', error);
-        return number; // Return as is if formatting fails
+        return number; 
     }
 };
 
   const handleCountrySelect = (country) => {
     setSelectedCountryCode(country);
-    setContactNumber(''); // Clear phone number when changing country
-    setAnchorEl(null); // Close the menu
+    setContactNumber(''); 
+    setAnchorEl(null);
 };
 
 return (
@@ -414,61 +423,44 @@ return (
 
 
               <Grid item xs={6}>
-            <label>Phone Number <span style={{ color: 'red' }}>*</span></label>
-            <TextField
-  fullWidth
-  name="phoneNumber"
-  placeholder="Enter phone number"
-  type="tel"
-  disabled={!isEditable}
-  value={contactNumber.replace(selectedCountryCode.dialCode, '')} // Display without country code
-  sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
-  InputProps={{
-    startAdornment: (
-      <InputAdornment position="start">
-        <IconButton
-          onClick={(e) => setAnchorEl(e.currentTarget)} // Open the country code menu
-          sx={{
-            width: 30, height: 30, padding: 2, borderRadius: 1,
-            fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-          {selectedCountryCode.label} {selectedCountryCode.dialCode}
-        </IconButton>
-      </InputAdornment>
-    ),
-  }}
-  onChange={(e) => {
-    const numberInput = e.target.value;
-    const cleanedInput = numberInput.replace(/\D/g, ''); // Remove non-digit characters
+                <label>Phone Number <span style={{ color: 'red' }}>*</span></label>
+                <TextField fullWidth name="phoneNumber" placeholder="Enter phone number" type="tel" disabled={!isEditable}
+                  value={contactNumber.replace(selectedCountryCode.dialCode, '')}
+                  sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ width: 30, height: 30, padding: 2, borderRadius: 1,
+                            fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',}}>
+                          {selectedCountryCode.label} {selectedCountryCode.dialCode}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                  onChange={(e) => {
+                    const numberInput = e.target.value;
+                    const cleanedInput = numberInput.replace(/\D/g, '');
+                    const fullPhoneNumber = `${selectedCountryCode.dialCode}${cleanedInput}`;
 
-    // Set full phone number with dial code
-    const fullPhoneNumber = `${selectedCountryCode.dialCode}${cleanedInput}`;
-    setContactNumber(fullPhoneNumber); // Set the full phone number, including the country code
+                    setContactNumber(fullPhoneNumber);
+                    validateContactNumber(cleanedInput);
+                  }}
+                  error={!!contactNumberError}
+                  onFocus={() => setContactNumberErrorVisible(true)}
+                  onBlur={() => setContactNumberErrorVisible(false)}/>
 
-    // Validate the cleaned phone number (without dial code)
-    validateContactNumber(cleanedInput);
-  }}
-  error={!!contactNumberError}
-  onFocus={() => setContactNumberErrorVisible(true)}
-  onBlur={() => setContactNumberErrorVisible(false)}
-/>
+                {contactNumberError && (
+                  <FormHelperText error>{contactNumberError}</FormHelperText>
+                )}
 
-{contactNumberError && (
-  <FormHelperText error>{contactNumberError}</FormHelperText>
-)}
-
-<Menu
-  anchorEl={anchorEl} // The element to anchor the menu to
-  open={Boolean(anchorEl)} // Menu will open if anchorEl is not null
-  onClose={() => setAnchorEl(null)} // Close the menu when clicking outside
->
-  {countries.map((country) => (
-    <MenuItem key={country.code} onClick={() => handleCountrySelect(country)}>
-      {country.label} {country.dialCode}
-    </MenuItem>
-  ))}
-</Menu>
-        </Grid>
+                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+                  {countries.map((country) => (
+                    <MenuItem key={country.code} onClick={() => handleCountrySelect(country)}>
+                      {country.label} {country.dialCode}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </Grid>
 
               {userData.role === 'Investor' && (
                 <Grid item xs={12}>

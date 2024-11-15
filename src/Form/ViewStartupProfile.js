@@ -230,41 +230,44 @@ function ViewStartupProfile({ profile }) {
         }
       }, [profile.id]);
 
-    const validateContactNumber = (phoneNumber) => {
-      try {
-
-        // Parse the phone number using libphonenumber with the selected country code
-        const phoneNumberInstance = parsePhoneNumber(phoneNumber, selectedCountryCode.code);
-    
-        // Check if the phone number is valid for the selected country
-        if (!phoneNumberInstance.isValid()) {
-          setPhoneNumberError(`Invalid phone number for ${selectedCountryCode.label}.`);
-          return false;
+      useEffect(() => {
+        if (phoneNumber) {
+            const matchingCountry = countries.find((country) => phoneNumber.startsWith(country.dialCode));
+            if (matchingCountry) {
+                setSelectedCountryCode(matchingCountry);
+            }
         }
-    
-        // If valid, clear the error
-        setPhoneNumberError('');
-        return true;
-      } catch (error) {
-        // If there's an error in parsing (e.g., malformed number), show a generic error message
-        setPhoneNumberError('Invalid phone number format.');
-        return false;
-      }
-    };    
+    }, [phoneNumber]);
+
+    const validateContactNumber = (phoneNumber) => {
+        try {
+            const phoneNumberInstance = parsePhoneNumber(phoneNumber, selectedCountryCode.code);
+            if (!phoneNumberInstance.isValid()) {
+                setPhoneNumberError(`Invalid phone number for ${selectedCountryCode.label}.`);
+                return false;
+            }
+            setPhoneNumberError('');
+            return true;
+        } catch (error) {
+            setPhoneNumberError('Invalid phone number format.');
+            return false;
+        }
+    };
 
     const formatContactNumberForCountry = (number) => {
       try {
           const phoneNumberInstance = parsePhoneNumber(number, selectedCountryCode.code);
-          return phoneNumberInstance.formatInternational(); // Formats number in international format
+          return phoneNumberInstance.formatInternational();
       } catch (error) {
           console.error('Phone number formatting error:', error);
-          return number; // Return as is if formatting fails
+          return number;
       }
   };
 
-    const handleCountrySelect = (country) => {
-      setSelectedCountryCode(country); // Set the selected country code and label
-      setAnchorEl(null); // Close the menu after selecting a country
+  const handleCountrySelect = (country) => {
+    setSelectedCountryCode(country);
+    setPhoneNumber(''); 
+    setAnchorEl(null);
   };
 
     return (
@@ -414,16 +417,15 @@ function ViewStartupProfile({ profile }) {
                   <Grid item xs={6}>
                     <label>Phone Number <span style={{ color: 'red' }}>*</span></label>
                     <TextField fullWidth name="phoneNumber" placeholder="Enter phone number" type="tel" disabled={!isEditable}
-                        value={phoneNumber.replace(selectedCountryCode.dialCode, '')} sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
+                        value={phoneNumber.replace(selectedCountryCode.dialCode, '')}
+                        sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
                                     <IconButton
-                                        onClick={(e) => setAnchorEl(e.currentTarget)} // Open the menu
-                                        sx={{
-                                            width: 30, height: 30, padding: 2, borderRadius: 1,
-                                            fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        }}>
+                                        onClick={(e) => setAnchorEl(e.currentTarget)}
+                                        sx={{ width: 30, height: 30, padding: 2, borderRadius: 1, fontSize: '12px', display: 'flex', 
+                                          alignItems: 'center', justifyContent: 'center', }}>
                                         {selectedCountryCode.label} {selectedCountryCode.dialCode}
                                     </IconButton>
                                 </InputAdornment>
@@ -431,24 +433,20 @@ function ViewStartupProfile({ profile }) {
                         }}
                         onChange={(e) => {
                             const numberInput = e.target.value;
-                            const cleanedInput = numberInput.replace(/\D/g, ''); // Remove non-digit characters
-
-                            // Extract dial code and remove it from the phone number input
+                            const cleanedInput = numberInput.replace(/\D/g, '');
                             const fullPhoneNumber = `${selectedCountryCode.dialCode}${cleanedInput}`;
+                            
                             setPhoneNumber(fullPhoneNumber);
-
-                            // Call validation on the cleaned input (without dial code)
                             validateContactNumber(cleanedInput);
                         }}
                         error={!!phoneNumberError}
                         onFocus={() => setPhoneNumberErrorVisible(true)}
                         onBlur={() => setPhoneNumberErrorVisible(false)} />
-                    
+
                     {phoneNumberError && (
                         <FormHelperText error>{phoneNumberError}</FormHelperText>
                     )}
 
-                    {/* Country selection menu */}
                     <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
                         {countries.map((country) => (
                             <MenuItem key={country.code} onClick={() => handleCountrySelect(country)}>
@@ -456,7 +454,7 @@ function ViewStartupProfile({ profile }) {
                             </MenuItem>
                         ))}
                     </Menu>
-                </Grid>
+                  </Grid>
 
                   <Grid item xs={12}>
                     <label>Contact Email {RequiredAsterisk}</label>
