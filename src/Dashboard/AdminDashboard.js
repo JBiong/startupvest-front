@@ -80,49 +80,49 @@ const AdminDashboard = () => {
     useEffect(() => {
       const fetchData = async () => {
         setLoading(true);
-        try {
-          // Fetch all data in parallel
-          const [usersResponse, startupsResponse, investorsResponse, fundingRoundsResponse] = await Promise.all([
-            axios.get(`${process.env.REACT_APP_API_URL}/users/all`, {
-              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            }),
-            axios.get(`${process.env.REACT_APP_API_URL}/startups/all`, {
-              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            }),
-            axios.get(`${process.env.REACT_APP_API_URL}/investors/all`, {
-              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            }),
-            axios.get(`${process.env.REACT_APP_API_URL}/funding-rounds/all`, {
-              headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-            }),
-          ]);
     
-          // Process users data
+        try {
+          // Fetch users
+          const usersResponse = await axios.get(`${process.env.REACT_APP_API_URL}/users/all`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          });
           const nonAdminUsers = usersResponse.data.filter(user => user.role !== "Admin");
           setUsers(nonAdminUsers);
-
-          // Fetch profile pictures for users
+    
+          // Fetch startups
+          const startupsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/startups/all`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          });
+          setStartups(startupsResponse.data);
+    
+          // Fetch investors
+          const investorsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/investors/all`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          });
+          const verifiedInvestors = investorsResponse.data.filter(investor => investor.user.isVerified);
+          setInvestors(verifiedInvestors);
+    
+          // Fetch funding rounds
+          const fundingRoundsResponse = await axios.get(`${process.env.REACT_APP_API_URL}/funding-rounds/all`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          });
+          setFundingRounds(fundingRoundsResponse.data);
+    
+          // Fetch profile pictures for users, investors, and startups
           nonAdminUsers.forEach(user => {
             fetchProfilePicture(user.id, 'user');
           });
-
-          // Fetch profile pictures for investors
-          investorsResponse.data.forEach(investor => {
+          verifiedInvestors.forEach(investor => {
             fetchProfilePicture(investor.id, 'investor');
           });
-
-          // Fetch profile pictures for startups
           startupsResponse.data.forEach(startup => {
             fetchProfilePicture(startup.id, 'startup');
           });
-
-          setCeoCount(nonAdminUsers.filter(user => user.role === "CEO").length);
-          setCfoCount(nonAdminUsers.filter(user => user.role === "CFO").length);
-
-          // Set basic data
-          setStartups(startupsResponse.data);
-          setFundingRounds(fundingRoundsResponse.data);
-          setInvestors(investorsResponse.data);
+    
+          // Filter out non-verified users and count CEOs and CFOs
+          const verifiedUsers = usersResponse.data.filter((user) => user.isVerified);
+          setCeoCount(verifiedUsers.filter((user) => user.role === "CEO").length);
+          setCfoCount(verifiedUsers.filter((user) => user.role === "CFO").length);
     
           // Calculate top performing startup
           const validFundingRounds = fundingRoundsResponse.data.filter(round => !round.isDeleted && round.startup && round.capTableInvestors && round.capTableInvestors.length > 0);
@@ -131,14 +131,10 @@ const AdminDashboard = () => {
             acc[startupId] = (acc[startupId] || 0) + round.moneyRaised;
             return acc;
           }, {});
-
-          // Filter out startups with no funding rounds or no investors
           const startupsWithFunding = Object.keys(startupTotalFunding).map(key => parseInt(key));
-
           const topStartupEntry = Object.entries(startupTotalFunding)
             .filter(([id]) => startupsWithFunding.includes(parseInt(id)))
             .sort(([, a], [, b]) => b - a)[0];
-
           if (topStartupEntry) {
             const topStartupId = parseInt(topStartupEntry[0]);
             const topStartup = startupsResponse.data.find(s => s.id === topStartupId);
@@ -163,8 +159,6 @@ const AdminDashboard = () => {
                 ) {
                   const investorId = capTableInvestor.investor.id;
                   const investment = parseFloat(capTableInvestor.totalInvestment) || 0;
-                  
-                  // Add this investment to the investor's running total
                   acc[investorId] = {
                     totalAmount: (acc[investorId]?.totalAmount || 0) + investment,
                     investor: capTableInvestor.investor,
@@ -182,12 +176,8 @@ const AdminDashboard = () => {
             }
             return acc;
           }, {});
-
-          // Sort investors by their total investment amount across all rounds
           const sortedInvestors = Object.entries(investorTotalInvestments)
             .sort(([, a], [, b]) => b.totalAmount - a.totalAmount);
-
-          // Get and set the top investor
           const topInvestorData = sortedInvestors[0];
           if (topInvestorData) {
             setTopInvestor({
@@ -195,7 +185,6 @@ const AdminDashboard = () => {
               totalInvestmentAmount: topInvestorData[1].totalAmount
             });
           }
-            
         } catch (error) {
           console.error("Error fetching dashboard data:", error);
           // You might want to add error state handling here
@@ -207,7 +196,6 @@ const AdminDashboard = () => {
     
       fetchData();
     }, []);
-  
 
   const handleLogout = () => {
     localStorage.removeItem("token");
