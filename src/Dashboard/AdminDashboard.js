@@ -714,7 +714,17 @@ const AdminDashboard = () => {
                               <div style={{ display: "flex",alignItems: "center", }}>
                                 <Avatar variant="square"sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease",
                                     "&:hover": { transform: "scale(1.5)" }, }}
-                                  src={row.avatarUrl}/>{row.ceoName}
+                                    src={
+                                      row.ceo?.profilePicture?.[0]?.data?.data?.length
+                                        ? `data:image/png;base64,${btoa(
+                                            new Uint8Array(row.ceo.profilePicture[0].data.data).reduce(
+                                              (data, byte) => data + String.fromCharCode(byte),
+                                              ""
+                                            )
+                                          )}`
+                                        : "/default-avatar.png"
+                                    }
+                                    />{row.ceoName}
                               </div>
                             </TableCell>
                             <TableCell>{row.companyName}</TableCell>
@@ -823,12 +833,24 @@ const AdminDashboard = () => {
                             <TableCell>
                               <div style={{ display: "flex", alignItems: "center", }}>
                                 <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease",
-                                    "&:hover": { transform: "scale(1.5)" }, }}src={row.avatarUrl}/>{row.ceoName}
+                                    "&:hover": { transform: "scale(1.5)" }, }}
+                                    src={
+                                      row.ceo?.profilePicture?.[0]?.data?.data?.length
+                                        ? `data:image/png;base64,${btoa(
+                                            new Uint8Array(row.ceo.profilePicture[0].data.data).reduce(
+                                              (data, byte) => data + String.fromCharCode(byte),
+                                              ""
+                                            )
+                                          )}`
+                                        : "/default-avatar.png"
+                                    }
+                                    />{row.ceoName}
                               </div>
                             </TableCell>
                             <TableCell>
                               <div style={{ display: "flex", alignItems: "center", }}>
-                                <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" }, }} src={row.companyLogoUrl}/>{row.companyName}
+                                <Avatar variant="square" sx={{ border: "1px solid #336FB0", width: 50, height: 50, mr: 1, transition: "transform 0.3s ease", "&:hover": { transform: "scale(1.5)" }, }} 
+                                  src={profilePictures[`startup_${row.id}`]} />{row.companyName}
                               </div>
                             </TableCell>
                             <TableCell>{row.contactEmail}</TableCell>
