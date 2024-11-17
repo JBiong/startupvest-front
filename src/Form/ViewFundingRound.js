@@ -88,8 +88,8 @@ function ViewFundingRound({ fundingRoundDetails }) {
                     }
                 });
                 setAllInvestors(response.data);
-                // const verifiedInvestors = response.data.filter(investor => investor.user.isVerified);
-                // setAllInvestors(verifiedInvestors);
+                const verifiedInvestors = response.data.filter(investor => investor.user.isVerified);
+                setAllInvestors(verifiedInvestors);
             } catch (error) {
                 console.error('Error fetching investors:', error);
             }
