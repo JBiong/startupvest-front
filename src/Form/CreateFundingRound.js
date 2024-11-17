@@ -80,7 +80,6 @@ function CreateFundingRound({ onSuccess }) {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 });
-                setAllInvestors(response.data);
                 const verifiedInvestors = response.data.filter(investor => investor.user.isVerified);
                 setAllInvestors(verifiedInvestors);
             } catch (error) {
