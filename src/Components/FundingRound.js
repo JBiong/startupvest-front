@@ -269,7 +269,7 @@ export default function FundingRound() {
                   <StyledTableRow key={row.id} onClick={() => handleRowClick(row)}>
                     <StyledTableCell>
                       <StyledStack direction="row" alignItems="center">
-                        <StyledAvatar alt={row.startupName}  variant='rounded'/>
+                        <StyledAvatar alt={row.startupName}  variant='rounded'/> //iwagtang ang profile 
                         {row.startupName}
                       </StyledStack>
                     </StyledTableCell>
