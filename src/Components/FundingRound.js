@@ -269,7 +269,7 @@ export default function FundingRound() {
                   <StyledTableRow key={row.id} onClick={() => handleRowClick(row)}>
                     <StyledTableCell>
                       <StyledStack direction="row" alignItems="center">
-                        <StyledAvatar alt={row.startupName} src={profilePictures[row.id]} variant='rounded'/>
+                        <StyledAvatar alt={row.startupName}  variant='rounded'/>
                         {row.startupName}
                       </StyledStack>
                     </StyledTableCell>
