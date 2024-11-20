@@ -54,7 +54,8 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
     const [anchorEl, setAnchorEl] = useState(null);
 
     const RequiredAsterisk = <span style={{ color: 'red' }}>*</span>;
-    
+    const [loading, setLoading] = useState(false);
+
     // Error State Variables
     const [errors, setErrors] = useState({});
     const [phoneNumberErrorVisible, setPhoneNumberErrorVisible] = useState(false);
@@ -98,10 +99,13 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
         };
 
     const handleCreateProfile = async () => {
+        if (loading) return;
+
         if (!validateFields()) {
             return;
         }
   
+        setLoading(true);
         const formattedContactNumber = formatContactNumberForCountry(phoneNumber);
 
         const profileData = {
@@ -122,6 +126,7 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
             logMessage = `${firstName} ${lastName} profile created successfully.`;
           } else {
             console.error('Invalid profile type:', selectedProfileType);
+            setLoading(false);
             return;
           }
     
@@ -139,9 +144,10 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
             setTimeout(() => {
               setSuccessDialogOpen(false);
               onSuccess();
-            }, 1500);
+            }, 1000);
           } catch (error) {
             console.error('Failed to create profile:', error);
+            setLoading(false);
           }
       };
 
@@ -421,9 +427,10 @@ function CreateBusinessProfile({ onSuccess, companyCount }) {
                         </Grid>
                     </Grid>
                 </Grid>
+
                 <Button variant="contained" sx={{ background: '#336FB0', '&:hover': { boxShadow: '0 0 10px rgba(0,0,0,0.5)', backgroundColor: '#336FB0' }}} 
-                style={{marginLeft: '82.7%'}} onClick={handleCreateProfile}>
-                    Create Profile
+                style={{marginLeft: '82.7%', width: '158px' }} onClick={handleCreateProfile} disabled={loading}>
+                   {loading ? 'Creating...' : 'Create Profile'}
                 </Button>
                 </>
             )}

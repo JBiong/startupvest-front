@@ -269,8 +269,8 @@ function StartupDashboard() {
             // Log recent activity
             const companyName = profileToDelete.companyName || 'Unknown Company';
             await logActivity(
-                `${companyName} profile has been deleted.`,
-                'Startup profile removed successfully.',
+                `Deletion request for ${companyName} submitted.`,
+                'Awaiting admin approval.',
                 fetchRecentActivities
             );
 

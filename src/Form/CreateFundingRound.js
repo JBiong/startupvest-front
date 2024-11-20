@@ -29,7 +29,7 @@ function CreateFundingRound({ onSuccess }) {
     const [minimumShare, setMinimumShare] = useState('');
     const [successDialogOpen, setSuccessDialogOpen] = useState(false);
     const RequiredAsterisk = <span style={{ color: 'red' }}>*</span>;
-    const [openCreateBusinessProfile, setCreateBusinessProfile] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const selectedStartup = startups.find(startup => startup.id === selectedStartupId);
     const selectedCompanyName = selectedStartup ? selectedStartup.companyName : '';
@@ -119,7 +119,13 @@ function CreateFundingRound({ onSuccess }) {
     };
 
     const handleCreateFundingRound = async () => {
-        if (!validateForm()) return;
+        if (loading) return;
+        setLoading(true);
+        
+        if (!validateForm()) {
+            setLoading(false);
+            return;
+        }
 
         try {
             const selectedInvestors = investors
@@ -129,7 +135,6 @@ function CreateFundingRound({ onSuccess }) {
                     title: investor.title,
                     shares: parseInt(parseFormattedNumber(investor.shares), 10)
                 }));
-                console.log("Selected Investors",selectedInvestors);
 
             const moneyRaised = selectedInvestors.reduce((acc, investor) => acc + investor.shares, 0);
             setMoneyRaised(moneyRaised);
@@ -170,6 +175,8 @@ function CreateFundingRound({ onSuccess }) {
             }, 1500);
         } catch (error) {
             console.error('Failed to create funding round:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -430,8 +437,8 @@ function CreateFundingRound({ onSuccess }) {
             </Grid>
 
             <Button variant="contained" sx={{ background: '#336FB0', '&:hover': { boxShadow: '0 0 10px rgba(0,0,0,0.5)', backgroundColor: '#336FB0' } }} 
-            style={{ marginLeft: '80.56%' }} onClick={handleCreateFundingRound}>
-                Create Round
+            style={{ marginLeft: '80.56%', width: '150px' }} onClick={handleCreateFundingRound} disabled={loading}>
+                {loading ? 'Creating...' : 'Create Round'}
             </Button>
 
 

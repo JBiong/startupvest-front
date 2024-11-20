@@ -57,7 +57,7 @@ const ConfirmDeleteDialog = ({ open, onClose, onConfirm, companyName }) => {
       {/* Success Dialog */}
       <Dialog open={deleteSuccessDialogOpen} onClose={() => setDeleteSuccessDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ bgcolor: '#4caf50', color: 'white', mb: 3}}>
-          <Typography variant="h6">Profile Removed</Typography>
+          <Typography variant="h6">Request to Delete Profile</Typography>
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
