@@ -29,7 +29,7 @@ function CreateFundingRound({ onSuccess }) {
     const [minimumShare, setMinimumShare] = useState('');
     const [successDialogOpen, setSuccessDialogOpen] = useState(false);
     const RequiredAsterisk = <span style={{ color: 'red' }}>*</span>;
-    const [openCreateBusinessProfile, setCreateBusinessProfile] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const selectedStartup = startups.find(startup => startup.id === selectedStartupId);
     const selectedCompanyName = selectedStartup ? selectedStartup.companyName : '';
@@ -80,7 +80,8 @@ function CreateFundingRound({ onSuccess }) {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 });
-                setAllInvestors(response.data);
+                const verifiedInvestors = response.data.filter(investor => investor.user.isVerified);
+                setAllInvestors(verifiedInvestors);
             } catch (error) {
                 console.error('Error fetching investors:', error);
             }
@@ -118,7 +119,13 @@ function CreateFundingRound({ onSuccess }) {
     };
 
     const handleCreateFundingRound = async () => {
-        if (!validateForm()) return;
+        if (loading) return;
+        setLoading(true);
+        
+        if (!validateForm()) {
+            setLoading(false);
+            return;
+        }
 
         try {
             const selectedInvestors = investors
@@ -128,7 +135,6 @@ function CreateFundingRound({ onSuccess }) {
                     title: investor.title,
                     shares: parseInt(parseFormattedNumber(investor.shares), 10)
                 }));
-                console.log("Selected Investors",selectedInvestors);
 
             const moneyRaised = selectedInvestors.reduce((acc, investor) => acc + investor.shares, 0);
             setMoneyRaised(moneyRaised);
@@ -169,6 +175,8 @@ function CreateFundingRound({ onSuccess }) {
             }, 1500);
         } catch (error) {
             console.error('Failed to create funding round:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -206,11 +214,6 @@ function CreateFundingRound({ onSuccess }) {
         return value.replace(/,/g, '');
     };
 
-    const handleCloseBusinessProfile = async () => {
-        setCreateBusinessProfile(false);
-        window.location.reload();
-    };
-
     return (
         <Box component="main" sx={{ flexGrow: 1, width: '100%', overflowX: 'hidden', maxWidth: '1000px', background: '#F2F2F2' }}>
             <Typography variant="h5" sx={{ color: '#414a4c', fontWeight: '500', pl: 5, pb: 3 }}>Organization</Typography>
@@ -231,6 +234,7 @@ function CreateFundingRound({ onSuccess }) {
                                     ))}
                                 </Select>
                             </FormControl>
+                            {errors.selectedStartupId && <FormHelperText sx={{color:'red'}}>{errors.selectedStartupId}</FormHelperText>}
                         </Grid>
                     </Grid>
                 </Grid>
@@ -248,7 +252,8 @@ function CreateFundingRound({ onSuccess }) {
                             <FormControl fullWidth variant="outlined" error={!!errors.fundingName}>
                             <TextField fullWidth variant="outlined"
                                 value={fundingName} onChange={(e) => setFundingName(e.target.value)}
-                                sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }} />
+                                sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
+                                error={!!errors.fundingName} />
                             </FormControl>
                             {errors.fundingName && <FormHelperText sx={{color:'red'}}>{errors.fundingName}</FormHelperText>}
                         </Grid>
@@ -432,8 +437,8 @@ function CreateFundingRound({ onSuccess }) {
             </Grid>
 
             <Button variant="contained" sx={{ background: '#336FB0', '&:hover': { boxShadow: '0 0 10px rgba(0,0,0,0.5)', backgroundColor: '#336FB0' } }} 
-            style={{ marginLeft: '80.56%' }} onClick={handleCreateFundingRound}>
-                Create Round
+            style={{ marginLeft: '80.56%', width: '150px' }} onClick={handleCreateFundingRound} disabled={loading}>
+                {loading ? 'Creating...' : 'Create Round'}
             </Button>
 
 

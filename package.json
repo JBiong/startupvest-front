@@ -17,6 +17,7 @@
     "axios": "^1.6.8",
     "chart.js": "^4.4.4",
     "dayjs": "^1.11.13",
+    "libphonenumber-js": "^1.11.14",
     "material-ui-popup-state": "^5.1.2",
     "papaparse": "^5.4.1",
     "react": "^18.2.0",

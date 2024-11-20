@@ -3,11 +3,14 @@ import axios from 'axios';
 import Navbar from '../Navbar/Navbar';
 import genderOptions from '../static/genderOptions';
 import ChangePasswordDialog from '../Dialogs/ChangePasswordDialog';
-import { Box, Typography, Toolbar, TextField, Avatar, Button, Select, MenuItem, Grid, Skeleton, IconButton } from '@mui/material';
+import { Box, Typography, Toolbar, TextField, Avatar, Button, Select, MenuItem, Grid, Skeleton, IconButton, Menu, FormHelperText, InputAdornment } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+
+import countries from '../static/countries';
+import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
 
 const drawerWidth = 250;
 
@@ -35,6 +38,12 @@ function Profile() {
   });
 
   const [profilePicUrl, setProfilePicUrl] = useState('');
+  const [selectedCountryCode, setSelectedCountryCode] = useState(countries[0]);
+  const [contactNumber, setContactNumber] = useState(''); 
+  const [contactNumberErrorVisible, setContactNumberErrorVisible] = useState(false);
+  const [contactNumberError, setContactNumberError] = useState('');
+  const [anchorEl, setAnchorEl] = useState(null);
+
 
   const toggleBio = () => {
     setShowFullBio(!showFullBio); 
@@ -44,11 +53,14 @@ function Profile() {
   useEffect(() => {
     fetchUserData();
     fetchBusinessProfiles();
-    // Call fetchProfilePicture here using the user ID from userData
     if (userData.id) {
-      fetchProfilePicture(userData.id);
+        fetchProfilePicture(userData.id);
+        // Initialize contactNumber from userData.contactNumber if available
+        if (userData.contactNumber) {
+            setContactNumber(userData.contactNumber);  // Set the full contact number including the country code
+        }
     }
-  }, [userData.id]);
+}, [userData.id]);
 
   const fetchUserData = async () => {
     setLoading(true);
@@ -58,6 +70,7 @@ function Profile() {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
       });
       setUserData(response.data);
+      setContactNumber(response.data.contactNumber);
     } catch (error) {
       console.error('Failed to fetch user data:', error);
     } finally {
@@ -139,7 +152,11 @@ function Profile() {
     if (!userData.firstName.trim()) errors.firstName = emptyFieldError;
     if (!userData.lastName.trim()) errors.lastName = emptyFieldError;
     if (!userData.email.trim()) errors.email = emptyFieldError;
-    if (!userData.contactNumber.trim()) errors.contactNumber = emptyFieldError;
+
+    if (!contactNumber || contactNumber.trim() === '' || !validateContactNumber(contactNumber)) {
+      errors.contactNumber = "Please provide a valid phone number";
+    }
+
     if (!userData.gender.trim()) errors.gender = emptyFieldError;
     if (userData.biography && userData.biography.trim().length === 0) {
       errors.biography = emptyFieldError;
@@ -153,27 +170,38 @@ function Profile() {
 
   const handleSaveChanges = async () => {
     if (!validateFields()) return;
-
+  
+    // Check if the contact number is valid before proceeding
+    const formattedContactNumber = formatContactNumberForCountry(contactNumber);
+    if (!formattedContactNumber || formattedContactNumber === selectedCountryCode.dialCode) {
+      setContactNumberError('Please provide a valid phone number.');
+      return;  // Don't proceed if the contact number is invalid or just the dial code
+    }
+  
     try {
-      await updateUser(userData);
+      await updateUser(userData, formattedContactNumber); // Pass formatted contact number
       setIsEditable(false);
     } catch (error) {
       console.error('Failed to update user data:', error);
     }
   };
-
-  const updateUser = async (userData) => {
+  
+  const updateUser = async (userData, formattedContactNumber) => {
     try {
-      const response = await axios.put(`${process.env.REACT_APP_API_URL}/users/${userData.id}`, userData, {
+      // Ensure the updatedUserData includes the full contactNumber
+      const updatedUserData = { ...userData, contactNumber: formattedContactNumber }; 
+  
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/users/${userData.id}`, updatedUserData, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
       });
+  
       console.log('User data updated successfully:', response.data);
-      setUserData(userData); 
+      setUserData(updatedUserData); // Set the updated user data in state
     } catch (error) {
       console.error('Failed to update user data:', error);
       throw error;
     }
-  };
+  };  
 
   const areRequiredFieldsFilled = () => {
     return userData.firstName && userData.lastName && userData.email && userData.contactNumber && userData.gender && 
@@ -186,6 +214,58 @@ function Profile() {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join(' ');
   };
+
+  useEffect(() => {
+    if (contactNumber) {
+        const matchingCountry = countries.find((country) => contactNumber.startsWith(country.dialCode));
+        if (matchingCountry) {
+            setSelectedCountryCode(matchingCountry);
+        }
+    }
+}, [contactNumber]);
+
+  const validateContactNumber = (phoneNumber) => {
+    try {
+      if (!phoneNumber || phoneNumber.trim() === '') {
+        setContactNumberError('Phone number cannot be empty');
+        return false;
+      }
+    
+      const phoneNumberInstance = parsePhoneNumber(phoneNumber, selectedCountryCode.code);
+    
+      if (!phoneNumberInstance.isValid()) {
+        setContactNumberError(`Invalid phone number for ${selectedCountryCode.label}.`);
+        return false;
+      }
+    
+      if (phoneNumberInstance.number === selectedCountryCode.dialCode) {
+        setContactNumberError('Phone number cannot just be the country dial code.');
+        return false;
+      }
+  
+      setContactNumberError('');
+      return true;
+    } catch (error) {
+      setContactNumberError('Invalid phone number format.');
+      return false;
+    }
+  };  
+  
+  const formatContactNumberForCountry = (number) => {
+    try {
+        const phoneNumberInstance = parsePhoneNumber(number, selectedCountryCode.code);
+        return phoneNumberInstance.formatInternational(); 
+    } catch (error) {
+        console.error('Phone number formatting error:', error);
+        return number; 
+    }
+};
+
+  const handleCountrySelect = (country) => {
+    setSelectedCountryCode(country);
+    setContactNumber(''); 
+    setAnchorEl(null);
+};
 
 return (
   <>
@@ -343,14 +423,43 @@ return (
 
 
               <Grid item xs={6}>
-                <label>Phone Number</label>
-                <TextField fullWidth variant="outlined" value={userData.contactNumber}
+                <label>Phone Number <span style={{ color: 'red' }}>*</span></label>
+                <TextField fullWidth name="phoneNumber" placeholder="Enter phone number" type="tel" disabled={!isEditable}
+                  value={contactNumber.replace(selectedCountryCode.dialCode, '')}
+                  sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <IconButton onClick={(e) => setAnchorEl(e.currentTarget)} sx={{ width: 30, height: 30, padding: 2, borderRadius: 1,
+                            fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',}}>
+                          {selectedCountryCode.label} {selectedCountryCode.dialCode}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                   onChange={(e) => {
-                  const numericValue = e.target.value.replace(/[^0-9]/g, '');
-                  setUserData((prevData) => ({ ...prevData, contactNumber: numericValue }));
-                }}
-                error={!!formErrors.contactNumber} helperText={formErrors.contactNumber}
-                InputProps={{ disabled: !isEditable, style: { height: '45px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }, }} />
+                    const numberInput = e.target.value;
+                    const cleanedInput = numberInput.replace(/\D/g, '');
+                    const fullPhoneNumber = `${selectedCountryCode.dialCode}${cleanedInput}`;
+
+                    setContactNumber(fullPhoneNumber);
+                    validateContactNumber(cleanedInput);
+                  }}
+                  error={!!contactNumberError}
+                  onFocus={() => setContactNumberErrorVisible(true)}
+                  onBlur={() => setContactNumberErrorVisible(false)}/>
+
+                {contactNumberError && (
+                  <FormHelperText error>{contactNumberError}</FormHelperText>
+                )}
+
+                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+                  {countries.map((country) => (
+                    <MenuItem key={country.code} onClick={() => handleCountrySelect(country)}>
+                      {country.label} {country.dialCode}
+                    </MenuItem>
+                  ))}
+                </Menu>
               </Grid>
 
               {userData.role === 'Investor' && (

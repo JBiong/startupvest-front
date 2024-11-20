@@ -39,7 +39,7 @@ function FundingRoundTable({
   const getFundingRoundStatus = (closedDate, moneyRaised, targetFunding) => {
     const today = new Date();
 
-    if (moneyRaised > targetFunding) {
+    if (moneyRaised >= targetFunding) {
       return 'Completed';
     }
 
@@ -149,8 +149,8 @@ function FundingRoundTable({
           <FormControl sx={{ minWidth: 200, background: 'white' }}>
             <Select value={selectedStartupFunding} onChange={handleStartupChangeFunding} variant="outlined" 
               sx={{ minWidth: 100, height: '45px' }}>
-              <MenuItem value="All">All</MenuItem>
-              {businessProfiles.filter(profile => profile.type === 'Startup')
+                <MenuItem value="All">All</MenuItem>
+                {businessProfiles.filter(profile => profile.type === 'Startup' && profile.status === 'approved')
                 .map((startup) => (
                   <MenuItem key={startup.id} value={startup.id}>{startup.companyName}</MenuItem>
                 ))}

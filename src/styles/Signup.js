@@ -53,7 +53,7 @@ export const styles = {
     },
   },
   submitButton: {
-    mt: 3,
+    mt: 1,
     mb: 2,
     background: '#f2f2f2',
     textTransform: 'none',

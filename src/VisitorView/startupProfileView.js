@@ -123,10 +123,6 @@ function StartUpView() {
         : 'N/A';
     };
 
-  const streetAddress = startup.streetAddress === "N/A" ? "" : startup.streetAddress || "";
-  const city = startup.city === "N/A" ? "" : startup.city || "";
-  const state = startup.state === "N/A" ? "" : startup.state || "";
-
   return (
     <Box sx={{ width: '100%', paddingLeft: `${drawerWidth}px`, mt: 5 }}>
       <Navbar />
@@ -230,7 +226,16 @@ function StartUpView() {
                             {loading ? (
                               <Skeleton variant="text" width="100%" height={80} />
                             ) : (
+                              <>
                                 <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>{startup.companyDescription}</Typography>
+
+                                <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', mt: 3 }}>
+                                  Should you need additional information, please don’t hesitate to contact us via email at{' '}
+                                  <a href={`mailto:${startup.contactEmail}`} style={{ color: 'inherit', fontWeight: 'bold', textDecoration: 'none' }}>
+                                  {startup.contactEmail}
+                                  </a> or by phone at <span style={{ fontWeight: 'bold',  }}>{startup.phoneNumber}</span>.
+                                </Typography>
+                              </>
                             )}
                         </Grid>
 

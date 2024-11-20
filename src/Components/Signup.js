@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Grid, Typography, TextField, Button, Select, MenuItem, FormControl, InputAdornment, IconButton, Tooltip } from '@mui/material';
+import { Grid, Typography, TextField, Button, Select, MenuItem, FormControl, InputAdornment, IconButton, Menu, FormControlLabel, Checkbox, Tooltip} from '@mui/material';
 import genderOptions from '../static/genderOptions';
 import roleOptions from '../static/roleOptions';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import SignupDialog from '../Dialogs/SignupDialog';
+import countries from '../static/countries';
+import TermsAndConditionsDialog from '../Dialogs/SignupConditionDialog';
+import { parsePhoneNumber, isValidPhoneNumber } from 'libphonenumber-js';
+
 import { styles } from '../styles/Signup';
 
 function Signup() {
@@ -14,6 +18,9 @@ function Signup() {
     const [tooltipVisible, setTooltipVisible] = useState(false);
     const [contactNumberErrorVisible, setContactNumberErrorVisible] = useState(false);
     const [emailErrorVisible, setEmailErrorVisible] = useState(false);
+    const [selectedCountryCode, setSelectedCountryCode] = useState(countries[0]);
+    const [attemptedSubmit, setAttemptedSubmit] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
 
     const navigate = useNavigate();
     const [role, setRole] = useState('CEO');
@@ -23,6 +30,8 @@ function Signup() {
     const [email, setEmail] = useState('');
     const [contactNumber, setContactNumber] = useState('');
     const [startupCode, setStartupCode] = useState('');
+    const [agreeToTerms, setAgreeToTerms] = useState(false);
+    const [openTermsDialog, setOpenTermsDialog] = useState(false);
 
     const [error, setError] = useState('');
     const [contactNumberError, setContactNumberError] = useState('');
@@ -33,7 +42,7 @@ function Signup() {
             length: false,
             hasUpperCase: false,
             hasLowerCase: false,
-            hasNumber: false,
+            hasNumber: false,   
             hasSpecialChar: false,
         },
     });
@@ -79,7 +88,7 @@ function Signup() {
             if (!hasLowerCase) feedbackMessages.push('Must contain at least one lowercase letter.');
             if (!hasNumber) feedbackMessages.push('Must contain at least one number.');
             if (!hasSpecialChar) feedbackMessages.push('Must contain at least one special character.');
-            setPasswordError('Please enter valid password.');
+            setPasswordError('Please follow the password requirements below!');
             return false;
         }
 
@@ -87,34 +96,85 @@ function Signup() {
         return true;
     };
 
+    // Validate phone number based on selected country
     const validateContactNumber = (number) => {
-        const phoneRegex = /^[0-9]{10,15}$/;
-        if (!phoneRegex.test(number)) {
-            setContactNumberError('Enter a valid number (10-15 digits).');
+        try {
+            // Check for Philippines-specific validation
+            if (selectedCountryCode.code === 'PH') {
+                // Philippine numbers should start with a 9
+                if (!number.startsWith('9')) {
+                    setContactNumberError('Philippine phone numbers must start with 9.');
+                    return false;
+                }
+            }
+
+            // Parse phone number using libphonenumber-js for the selected country
+            const phoneNumber = parsePhoneNumber(number, selectedCountryCode.code);
+
+            if (phoneNumber && phoneNumber.isValid()) {
+                setContactNumberError('');
+                return true;
+            }
+            setContactNumberError(`Invalid phone number for ${selectedCountryCode.label}.`);
+            return false;
+        } catch (error) {
+            setContactNumberError(`Invalid phone number format for ${selectedCountryCode.label}.`);
             return false;
         }
-        setContactNumberError('');
-        return true;
     };
-
+    
+    const handleCountryClick = (event) => {
+        setAnchorEl(event.currentTarget);
+      };
+    
+      const handleCountrySelect = (country) => {
+        setSelectedCountryCode(country);
+        setContactNumber('');  // Reset the phone number on country change
+        setAnchorEl(null);
+      };
+    
+      const formatContactNumberForCountry = (number) => {
+        try {
+          const phoneNumber = parsePhoneNumber(number, selectedCountryCode.code);
+          return phoneNumber.formatInternational(); // Formats the phone number in international format
+        } catch (error) {
+          return number;
+        }
+      };
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+        setAttemptedSubmit(true);
+    
+        if (!agreeToTerms) {
+            return;
+        }
+    
+        const contactNumber = e.target.elements.contactNumber.value;
+    
+        // Validate the local format first
+        if (!validateContactNumber(contactNumber)) {
+            return;
+        }
+    
+        // Format the contact number for saving
+        const formattedContactNumber = formatContactNumberForCountry(contactNumber);
+    
         const userData = {
             firstName: e.target.elements.firstName.value,
             lastName: e.target.elements.lastName.value,
             email: e.target.elements.email.value,
-            contactNumber: e.target.elements.contactNumber.value,
+            contactNumber: formattedContactNumber,
             gender: e.target.elements.gender.value,
             password,
             role: role,
             startupCode: role === 'CFO' ? startupCode : '',
         };
-
-        if (!validateEmail(userData.email) || !validatePassword(password) || !validateContactNumber(userData.contactNumber)) {
+    
+        if (!validateEmail(userData.email) || !validatePassword(password)) {
             return;
         }
-
+    
         try {
             const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/register`, userData);
             console.log('Signup successful:', response.data);
@@ -124,7 +184,7 @@ function Signup() {
             console.error('Signup failed:', error);
             setError('Signup failed. Please try again.');
         }
-    };
+    };    
 
     const checkEmailExists = async () => {
         try {
@@ -149,7 +209,7 @@ function Signup() {
     // Detect Windows display scaling (via devicePixelRatio)
     useEffect(() => {
         const handleResize = () => {
-            setIsScaled(window.devicePixelRatio > 1.24); // Detect when scaling is at 125% or higher
+            setIsScaled(window.devicePixelRatio > 1.24);
         };
 
         window.addEventListener('resize', handleResize);
@@ -175,6 +235,14 @@ function Signup() {
         color: '#004A98',
     };
 
+    const handleOpenTermsDialog = () => {
+        setOpenTermsDialog(true);
+    };
+
+    const handleCloseTermsDialog = () => {
+        setOpenTermsDialog(false);
+    };
+
     return (
         <div style={ styles.container }>
             <Grid container>
@@ -187,10 +255,7 @@ function Signup() {
                 </Grid>
 
                 <Grid item xs={12} sm={4} sx={styles.formContainer}>
-                    <Typography variant="h5" component="header" sx={styles.formTitle}>
-                        Create Account
-                    </Typography>
-
+                    <Typography variant="h5" component="header" sx={styles.formTitle}> Create Account</Typography>
                     <form onSubmit={handleSubmit} className="signup-form">
                         <Grid container spacing={1.5} className="signup-details">
                             <Grid item xs={6}>
@@ -253,27 +318,47 @@ function Signup() {
                             </Grid>
 
                             <Grid item xs={6}>
-                                <Typography variant="body2" sx={{ color: '#F2F2F2', fontSize: '16px' }}>Phone Number *</Typography>
-                                <span>
-                                    <TextField fullWidth name="contactNumber" placeholder="09231321889" type="tel" value={contactNumber}
-                                        sx={{ width: '100%', ...adjustedTextFieldStyle, fontSize: '16px' }}
-                                        onChange={(e) => {
-                                            const numberInput = e.target.value;
-                                            const cleanedInput = numberInput.replace(/\D/g, '');
-                                            setContactNumber(cleanedInput);
-                                            validateContactNumber(cleanedInput);
-                                        }}
-                                        error={!!contactNumberError}
-                                        onFocus={() => setContactNumberErrorVisible(true)} 
-                                        onBlur={() => setContactNumberErrorVisible(false)} 
-                                    />
-                                </span>
+                                <Typography variant="body2" sx={{ color: '#F2F2F2' }}>Phone Number *</Typography>
+                                <TextField fullWidth name="contactNumber" placeholder="Enter phone number" type="tel"
+                                    value={contactNumber} sx={{ width: '100%', ...adjustedTextFieldStyle }}
+                                    InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                        <IconButton onClick={handleCountryClick}
+                                            sx={{ width: 30, height: 30, padding: 2, borderRadius: 1, fontSize: '12px', display: 'flex', alignItems: 'center',
+                                            justifyContent: 'center',}}>
+                                            {selectedCountryCode.dialCode}
+                                        </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                    }}
+                                    onChange={(e) => {
+                                    const numberInput = e.target.value;
+                                    const cleanedInput = numberInput.replace(/\D/g, ''); // Strip non-numeric characters
+                                    setContactNumber(cleanedInput);
+                                    validateContactNumber(cleanedInput);
+                                    }}
+                                    error={!!contactNumberError}
+                                    onFocus={() => setContactNumberErrorVisible(true)}
+                                    onBlur={() => setContactNumberErrorVisible(false)} />
+
+                                {/* Error tooltip */}
                                 {contactNumberError && contactNumberErrorVisible && (
-                                    <div style={{ backgroundColor: '#333', color: 'white',  borderRadius: '4px',  padding: '10px',  marginTop: '5px',  fontSize: '14px', 
-                                        position: 'absolute', zIndex: 1000,  }}>
-                                        {contactNumberError}
+                                    <div
+                                    style={{ backgroundColor: '#333', color: 'white', borderRadius: '4px', padding: '10px', marginTop: '5px', fontSize: '14px', position: 'absolute',
+                                        zIndex: 1000, }}>
+                                    {contactNumberError}
                                     </div>
                                 )}
+
+                                {/* Country selection menu */}
+                                <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+                                    {countries.map((country) => (
+                                    <MenuItem key={country.code} onClick={() => handleCountrySelect(country)}>
+                                        {country.label} {country.dialCode}
+                                    </MenuItem>
+                                    ))}
+                                </Menu>
                             </Grid>
                             
                             <Grid item xs={6}>
@@ -320,9 +405,11 @@ function Signup() {
                                             e.preventDefault();
                                         }}/>
                                 </span>
-                                {tooltipVisible && ( 
-                                    <div style={{ backgroundColor: '#333',  color: 'white',  borderRadius: '4px',  padding: '10px', marginTop: '5px', fontSize: '14px',  
-                                        position: 'absolute',  zIndex: 1000, }}>
+                                {tooltipVisible && (
+                                    <div style={{ backgroundColor: '#333', color: 'white', borderRadius: '4px', padding: '10px', marginTop: '5px', fontSize: '14px', position: 'absolute', zIndex: 1000 }}>
+                                        {passwordError && (
+                                            <div style={{ color: 'salmon', marginBottom: '5px' }}>{passwordError}</div>
+                                        )}
                                         <div style={{ color: passwordValidation.feedback.length ? 'lightgreen' : 'white' }}>
                                             Must be at least 8 characters long.
                                         </div>
@@ -340,9 +427,25 @@ function Signup() {
                                         </div>
                                     </div>
                                 )}
-                                {passwordError && (
-                                    <Typography variant="body2" sx={{ color: 'white', fontSize: '14px' }}>{passwordError}</Typography>
-                                )}
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <Tooltip title="You need to agree to the terms and conditions" open={attemptedSubmit && !agreeToTerms} placement="bottom" arrow>
+                                    <span>
+                                        <FormControlLabel control={
+                                                <Checkbox checked={agreeToTerms} onChange={() => setAgreeToTerms(!agreeToTerms)}
+                                                    sx={{ color: '#f2f2f2', '&.Mui-checked': { color: '#f2f2f2' }, }}/>
+                                            }
+                                            label={
+                                                <>
+                                                    I agree to the{' '}
+                                                    <span onClick={handleOpenTermsDialog} style={{ fontWeight: 'bold', cursor: 'pointer'}}>
+                                                        Terms and Conditions
+                                                    </span>
+                                                </>
+                                            } sx={{ color: 'white' }} />
+                                    </span>
+                                </Tooltip>
                             </Grid>
                         </Grid>
 
@@ -361,6 +464,7 @@ function Signup() {
             </Grid>
             
             <SignupDialog open={openDialog} handleClose={handleCloseDialog} email={email} />
+            <TermsAndConditionsDialog open={openTermsDialog} handleClose={handleCloseTermsDialog} />
         </div>
     );
 }

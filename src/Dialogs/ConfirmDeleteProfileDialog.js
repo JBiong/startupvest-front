@@ -36,7 +36,7 @@ const ConfirmDeleteDialog = ({ open, onClose, onConfirm, companyName }) => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete the profile for <strong>{companyName}</strong>? This action cannot be undone.
+            Are you sure you want to delete the profile for <strong>{companyName}</strong>? This action is irreversible. Please confirm to proceed.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -57,11 +57,11 @@ const ConfirmDeleteDialog = ({ open, onClose, onConfirm, companyName }) => {
       {/* Success Dialog */}
       <Dialog open={deleteSuccessDialogOpen} onClose={() => setDeleteSuccessDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ bgcolor: '#4caf50', color: 'white', mb: 3}}>
-          <Typography variant="h6">Profile Removed</Typography>
+          <Typography variant="h6">Request to Delete Profile</Typography>
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            The profile for <strong>{companyName}</strong> has been successfully deleted.
+            Your request to delete the profile for <strong>{companyName}</strong> has been submitted. Please wait for admin approval before the deletion is finalized.
           </DialogContentText>
         </DialogContent>
         <DialogActions>

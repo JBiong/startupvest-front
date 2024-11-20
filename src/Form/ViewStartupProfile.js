@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import industries from '../static/industries';
 import quantityOptions from '../static/quantityOptions';
-import { Box, Typography, TextField, Avatar, Select, MenuItem, Grid, FormControl, FormHelperText, Button, Autocomplete} from '@mui/material';
-
+import { Box, Typography, TextField, Avatar, Select, MenuItem, Grid, FormControl, FormHelperText, Button, Autocomplete, Menu, IconButton, InputAdornment} from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
+
+import { parsePhoneNumber } from 'libphonenumber-js';
+import countries from '../static/countries';
 
 import axios from 'axios';
 
@@ -38,9 +40,29 @@ function ViewStartupProfile({ profile }) {
     const [instagram, setInstagram] = useState(profile ? profile.instagram : '');
     const [linkedIn, setLinkedIn] = useState(profile ? profile.linkedIn : '');
     
-    const contactEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneNumberRegex = /^[0-9]{10,15}$/;
+    const [selectedCountryCode, setSelectedCountryCode] = useState(countries[0]);
+    const [phoneNumberErrorVisible, setPhoneNumberErrorVisible] = useState(false);
+    const [phoneNumberError, setPhoneNumberError] = useState('');
+    const [anchorEl, setAnchorEl] = useState(null);
 
+    const contactEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Phone number validation function
+    const validatePhoneNumber = (number, countryCode) => {
+      try {
+          const phoneNumberInstance = parsePhoneNumber(number, countryCode);
+
+          // Check if the phone number is valid for the selected country
+          if (!phoneNumberInstance.isValid()) {
+              return 'Invalid phone number.';
+          }
+
+          return ''; // No error if valid
+      } catch (error) {
+          return 'Invalid phone number format.';
+      }
+  };
+  
     const handleAvatarClick = (event) => {
         event.preventDefault(); 
         event.stopPropagation();
@@ -87,9 +109,12 @@ function ViewStartupProfile({ profile }) {
         if (!numberOfEmployees.trim()) newErrors.numberOfEmployees = emptyFieldError;
         
         if (!phoneNumber.trim()) 
-            newErrors.phoneNumber = emptyFieldError;
-        else if (!phoneNumberRegex.test(phoneNumber)) 
-            newErrors.phoneNumber = 'Enter a valid phone number (10-15 digits).';
+          newErrors.phoneNumber = emptyFieldError;
+        else {
+            const phoneNumberError = validatePhoneNumber(phoneNumber, country);
+            if (phoneNumberError) newErrors.phoneNumber = phoneNumberError;
+        }
+
         if (!contactEmail.trim()) {
                 newErrors.contactEmail = emptyFieldError;
         } else if (!contactEmailRegex.test(contactEmail)) {
@@ -113,7 +138,8 @@ function ViewStartupProfile({ profile }) {
             }
 
             setIsLoading(true);
-    
+            const formattedContactNumber = formatContactNumberForCountry(phoneNumber);
+
             try {
                 const profileData = {
                     streetAddress: streetAddress,
@@ -132,7 +158,7 @@ function ViewStartupProfile({ profile }) {
                     foundedDate: formattedDateString,
                     typeOfCompany: typeOfCompany,
                     numberOfEmployees: numberOfEmployees,
-                    phoneNumber: phoneNumber,
+                    phoneNumber: formattedContactNumber,
                     contactEmail: contactEmail,
                     industry: industry,    
                 
@@ -182,7 +208,6 @@ function ViewStartupProfile({ profile }) {
         }
       };
       
-
       const fetchProfilePicture = async () => {
         try {
           const response = await axios.get(`${process.env.REACT_APP_API_URL}/profile-picture/startup/${profile.id}`, {
@@ -204,6 +229,46 @@ function ViewStartupProfile({ profile }) {
           fetchProfilePicture();
         }
       }, [profile.id]);
+
+      useEffect(() => {
+        if (phoneNumber) {
+            const matchingCountry = countries.find((country) => phoneNumber.startsWith(country.dialCode));
+            if (matchingCountry) {
+                setSelectedCountryCode(matchingCountry);
+            }
+        }
+    }, [phoneNumber]);
+
+    const validateContactNumber = (phoneNumber) => {
+        try {
+            const phoneNumberInstance = parsePhoneNumber(phoneNumber, selectedCountryCode.code);
+            if (!phoneNumberInstance.isValid()) {
+                setPhoneNumberError(`Invalid phone number for ${selectedCountryCode.label}.`);
+                return false;
+            }
+            setPhoneNumberError('');
+            return true;
+        } catch (error) {
+            setPhoneNumberError('Invalid phone number format.');
+            return false;
+        }
+    };
+
+    const formatContactNumberForCountry = (number) => {
+      try {
+          const phoneNumberInstance = parsePhoneNumber(number, selectedCountryCode.code);
+          return phoneNumberInstance.formatInternational();
+      } catch (error) {
+          console.error('Phone number formatting error:', error);
+          return number;
+      }
+  };
+
+  const handleCountrySelect = (country) => {
+    setSelectedCountryCode(country);
+    setPhoneNumber(''); 
+    setAnchorEl(null);
+  };
 
     return (
       <>
@@ -350,30 +415,45 @@ function ViewStartupProfile({ profile }) {
                   </Grid>
 
                   <Grid item xs={6}>
-                    <label>Phone Number {RequiredAsterisk}</label>
-                    <TextField
-                      fullWidth
-                      variant="outlined"
-                      value={phoneNumber}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (/^\d*$/.test(value) && value.length <= 15) {
-                          setPhoneNumber(value);
-                          validateFields();
-                        }
-                      }}
-                      disabled={!isEditable}
-                      sx={{
-                        height: "45px",
-                        "& .MuiInputBase-root": { height: "45px" },
-                      }}
-                      error={!!errors.phoneNumber}
-                    />
-                    {errors.phoneNumber && (
-                      <FormHelperText error>
-                        {errors.phoneNumber}
-                      </FormHelperText>
+                    <label>Phone Number <span style={{ color: 'red' }}>*</span></label>
+                    <TextField fullWidth name="phoneNumber" placeholder="Enter phone number" type="tel" disabled={!isEditable}
+                        value={phoneNumber.replace(selectedCountryCode.dialCode, '')}
+                        sx={{ height: '45px', '& .MuiInputBase-root': { height: '45px' } }}
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <IconButton
+                                        onClick={(e) => setAnchorEl(e.currentTarget)}
+                                        sx={{ width: 30, height: 30, padding: 2, borderRadius: 1, fontSize: '12px', display: 'flex', 
+                                          alignItems: 'center', justifyContent: 'center', }}>
+                                        {selectedCountryCode.label} {selectedCountryCode.dialCode}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                        onChange={(e) => {
+                            const numberInput = e.target.value;
+                            const cleanedInput = numberInput.replace(/\D/g, '');
+                            const fullPhoneNumber = `${selectedCountryCode.dialCode}${cleanedInput}`;
+                            
+                            setPhoneNumber(fullPhoneNumber);
+                            validateContactNumber(cleanedInput);
+                        }}
+                        error={!!phoneNumberError}
+                        onFocus={() => setPhoneNumberErrorVisible(true)}
+                        onBlur={() => setPhoneNumberErrorVisible(false)} />
+
+                    {phoneNumberError && (
+                        <FormHelperText error>{phoneNumberError}</FormHelperText>
                     )}
+
+                    <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+                        {countries.map((country) => (
+                            <MenuItem key={country.code} onClick={() => handleCountrySelect(country)}>
+                                {country.label} {country.dialCode}
+                            </MenuItem>
+                        ))}
+                    </Menu>
                   </Grid>
 
                   <Grid item xs={12}>
