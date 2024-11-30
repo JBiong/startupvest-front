@@ -116,7 +116,6 @@ export default function Companies() {
         );
         setRows(approvedStartups);
         setFilteredRows(approvedStartups);
-        fetchAllProfilePictures(approvedStartups);
         setLoading(false);
       })
       .catch((error) => {
@@ -125,29 +124,35 @@ export default function Companies() {
       });
   }, []);
 
-  // Function to fetch all profile pictures for startups
-  const fetchAllProfilePictures = async (startups) => {
-    const pictures = {};
-    await Promise.all(
-      startups.map(async (startup) => {
-        try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/profile-picture/startup/${startup.id}`, {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
-            responseType: 'blob', 
-          });
+  // Fetch profile picture for a single startup
+  const fetchProfilePicture = async (startupId) => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/profile-picture/startup/${startupId}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        },
+        responseType: 'blob', 
+      });
 
-          const imageUrl = URL.createObjectURL(response.data); 
-          pictures[startup.id] = imageUrl;
-        } catch (error) {
-          console.error(`Failed to fetch profile picture for startup ID ${startup.id}:`, error);
-        }
-      })
-    );
-
-    setProfilePictures(pictures); 
+      const imageUrl = URL.createObjectURL(response.data);
+      setProfilePictures(prev => ({
+        ...prev,
+        [startupId]: imageUrl
+      }));
+    } catch (error) {
+      console.error(`Failed to fetch profile picture for startup ID ${startupId}:`, error);
+    }
   };
+
+  useEffect(() => {
+    // Reset profile pictures when page changes
+    setProfilePictures({});
+
+    // Fetch pictures only for visible rows
+    visibleRows.forEach(row => {
+      fetchProfilePicture(row.id);
+    });
+  }, [page, filteredRows, rowsPerPage, order, orderBy]);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
