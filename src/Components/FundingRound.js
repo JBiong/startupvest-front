@@ -165,7 +165,6 @@ export default function FundingRound() {
           
         setRows(fetchedRows);
         setFilteredRows(fetchedRows);
-        await fetchAllProfilePictures(response.data); 
       } catch (error) {
         console.error('Error fetching funding rounds:', error);
       } finally {
@@ -176,34 +175,40 @@ export default function FundingRound() {
     fetchFundingRounds();
   }, []);
   
-  const fetchAllProfilePictures = async (fundingRounds) => {
-    const pictures = {};
-    await Promise.all(
-      fundingRounds.map(async (fundingRound) => {
-        const startupId = fundingRound.startup?.id;
-        if (!startupId) return
+  const handleRowClick = (fundinground) => {
+    // Fetch the profile picture for this specific funding round
+    const fetchProfilePicture = async () => {
+      if (!fundinground.startupId) {
+        navigate(`/fundingroundview`, { state: { fundinground } });
+        return;
+      }
   
-        try {
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/profile-picture/startup/${startupId}`, {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/profile-picture/startup/${fundinground.startupId}`, 
+          {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`,
             },
             responseType: 'blob',
-          });
+          }
+        );
   
-          const imageUrl = URL.createObjectURL(response.data); 
-          pictures[fundingRound.id] = imageUrl; 
-        } catch (error) {
-          console.error(`Failed to fetch profile picture for startup ID ${startupId}:`, error);
-        }
-      })
-    );
-    setProfilePictures(pictures); 
+        const avatarUrl = URL.createObjectURL(response.data);
+        navigate(`/fundingroundview`, { 
+          state: { 
+            fundinground, 
+            avatarUrl 
+          } 
+        });
+      } catch (error) {
+        console.error('Failed to fetch profile picture:', error);
+        navigate(`/fundingroundview`, { state: { fundinground } });
+      }
+    };
+  
+    fetchProfilePicture();
   };
-  
-  const handleRowClick = (fundinground) => {
-    navigate(`/fundingroundview`, { state: { fundinground } });
-  };  
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -269,7 +274,7 @@ export default function FundingRound() {
                   <StyledTableRow key={row.id} onClick={() => handleRowClick(row)}>
                     <StyledTableCell>
                       <StyledStack direction="row" alignItems="center">
-                        <StyledAvatar alt={row.startupName}  variant='rounded'/> //iwagtang ang profile 
+                        {/* <StyledAvatar alt={row.startupName}  variant='rounded'/> //iwagtang ang profile  */}
                         {row.startupName}
                       </StyledStack>
                     </StyledTableCell>

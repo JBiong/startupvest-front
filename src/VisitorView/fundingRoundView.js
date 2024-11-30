@@ -33,6 +33,13 @@ function FundingRoundView() {
       }
 
       try {
+        // Check if the profile picture is already in the location state
+        if (location.state?.avatarUrl) {
+          setAvatarUrl(location.state.avatarUrl);
+          setLoading(false);
+          return;
+        }
+
         const response = await axios.get(
           `${process.env.REACT_APP_API_URL}/profile-picture/startup/${fundinground.startupId}`,
           {
@@ -59,7 +66,7 @@ function FundingRoundView() {
     };
 
     fetchProfilePicture();
-  }, [fundinground]);
+  }, [fundinground, location.state]);
 
   const handlePageChange = (event, newPage) => {
     setCurrentPage(newPage);
