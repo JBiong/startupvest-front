@@ -112,7 +112,7 @@ function UserProfileView() {
                         {loading ? (
                           <Skeleton variant="text" width="100%" />
                         ) : (
-                          <Typography variant="body1">{locationDisplay}</Typography>
+                          <Typography variant="body1">{profile.locationName}</Typography>
                         )}
                       </Grid>
 

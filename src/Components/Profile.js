@@ -465,7 +465,8 @@ return (
               {userData.role === 'Investor' && (
                 <Grid item xs={12}>
                   <label>Location</label>
-                  <TextField disabled fullWidth variant="outlined" InputProps={{ style: { height: '45px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', }, }} />
+                  <TextField disabled fullWidth variant="outlined" value={userData.locationName || ''} 
+                    InputProps={{ style: { height: '45px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)', }, }} />
                 </Grid>
               )}
 
