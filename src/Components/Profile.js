@@ -35,6 +35,7 @@ function Profile() {
     instagram: '',
     twitter: '',
     linkedIn: '',
+    locationName:''
   });
 
   const [profilePicUrl, setProfilePicUrl] = useState('');
