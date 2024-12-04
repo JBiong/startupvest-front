@@ -43,6 +43,7 @@ function Profile() {
   const [contactNumberErrorVisible, setContactNumberErrorVisible] = useState(false);
   const [contactNumberError, setContactNumberError] = useState('');
   const [anchorEl, setAnchorEl] = useState(null);
+  const [locationName, setLocationName] = useState(''); 
 
 
   const toggleBio = () => {
@@ -54,6 +55,7 @@ function Profile() {
     fetchUserData();
     fetchBusinessProfiles();
     if (userData.id) {
+        fetchInvestorData(userData.id)
         fetchProfilePicture(userData.id);
         // Initialize contactNumber from userData.contactNumber if available
         if (userData.contactNumber) {
@@ -77,6 +79,23 @@ function Profile() {
       setLoading(false);
     }
   };
+
+  const fetchInvestorData = async () => {
+    setLoading(true);
+
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/investors/all`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      });
+      setLocationName(response.data.locationName);
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  
 
   const fetchBusinessProfiles = async () => {
     setLoading(true);
